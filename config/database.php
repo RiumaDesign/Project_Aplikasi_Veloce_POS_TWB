@@ -120,16 +120,73 @@ date_default_timezone_set('Asia/Jakarta');
 $conn->set_charset("utf8mb4");
 @$conn->query("SET time_zone = '+07:00'");
 
-// Otomatis inisialisasi skema jika database di cloud masih kosong (First Run Seeding)
-if ($conn && !$conn->connect_error) {
-    $check_tables = @$conn->query("SHOW TABLES LIKE 'produk'");
-    if ($check_tables && $check_tables->num_rows === 0) {
-        $sql_file = __DIR__ . '/../database/veloce_pos_latest.sql';
-        if (file_exists($sql_file)) {
-            $sql_content = file_get_contents($sql_file);
-            @$conn->multi_query($sql_content);
-            while (@$conn->next_result()) {;} // flush
+/**
+ * Fungsi Impor Otomatis Skema & Master Data Awal (First-Run Seeding)
+ */
+function import_default_database($db) {
+    if (!$db || $db->connect_error) return false;
+
+    $sql_file = __DIR__ . '/../database/veloce_pos_latest.sql';
+    if (file_exists($sql_file)) {
+        $sql_content = file_get_contents($sql_file);
+        if (!empty($sql_content)) {
+            @$db->query("SET FOREIGN_KEY_CHECKS = 0");
+            if (@$db->multi_query($sql_content)) {
+                do {
+                    if ($result = $db->store_result()) {
+                        $result->free();
+                    }
+                } while ($db->more_results() && $db->next_result());
+            } else {
+                // Fallback per-query execution
+                $queries = explode(";\n", $sql_content);
+                foreach ($queries as $q) {
+                    $trimmed = trim($q);
+                    if (!empty($trimmed) && strpos($trimmed, '--') !== 0) {
+                        @$db->query($trimmed);
+                    }
+                }
+            }
+            @$db->query("SET FOREIGN_KEY_CHECKS = 1");
         }
+    }
+
+    // Safety net: Pastikan data default kasir & lokasi terisi jika masih kosong
+    $check_k = @$db->query("SELECT COUNT(*) AS total FROM `kasir`");
+    if ($check_k && intval($check_k->fetch_assoc()['total']) === 0) {
+        @$db->query("INSERT IGNORE INTO `kasir` (`id`, `nama`, `password`, `role`) VALUES 
+            (1, 'Budi Santoso', 'kasir123', 'kasir'),
+            (2, 'Siti Rahma', 'kasir123', 'kasir'),
+            (3, 'Andi Wijaya', 'kasir123', 'kasir'),
+            (4, 'Admin', 'admin123', 'admin')");
+    }
+
+    $check_l = @$db->query("SELECT COUNT(*) AS total FROM `locations`");
+    if ($check_l && intval($check_l->fetch_assoc()['total']) === 0) {
+        @$db->query("INSERT IGNORE INTO `locations` (`id`, `code`, `name`, `type`, `status`) VALUES
+            (1, 'WH-CENTRAL', 'Gudang Pusat Borobudur', 'warehouse', 'active'),
+            (2, 'OUT-MUSEUM', 'Outlet Museum Samudra Raksa', 'outlet', 'active'),
+            (3, 'OUT-BARAT', 'Outlet Refreshment Barat', 'outlet', 'active'),
+            (6, 'VM-01', 'Vending Machine 1', 'vm', 'active'),
+            (7, 'VM-02', 'Vending Machine 2', 'vm', 'active'),
+            (8, 'VM-03', 'Vending Machine 3', 'vm', 'active'),
+            (9, 'VM-04', 'Vending Machine 4', 'vm', 'active'),
+            (10, 'VM-05', 'Vending Machine 5', 'vm', 'active'),
+            (11, 'VM-06', 'Vending Machine 6', 'vm', 'active'),
+            (12, 'VM-07', 'Vending Machine 7', 'vm', 'active'),
+            (13, 'VM-08', 'Vending Machine 8', 'vm', 'active'),
+            (50, 'VM-09', 'Vending Machine 9', 'vm', 'active')");
+    }
+
+    return true;
+}
+
+// Inisialisasi otomatis jika tabel kasir belum ada atau belum berisi data
+if ($conn && !$conn->connect_error) {
+    $check_kasir = @$conn->query("SELECT COUNT(*) AS total FROM `kasir`");
+    $kasir_count = ($check_kasir) ? intval($check_kasir->fetch_assoc()['total']) : 0;
+    if (!$check_kasir || $kasir_count === 0) {
+        import_default_database($conn);
     }
 }
 

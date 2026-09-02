@@ -51,6 +51,29 @@ if ($outlets_res) {
         $outlets_list[] = $l;
     }
 }
+
+// 3. Jika data masih kosong di database cloud, jalankan seeder otomatis dan ambil ulang datanya
+if (empty($kasir_list) || empty($outlets_list)) {
+    if (function_exists('import_default_database')) {
+        import_default_database($conn);
+    }
+    // Refresh daftar kasir
+    $kasir_list_res = $conn->query("SELECT id, nama, role FROM `kasir` WHERE `role` = 'kasir' OR `role` IS NULL ORDER BY `nama` ASC");
+    $kasir_list = [];
+    if ($kasir_list_res) {
+        while ($k = $kasir_list_res->fetch_assoc()) {
+            $kasir_list[] = $k;
+        }
+    }
+    // Refresh daftar outlet
+    $outlets_res = $conn->query("SELECT id, code, name, type FROM locations WHERE type IN ('outlet', 'vm', 'pos') AND status = 'active' ORDER BY type ASC, code ASC");
+    $outlets_list = [];
+    if ($outlets_res) {
+        while ($l = $outlets_res->fetch_assoc()) {
+            $outlets_list[] = $l;
+        }
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
