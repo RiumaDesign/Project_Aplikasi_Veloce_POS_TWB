@@ -23,12 +23,37 @@
             </div>
         </div>
 
-        <div id="input-tunai-wrapper">
-            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Nominal Diterima (Rp)</label>
-            <input type="number" id="nominal-bayar" onkeyup="hitungKembalian()" placeholder="Masukan nominal uang" class="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-3 text-sm text-white font-bold outline-none focus:border-blue-500">
-            <div class="flex justify-between text-xs mt-2 text-slate-400 font-medium">
-                <span>Kembalian:</span>
-                <span id="kembalian-display" class="font-bold text-white">Rp 0</span>
+        <div id="input-tunai-wrapper" class="space-y-2">
+            <div class="flex items-center justify-between">
+                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Nominal Uang Diterima (Rp)</label>
+                <button type="button" onclick="isiNominalCepat('pas')" class="text-[11px] font-bold text-blue-400 hover:text-blue-300 cursor-pointer">
+                    [⚡ Uang Pas]
+                </button>
+            </div>
+            <input type="number" id="nominal-bayar" onkeyup="hitungKembalian()" placeholder="Masukan nominal uang" class="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-3 text-sm text-white font-black outline-none focus:border-blue-500 shadow-sm transition">
+
+            <!-- Tombol Cepat Pecahan Uang Tunai (Quick Cash Buttons) -->
+            <div class="grid grid-cols-5 gap-1.5 pt-0.5">
+                <button type="button" onclick="isiNominalCepat('pas')" class="py-2 px-1 rounded-xl text-[11px] font-black transition border cursor-pointer bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 border-blue-500/30 text-center truncate">
+                    Pas
+                </button>
+                <button type="button" onclick="isiNominalCepat(10000)" class="py-2 px-1 rounded-xl text-[11px] font-bold transition border cursor-pointer bg-slate-800 hover:bg-slate-700 text-slate-200 border-white/10 text-center">
+                    10k
+                </button>
+                <button type="button" onclick="isiNominalCepat(20000)" class="py-2 px-1 rounded-xl text-[11px] font-bold transition border cursor-pointer bg-slate-800 hover:bg-slate-700 text-slate-200 border-white/10 text-center">
+                    20k
+                </button>
+                <button type="button" onclick="isiNominalCepat(50000)" class="py-2 px-1 rounded-xl text-[11px] font-bold transition border cursor-pointer bg-slate-800 hover:bg-slate-700 text-slate-200 border-white/10 text-center">
+                    50k
+                </button>
+                <button type="button" onclick="isiNominalCepat(100000)" class="py-2 px-1 rounded-xl text-[11px] font-bold transition border cursor-pointer bg-slate-800 hover:bg-slate-700 text-slate-200 border-white/10 text-center">
+                    100k
+                </button>
+            </div>
+
+            <div class="flex justify-between items-center text-xs pt-1 text-slate-400 font-medium">
+                <span class="font-bold">Kembalian:</span>
+                <span id="kembalian-display" class="font-mono font-black text-sm text-emerald-400">Rp 0</span>
             </div>
         </div>
 
@@ -67,6 +92,14 @@
                 <div class="flex justify-between text-slate-600 text-[11px]">
                     <span>Metode Pembayaran:</span>
                     <span id="nota-metode" class="font-bold text-slate-800"></span>
+                </div>
+                <div class="flex justify-between text-slate-600 text-[11px]" id="nota-row-tunai">
+                    <span>Tunai Diterima:</span>
+                    <span id="nota-uang-diterima" class="font-mono font-bold text-slate-800">Rp 0</span>
+                </div>
+                <div class="flex justify-between text-slate-600 text-[11px]" id="nota-row-kembalian">
+                    <span class="font-bold text-slate-900">Kembalian:</span>
+                    <span id="nota-kembalian" class="font-mono font-black text-emerald-700">Rp 0</span>
                 </div>
             </div>
 

@@ -20,12 +20,19 @@ if (!function_exists('proses_transaksi_kasir')) {
             return ['status' => 'error', 'message' => 'Keranjang transaksi kosong!'];
         }
 
+        $uang_diterima = intval($post_data['uang_diterima'] ?? 0);
+        $kembalian = intval($post_data['kembalian'] ?? 0);
+        if ($metode === 'QRIS' && $uang_diterima <= 0) {
+            $uang_diterima = $total_harga;
+            $kembalian = 0;
+        }
+
         $conn->begin_transaction();
 
         try {
-            // 1. Simpan Header Transaksi
-            $query_tx = "INSERT INTO `transaksi` (`id_transaksi`, `tanggal`, `waktu`, `petugas`, `outlet_id`, `pos_aktif`, `metode`, `item_singkat`, `total_harga`) 
-                         VALUES ('$id_transaksi', '$tanggal', '$waktu', '$petugas', $outlet_id, '$pos_aktif', '$metode', '$items_str', $total_harga)";
+            // 1. Simpan Header Transaksi (Termasuk Nominal Uang Diterima & Kembalian)
+            $query_tx = "INSERT INTO `transaksi` (`id_transaksi`, `tanggal`, `waktu`, `petugas`, `outlet_id`, `pos_aktif`, `metode`, `item_singkat`, `total_harga`, `uang_diterima`, `kembalian`) 
+                         VALUES ('$id_transaksi', '$tanggal', '$waktu', '$petugas', $outlet_id, '$pos_aktif', '$metode', '$items_str', $total_harga, $uang_diterima, $kembalian)";
             if (!$conn->query($query_tx)) {
                 throw new Exception("Gagal mencatat header transaksi: " . $conn->error);
             }
@@ -77,7 +84,11 @@ if (!function_exists('proses_transaksi_kasir')) {
                 'message' => 'Transaksi berhasil diproses!',
                 'id_transaksi' => $id_transaksi,
                 'tanggal' => $tanggal,
-                'waktu' => $waktu
+                'waktu' => $waktu,
+                'total_harga' => $total_harga,
+                'uang_diterima' => $uang_diterima,
+                'kembalian' => $kembalian,
+                'metode' => $metode
             ];
 
         } catch (Exception $e) {

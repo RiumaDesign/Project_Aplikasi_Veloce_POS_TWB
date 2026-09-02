@@ -138,6 +138,19 @@ function bukaModalBayar() {
     bukaModal('modal-bayar');
 }
 
+/**
+ * Tombol Cepat Pecahan Uang Tunai (Quick Cash Buttons)
+ */
+function isiNominalCepat(val) {
+    const total = hitungTotal();
+    if (val === 'pas') {
+        document.getElementById('nominal-bayar').value = total;
+    } else {
+        document.getElementById('nominal-bayar').value = Number(val);
+    }
+    hitungKembalian();
+}
+
 function pilihMetode(metode) {
     metodeTerpilih = metode;
     const btnCash = document.getElementById('btn-metode-cash');
@@ -163,30 +176,38 @@ function hitungKembalian() {
 
     if (kembalian < 0) {
         kembalianEl.innerText = 'Kurang ' + formatRupiah(Math.abs(kembalian));
-        kembalianEl.className = 'font-bold text-rose-400';
+        kembalianEl.className = 'font-mono font-black text-sm text-rose-400';
     } else {
         kembalianEl.innerText = formatRupiah(kembalian);
-        kembalianEl.className = 'font-bold text-emerald-400';
+        kembalianEl.className = 'font-mono font-black text-sm text-emerald-400';
     }
 }
 
 function prosesSimpanTransaksi() {
     const total = hitungTotal();
-    const bayar = Number(document.getElementById('nominal-bayar').value) || 0;
+    let bayar = Number(document.getElementById('nominal-bayar').value) || 0;
 
     if (metodeTerpilih === 'Cash' && bayar < total) {
         window.VeloceApp.showToast('Uang pembayaran masih kurang!', 'warning');
         return;
     }
 
-    const itemsRingkas = cart.map(i => `${i.qty}x ${i.nama}`).join(', ');
+    if (metodeTerpilih === 'QRIS') {
+        bayar = total;
+    }
+
+    const kembalian = Math.max(0, bayar - total);
+    const purchasedItems = cart.map(i => ({ ...i }));
+    const itemsRingkas = purchasedItems.map(i => `${i.qty}x ${i.nama}`).join(', ');
 
     const payload = new FormData();
     payload.append('action', 'simpan_transaksi');
     payload.append('items', itemsRingkas);
     payload.append('total_harga', total);
+    payload.append('uang_diterima', bayar);
+    payload.append('kembalian', kembalian);
     payload.append('metode', metodeTerpilih);
-    payload.append('detail_items', JSON.stringify(cart));
+    payload.append('detail_items', JSON.stringify(purchasedItems));
 
     const btn = document.getElementById('btn-proses-transaksi');
     btn.disabled = true;
@@ -202,11 +223,57 @@ function prosesSimpanTransaksi() {
         btn.innerHTML = '<span>Selesaikan & Cetak Nota</span> <span>✓</span>';
 
         if (res.status === 'success') {
+            // 1. Kurangi stok visual di product grid secara lokal tanpa reload layar
+            purchasedItems.forEach(item => {
+                const btnItem = document.querySelector(`.item-produk button[onclick*="tambahKeKeranjang(${item.id},"]`);
+                if (btnItem) {
+                    const card = btnItem.closest('.item-produk');
+                    if (card) {
+                        const badgeSisa = card.querySelector('.badge-sisa-stok');
+                        if (badgeSisa) {
+                            const cur = parseInt(badgeSisa.innerText.replace(/\D/g, '')) || 0;
+                            const nextVal = Math.max(0, cur - item.qty);
+                            badgeSisa.innerText = 'Sisa: ' + nextVal;
+                            if (nextVal === 0) {
+                                badgeSisa.remove();
+                                const imgWrapper = card.querySelector('.product-img-wrapper');
+                                if (imgWrapper) {
+                                    const overlay = document.createElement('div');
+                                    overlay.className = 'product-empty-overlay absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center';
+                                    overlay.innerHTML = '<span class="badge-stok-habis bg-rose-500/20 text-rose-300 border border-rose-500/30 text-[10px] font-black uppercase px-2.5 py-1 rounded-full tracking-wider">Stok Habis</span>';
+                                    imgWrapper.appendChild(overlay);
+                                }
+                                btnItem.disabled = true;
+                                btnItem.className = 'w-full bg-slate-800 text-slate-500 font-bold py-2 rounded-xl text-xs cursor-not-allowed';
+                                btnItem.innerText = 'Kosong';
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 2. Simpan nota ke localStorage untuk fitur Cetak Ulang Nota Terakhir
+            const receiptData = {
+                id_transaksi: res.id_transaksi,
+                tanggal: res.tanggal,
+                waktu: res.waktu,
+                total: total,
+                metode: metodeTerpilih,
+                uang_diterima: bayar,
+                kembalian: kembalian,
+                items: purchasedItems
+            };
+            try {
+                localStorage.setItem('twb_last_receipt', JSON.stringify(receiptData));
+            } catch (e) {}
+
             tutupModal('modal-bayar');
-            tampilkanStruk(res.id_transaksi, res.tanggal, res.waktu, total, metodeTerpilih);
+            tampilkanStruk(res.id_transaksi, res.tanggal, res.waktu, total, metodeTerpilih, bayar, kembalian, purchasedItems);
+            
+            // 3. Kosongkan keranjang untuk pembeli berikutnya
             cart = [];
             renderCart();
-            window.VeloceApp.showToast('Transaksi berhasil disimpan!', 'success');
+            window.VeloceApp.showToast('Transaksi berhasil disimpan & stok diperbarui!', 'success');
         } else {
             VeloceApp.alert(res.message, 'Gagal Transaksi', 'error');
         }
@@ -218,18 +285,41 @@ function prosesSimpanTransaksi() {
     });
 }
 
-function tampilkanStruk(noId, tgl, wkt, total, metode) {
+/**
+ * Tampilkan Struk Nota Belanja Lengkap dengan Rincian Tunai & Kembalian
+ */
+function tampilkanStruk(noId, tgl, wkt, total, metode, bayar, kembalian, items) {
     document.getElementById('nota-id').innerText = noId;
     document.getElementById('nota-date-time').innerText = `${tgl} ${wkt}`;
     document.getElementById('nota-total').innerText = formatRupiah(total);
     document.getElementById('nota-metode').innerText = metode;
 
+    const rowTunai = document.getElementById('nota-row-tunai');
+    const rowKembalian = document.getElementById('nota-row-kembalian');
+    const elTunai = document.getElementById('nota-uang-diterima');
+    const elKembalian = document.getElementById('nota-kembalian');
+
+    if (metode === 'Cash') {
+        if (rowTunai) rowTunai.style.display = 'flex';
+        if (rowKembalian) rowKembalian.style.display = 'flex';
+        if (elTunai) elTunai.innerText = formatRupiah(bayar || total);
+        if (elKembalian) elKembalian.innerText = formatRupiah(kembalian || 0);
+    } else {
+        // Non-tunai (QRIS)
+        if (rowTunai) rowTunai.style.display = 'none';
+        if (rowKembalian) {
+            rowKembalian.style.display = 'flex';
+            if (elKembalian) elKembalian.innerText = 'Rp 0 (LUNAS)';
+        }
+    }
+
     let itemsHtml = '';
-    cart.forEach(i => {
+    const list = (items && items.length > 0) ? items : cart;
+    list.forEach(i => {
         itemsHtml += `
             <div class="flex justify-between">
                 <span>${i.qty}x ${i.nama}</span>
-                <span>${formatRupiah(i.harga * i.qty)}</span>
+                <span class="font-mono">${formatRupiah(i.harga * i.qty)}</span>
             </div>
         `;
     });
@@ -237,7 +327,43 @@ function tampilkanStruk(noId, tgl, wkt, total, metode) {
     bukaModal('modal-struk');
 }
 
+/**
+ * Tutup Modal Struk Instan Tanpa Page Reload
+ */
 function tutupModalStruk() {
     tutupModal('modal-struk');
-    window.location.reload();
+    if (window.VeloceApp && window.VeloceApp.showToast) {
+        window.VeloceApp.showToast('Siap melayani transaksi berikutnya.', 'info');
+    }
+}
+
+/**
+ * Fitur Cetak Ulang Nota Terakhir (Jika Printer Macet / Pembeli Minta Nota Lagi)
+ */
+function cetakUlangNotaTerakhir() {
+    let lastReceipt = null;
+    try {
+        const stored = localStorage.getItem('twb_last_receipt');
+        if (stored) lastReceipt = JSON.parse(stored);
+    } catch (e) {}
+
+    if (!lastReceipt || !lastReceipt.id_transaksi) {
+        if (window.VeloceApp && window.VeloceApp.alert) {
+            window.VeloceApp.alert('Belum ada transaksi yang dicatat pada sesi kasir ini.', 'Struk Terakhir Kosong', 'info');
+        } else {
+            alert('Belum ada riwayat transaksi pada sesi ini.');
+        }
+        return;
+    }
+
+    tampilkanStruk(
+        lastReceipt.id_transaksi,
+        lastReceipt.tanggal,
+        lastReceipt.waktu,
+        lastReceipt.total,
+        lastReceipt.metode,
+        lastReceipt.uang_diterima,
+        lastReceipt.kembalian,
+        lastReceipt.items
+    );
 }
