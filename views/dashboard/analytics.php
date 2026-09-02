@@ -105,28 +105,50 @@ $omset_outlet_js = array_values($data_outlet_raw);
 // Ambil riwayat audit log ekspor
 $export_logs_res = $conn->query("SELECT * FROM `export_logs` ORDER BY id DESC LIMIT 15");
 
-// 2. Data Stok Realtime dari Database Multi-Lokasi
-$labels_stok = [];
-$stok_gudang_data = [];
-$stok_museum_data = [];
-$stok_barat_data = [];
+// 2. Data Penjualan Seluruh Produk di Semua Outlet & Vending Machine
+$all_prods_res = $conn->query("SELECT id, nama, harga FROM `produk` ORDER BY nama ASC");
+$produk_sales_map = [];
+if ($all_prods_res) {
+    while ($pr = $all_prods_res->fetch_assoc()) {
+        $pNama = $pr['nama'];
+        $produk_sales_map[$pNama] = [
+            'id'    => $pr['id'],
+            'nama'  => $pNama,
+            'harga' => intval($pr['harga']),
+            'qty'   => 0,
+            'omset' => 0
+        ];
+    }
+}
 
-$res_stok = $conn->query("
-    SELECT p.nama,
-        COALESCE(sg.quantity, 0) as stok_gudang,
-        COALESCE(sm.quantity, 0) as stok_museum,
-        COALESCE(sb.quantity, 0) as stok_barat
-    FROM `produk` p
-    LEFT JOIN `stok_lokasi` sg ON p.id = sg.product_id AND sg.location_id = 1
-    LEFT JOIN `stok_lokasi` sm ON p.id = sm.product_id AND sm.location_id = 2
-    LEFT JOIN `stok_lokasi` sb ON p.id = sb.product_id AND sb.location_id = 3
-    ORDER BY p.nama ASC
-");
-while ($ps = $res_stok->fetch_assoc()) {
-    $labels_stok[] = $ps['nama'];
-    $stok_gudang_data[] = intval($ps['stok_gudang']);
-    $stok_museum_data[] = intval($ps['stok_museum']);
-    $stok_barat_data[] = intval($ps['stok_barat']);
+// Sinkronkan penjualan riil dengan daftar produk
+foreach ($produk_terjual as $pNama => $qty) {
+    if (isset($produk_sales_map[$pNama])) {
+        $produk_sales_map[$pNama]['qty'] = $qty;
+        $produk_sales_map[$pNama]['omset'] = $qty * $produk_sales_map[$pNama]['harga'];
+    } else {
+        $produk_sales_map[$pNama] = [
+            'id'    => 0,
+            'nama'  => $pNama,
+            'harga' => 0,
+            'qty'   => $qty,
+            'omset' => 0
+        ];
+    }
+}
+
+// Urutkan produk berdasarkan kuantitas terjual terbanyak
+uasort($produk_sales_map, function($a, $b) {
+    return $b['qty'] <=> $a['qty'];
+});
+
+$chart_penjualan_labels = [];
+$chart_penjualan_qty    = [];
+$chart_penjualan_omset  = [];
+foreach ($produk_sales_map as $p) {
+    $chart_penjualan_labels[] = $p['nama'];
+    $chart_penjualan_qty[]    = $p['qty'];
+    $chart_penjualan_omset[]  = $p['omset'];
 }
 ?>
 
@@ -194,21 +216,44 @@ while ($ps = $res_stok->fetch_assoc()) {
         </div>
     </div>
 
-    <!-- GRAFIK UTAMA: MONITORING STOK REALTIME MULTI-LOKASI -->
-    <div class="glass-card-dark p-6 rounded-3xl border border-white/10 shadow-xl flex flex-col h-[400px]">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+    <!-- GRAFIK UTAMA: PENJUALAN PRODUK SELURUH OUTLET & VM -->
+    <div class="glass-card-dark p-6 rounded-3xl border border-white/10 shadow-xl flex flex-col min-h-[460px]">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-4">
             <div>
-                <h4 class="font-bold text-base text-white">📦 Grafik Real-Time Stok Multi-Outlet</h4>
-                <p class="text-xs text-slate-400">Perbandingan ketersediaan stok fisik di Gudang Pusat vs Outlet Museum vs Outlet Barat</p>
+                <h4 class="font-black text-lg text-white flex items-center gap-2">
+                    <span>📊</span> <span>Grafik Penjualan Produk Seluruh Outlet & Vending Machine</span>
+                </h4>
+                <p class="text-xs text-slate-400 mt-1">Perbandingan akumulasi volume terjual (Pcs) dan nilai omzet per produk di seluruh titik operasional Borobudur</p>
             </div>
-            <div class="flex items-center gap-4 text-xs font-bold">
-                <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-blue-500 inline-block"></span> Gudang Pusat</span>
-                <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span> Outlet Museum</span>
-                <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-indigo-500 inline-block"></span> Outlet Barat</span>
+            
+            <!-- Tombol Aksi: Lihat Detail Transaksi & Cetak Laporan -->
+            <div class="flex flex-wrap items-center gap-2.5">
+                <button type="button" onclick="bukaModal('modal-detail-transaksi')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-lg shadow-blue-600/30 flex items-center gap-2 transition hover:scale-105 cursor-pointer">
+                    <span>👁️</span> <span>Lihat Detail Transaksi</span>
+                </button>
+                <a href="export.php?module=penjualan&format=pdf&start_date=<?= urlencode($start_date) ?>&end_date=<?= urlencode($end_date) ?>&autoprint=1" target="_blank" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-white/10 font-bold text-xs px-4 py-2.5 rounded-xl flex items-center gap-2 transition hover:border-white/20">
+                    <span>🖨️</span> <span>Cetak Laporan Penjualan</span>
+                </a>
             </div>
         </div>
-        <div class="flex-1 relative min-h-0">
-            <canvas id="chartStokRealtime"></canvas>
+
+        <!-- Indikator Legend & Stat Ringkas -->
+        <div class="flex flex-wrap items-center justify-between gap-3 p-3 rounded-2xl bg-slate-950/40 border border-white/5 mb-4 text-xs">
+            <div class="flex items-center gap-5">
+                <span class="flex items-center gap-1.5 font-bold text-blue-400">
+                    <span class="w-3.5 h-3.5 rounded-md bg-blue-500 inline-block shadow-sm"></span> Volume Terjual (Pcs)
+                </span>
+                <span class="flex items-center gap-1.5 font-bold text-emerald-400">
+                    <span class="w-3.5 h-3.5 rounded-md bg-emerald-500 inline-block shadow-sm"></span> Nilai Omzet (Rp)
+                </span>
+            </div>
+            <div class="text-[11px] text-slate-400">
+                Total Produk Terdaftar: <strong class="text-white"><?= count($produk_sales_map) ?> Item</strong> • Total Volume: <strong class="text-blue-400 font-bold"><?= number_format(array_sum($chart_penjualan_qty)) ?> pcs</strong> • Total Omzet: <strong class="text-emerald-400 font-bold">Rp <?= number_format($total_omset, 0, ',', '.') ?></strong>
+            </div>
+        </div>
+
+        <div class="flex-1 relative min-h-[300px]">
+            <canvas id="chartPenjualanProduk"></canvas>
         </div>
     </div>
 
@@ -230,47 +275,113 @@ while ($ps = $res_stok->fetch_assoc()) {
     </div>
 </div>
 
-<!-- Modal Riwayat Transaksi Lengkap -->
+<!-- Modal Rincian Penjualan Produk Seluruh Outlet (Lengkap dengan Jam/Waktu Transaksi) -->
 <div id="modal-detail-transaksi" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden items-center justify-center p-4">
-    <div class="glass-card-dark rounded-3xl p-6 w-full max-w-3xl max-h-[85vh] flex flex-col border border-white/10 text-white shadow-2xl">
-        <div class="flex justify-between items-center pb-4 border-b border-white/10 mb-4">
+    <div class="glass-card-dark rounded-3xl p-6 w-full max-w-5xl max-h-[88vh] flex flex-col border border-white/10 text-white shadow-2xl">
+        
+        <!-- Modal Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-white/10 mb-4 gap-3">
             <div>
-                <h3 class="text-base font-bold text-white">📑 Riwayat Seluruh Transaksi Nota</h3>
-                <p class="text-xs text-slate-400">Menampilkan detail transaksi tercatat</p>
-            </div>
-            <button onclick="tutupModal('modal-detail-transaksi')" class="text-slate-400 hover:text-white text-lg">✕</button>
-        </div>
-        <div class="overflow-y-auto flex-1 divide-y divide-white/5 pr-2">
-            <?php if (empty($list_transaksi)): ?>
-                <div class="p-8 text-center text-slate-400 text-xs">Belum ada data transaksi tercatat.</div>
-            <?php else: ?>
-                <?php foreach($list_transaksi as $tx): ?>
-                <div class="py-3 flex items-center justify-between gap-4 text-xs">
-                    <div>
-                        <span class="font-mono font-bold text-blue-400"><?= htmlspecialchars($tx['id_nota']) ?></span>
-                        <span class="text-slate-400 ml-2 font-medium"><?= htmlspecialchars($tx['tanggal']) ?> <?= htmlspecialchars($tx['waktu_final']) ?></span>
-                        <p class="text-slate-300 mt-1 font-semibold"><?= htmlspecialchars($tx['item_final']) ?></p>
-                    </div>
-                    <div class="text-right">
-                        <span class="font-bold text-emerald-400 text-sm">Rp <?= number_format($tx['total_final'], 0, ',', '.') ?></span>
-                        <p class="text-[10px] text-slate-400 mt-0.5"><b class="text-slate-200"><?= htmlspecialchars($tx['outlet_name']) ?></b> • Petugas: <b><?= htmlspecialchars($tx['petugas']) ?></b> (<?= htmlspecialchars($tx['metode']) ?>)</p>
-                    </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xl">📑</span>
+                    <h3 class="text-base font-black text-white">Detail Penjualan Produk Seluruh Outlet & Vending Machine</h3>
                 </div>
-                <?php endforeach; ?>
-            <?php endif; ?>
+                <p class="text-xs text-slate-400 mt-0.5">Rincian data transaksi real-time mencakup jam/waktu transaksi, produk, titik operasional, kasir, dan nilai nota.</p>
+            </div>
+            <button onclick="tutupModal('modal-detail-transaksi')" class="self-end sm:self-auto p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition text-lg leading-none">✕</button>
         </div>
-        <div class="pt-4 border-t border-white/10 flex justify-between items-center text-xs">
-            <span class="text-slate-400">Total <?= count($list_transaksi) ?> transaksi ditampilkan</span>
-            <div class="flex gap-2">
-                <a href="export.php?module=penjualan&format=excel&start_date=<?= urlencode($start_date) ?>&end_date=<?= urlencode($end_date) ?>" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1.5 rounded-xl transition text-xs flex items-center gap-1">
+
+        <!-- Filter Pencarian Cepat & Quick Summary -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+            <div class="relative flex-1 max-w-md">
+                <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs">🔍</span>
+                <input type="text" id="cari-transaksi-input" onkeyup="filterTabelDetailTransaksi()" 
+                       placeholder="Cari no. nota, nama produk, outlet/VM, kasir..." 
+                       class="w-full pl-9 pr-4 py-2 bg-slate-900 border border-white/10 rounded-xl text-xs text-white placeholder-slate-500 outline-none focus:border-blue-500">
+            </div>
+            <div class="flex items-center gap-3 text-xs">
+                <span class="text-slate-400">
+                    Menampilkan: <strong id="count-transaksi-filtered" class="text-white"><?= count($list_transaksi) ?></strong> dari <?= count($list_transaksi) ?> Transaksi
+                </span>
+                <span class="px-2.5 py-1 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-bold">
+                    Total Omzet: Rp <?= number_format($total_omset, 0, ',', '.') ?>
+                </span>
+            </div>
+        </div>
+
+        <!-- Tabel Transaksi Lengkap -->
+        <div class="overflow-y-auto flex-1 rounded-2xl border border-white/5 bg-slate-950/40 custom-scroll">
+            <table class="w-full text-left text-xs">
+                <thead class="sticky top-0 bg-slate-900/90 backdrop-blur border-b border-white/10 text-slate-400 uppercase text-[10px] font-bold">
+                    <tr>
+                        <th class="p-3 text-center w-12">No</th>
+                        <th class="p-3">Waktu Transaksi</th>
+                        <th class="p-3">No. Nota</th>
+                        <th class="p-3">Outlet / Titik Lokasi</th>
+                        <th class="p-3">Rincian Produk Dibeli</th>
+                        <th class="p-3">Petugas & Metode</th>
+                        <th class="p-3 text-right">Nilai Transaksi</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-detail-transaksi" class="divide-y divide-white/5 text-slate-300">
+                    <?php if (empty($list_transaksi)): ?>
+                        <tr>
+                            <td colspan="7" class="p-8 text-center text-slate-400 text-xs">Belum ada data transaksi yang tercatat.</td>
+                        </tr>
+                    <?php else: ?>
+                        <?php $no = 1; foreach($list_transaksi as $tx): 
+                            $tglFmt = !empty($tx['tanggal']) ? date('d M Y', strtotime($tx['tanggal'])) : '-';
+                            $jamFmt = !empty($tx['waktu_final']) ? (date('H:i:s', strtotime($tx['waktu_final'])) . ' WIB') : '-';
+                        ?>
+                        <tr class="hover:bg-white/[0.02] transition row-trx-detail">
+                            <td class="p-3 text-center text-slate-500 font-mono"><?= $no++ ?></td>
+                            <td class="p-3 whitespace-nowrap">
+                                <span class="font-bold text-white block"><?= $tglFmt ?></span>
+                                <span class="text-[10px] text-blue-400 font-mono font-semibold"><?= $jamFmt ?></span>
+                            </td>
+                            <td class="p-3 font-mono font-bold text-blue-400 whitespace-nowrap">
+                                <?= htmlspecialchars($tx['id_nota']) ?>
+                            </td>
+                            <td class="p-3 whitespace-nowrap">
+                                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-slate-800 border border-white/5 text-[11px] font-bold text-slate-200">
+                                    <span>🏪</span> <?= htmlspecialchars($tx['outlet_name']) ?>
+                                </span>
+                            </td>
+                            <td class="p-3 max-w-xs">
+                                <span class="font-semibold text-slate-200 block"><?= htmlspecialchars($tx['item_final']) ?></span>
+                            </td>
+                            <td class="p-3 whitespace-nowrap">
+                                <span class="text-xs text-white font-medium block"><?= htmlspecialchars($tx['petugas']) ?></span>
+                                <span class="text-[10px] font-bold <?= (stripos($tx['metode'], 'qris') !== false) ? 'text-blue-400' : 'text-emerald-400' ?>">
+                                    <?= htmlspecialchars($tx['metode']) ?>
+                                </span>
+                            </td>
+                            <td class="p-3 text-right font-mono font-bold text-emerald-400 whitespace-nowrap">
+                                Rp <?= number_format($tx['total_final'], 0, ',', '.') ?>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Modal Footer: Cetak Laporan, Export Excel, CSV -->
+        <div class="pt-4 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs mt-4">
+            <span class="text-slate-400">Total <?= count($list_transaksi) ?> transaksi tercatat dalam sistem POS.</span>
+            <div class="flex flex-wrap items-center gap-2">
+                <a href="export.php?module=penjualan&format=excel&start_date=<?= urlencode($start_date) ?>&end_date=<?= urlencode($end_date) ?>" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3.5 py-2 rounded-xl transition text-xs flex items-center gap-1.5 shadow-sm shadow-emerald-600/30">
                     <span>📊</span> <span>Export Excel</span>
                 </a>
-                <a href="export.php?module=penjualan&format=csv&start_date=<?= urlencode($start_date) ?>&end_date=<?= urlencode($end_date) ?>" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-white/10 font-bold px-2.5 py-1.5 rounded-xl transition text-xs">
+                <a href="export.php?module=penjualan&format=csv&start_date=<?= urlencode($start_date) ?>&end_date=<?= urlencode($end_date) ?>" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-white/10 font-bold px-3 py-2 rounded-xl transition text-xs">
                     CSV
                 </a>
-                <a href="export.php?module=penjualan&format=pdf&start_date=<?= urlencode($start_date) ?>&end_date=<?= urlencode($end_date) ?>&autoprint=1" target="_blank" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-3 py-1.5 rounded-xl transition text-xs flex items-center gap-1">
-                    <span>🖨️</span> <span>Cetak PDF</span>
+                <a href="export.php?module=penjualan&format=pdf&start_date=<?= urlencode($start_date) ?>&end_date=<?= urlencode($end_date) ?>&autoprint=1" target="_blank" class="bg-blue-600 hover:bg-blue-500 text-white font-black px-4 py-2 rounded-xl transition text-xs flex items-center gap-1.5 shadow-lg shadow-blue-600/30">
+                    <span>🖨️</span> <span>Cetak / PDF Dokumen Resmi</span>
                 </a>
+                <button type="button" onclick="tutupModal('modal-detail-transaksi')" class="px-3 py-2 rounded-xl text-slate-400 hover:text-white transition font-bold">
+                    Tutup
+                </button>
             </div>
         </div>
     </div>
@@ -334,26 +445,107 @@ while ($ps = $res_stok->fetch_assoc()) {
 <!-- Inisialisasi Chart.js -->
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    // 1. Chart Stok Realtime
-    const ctxStok = document.getElementById('chartStokRealtime');
-    if (ctxStok) {
-        new Chart(ctxStok, {
+    // 1. Chart Penjualan Produk Seluruh Outlet & Vending Machine
+    const ctxPenjualan = document.getElementById('chartPenjualanProduk');
+    if (ctxPenjualan) {
+        new Chart(ctxPenjualan, {
             type: 'bar',
             data: {
-                labels: <?= json_encode($labels_stok) ?>,
+                labels: <?= json_encode($chart_penjualan_labels) ?>,
                 datasets: [
-                    { label: 'Gudang Pusat', data: <?= json_encode($stok_gudang_data) ?>, backgroundColor: 'rgba(59, 130, 246, 0.85)', borderRadius: 8 },
-                    { label: 'Outlet Museum', data: <?= json_encode($stok_museum_data) ?>, backgroundColor: 'rgba(16, 185, 129, 0.85)', borderRadius: 8 },
-                    { label: 'Outlet Barat', data: <?= json_encode($stok_barat_data) ?>, backgroundColor: 'rgba(99, 102, 241, 0.85)', borderRadius: 8 }
+                    {
+                        label: 'Volume Terjual (Pcs)',
+                        data: <?= json_encode($chart_penjualan_qty) ?>,
+                        backgroundColor: 'rgba(59, 130, 246, 0.85)',
+                        borderColor: '#3b82f6',
+                        borderWidth: 1,
+                        borderRadius: 8,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'Nilai Omzet (Rp)',
+                        data: <?= json_encode($chart_penjualan_omset) ?>,
+                        backgroundColor: 'rgba(16, 185, 129, 0.75)',
+                        borderColor: '#10b981',
+                        borderWidth: 1,
+                        borderRadius: 8,
+                        yAxisID: 'y1'
+                    }
                 ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: '#0f172a',
+                        titleColor: '#fff',
+                        bodyColor: '#cbd5e1',
+                        borderColor: 'rgba(255, 255, 255, 0.15)',
+                        borderWidth: 1,
+                        padding: 12,
+                        callbacks: {
+                            label: function(context) {
+                                if (context.dataset.yAxisID === 'y1') {
+                                    return ' 💵 Nilai Omzet: Rp ' + Number(context.raw).toLocaleString('id-ID');
+                                } else {
+                                    return ' 📦 Volume Terjual: ' + context.raw + ' pcs';
+                                }
+                            }
+                        }
+                    }
+                },
                 scales: {
-                    x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 10 } } },
-                    y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8', font: { size: 10 } } }
+                    x: {
+                        grid: { display: false },
+                        ticks: {
+                            color: '#e2e8f0',
+                            font: { size: 11, weight: 'bold' }
+                        }
+                    },
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        title: {
+                            display: true,
+                            text: 'Volume Terjual (Pcs)',
+                            color: '#60a5fa',
+                            font: { size: 10, weight: 'bold' }
+                        },
+                        grid: { color: 'rgba(255, 255, 255, 0.06)' },
+                        ticks: {
+                            color: '#94a3b8',
+                            font: { size: 10 },
+                            precision: 0
+                        }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: 'Nilai Omzet (Rp)',
+                            color: '#34d399',
+                            font: { size: 10, weight: 'bold' }
+                        },
+                        grid: { drawOnChartArea: false },
+                        ticks: {
+                            color: '#94a3b8',
+                            font: { size: 10 },
+                            callback: function(val) {
+                                return 'Rp ' + (val >= 1000 ? (val/1000) + 'k' : val);
+                            }
+                        }
+                    }
                 }
             }
         });
@@ -431,4 +623,30 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 });
+
+/**
+ * Filter pencarian instan pada tabel modal detail transaksi penjualan
+ */
+function filterTabelDetailTransaksi() {
+    const input = document.getElementById('cari-transaksi-input');
+    if (!input) return;
+    const query = input.value.toLowerCase().trim();
+    const rows = document.querySelectorAll('.row-trx-detail');
+    let visibleCount = 0;
+
+    rows.forEach(function(row) {
+        const text = row.textContent.toLowerCase();
+        if (query === '' || text.indexOf(query) !== -1) {
+            row.style.display = '';
+            visibleCount++;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+
+    const countSpan = document.getElementById('count-transaksi-filtered');
+    if (countSpan) {
+        countSpan.textContent = visibleCount;
+    }
+}
 </script>

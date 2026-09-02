@@ -1109,7 +1109,7 @@ HTML;
                         <tr>
                             <td class="text-center"><?= $no++ ?></td>
                             <td class="font-bold"><?= htmlspecialchars($row['id_transaksi'] ?? ('TRX-' . $row['id'])) ?></td>
-                            <td><?= htmlspecialchars($row['tanggal'] . ' ' . $row['waktu']) ?></td>
+                            <td><?= !empty($row['tanggal']) ? date('d/m/Y', strtotime($row['tanggal'])) : '-' ?> <span style="font-family:monospace;font-size:9.5px;color:#2563eb;"><?= !empty($row['waktu']) ? date('H:i:s', strtotime($row['waktu'])) : '-' ?> WIB</span></td>
                             <td><?= htmlspecialchars($row['petugas'] ?? '-') ?></td>
                             <td><span style="font-weight:bold;color:#2563eb;"><?= htmlspecialchars($row['nama_outlet'] ?? '-') ?></span></td>
                             <td class="text-center"><?= htmlspecialchars($row['metode'] ?? 'Cash') ?></td>
