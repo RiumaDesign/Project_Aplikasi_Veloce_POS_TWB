@@ -547,6 +547,22 @@ switch ($action) {
         }
         break;
 
+    case 'update_closing_shift':
+        require_once __DIR__ . '/controllers/ShiftController.php';
+        $shiftCtrl = new ShiftController($conn);
+
+        $rawInput = file_get_contents('php://input');
+        $jsonInput = !empty($rawInput) ? json_decode($rawInput, true) : null;
+        $payload = (!empty($jsonInput) && is_array($jsonInput)) ? $jsonInput : $_POST;
+
+        $res = $shiftCtrl->updateClosedShift($payload);
+        if ($res['status'] === 'success') {
+            send_api_response("success", 200, $res['message'], $res);
+        } else {
+            send_api_response("error", 400, $res['message']);
+        }
+        break;
+
     case 'get_shift_history':
         require_once __DIR__ . '/controllers/ShiftController.php';
         $shiftCtrl = new ShiftController($conn);

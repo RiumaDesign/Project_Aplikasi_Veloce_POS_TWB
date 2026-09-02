@@ -40,7 +40,7 @@
             <button type="button" onclick="bukaModal('modal-ganti-terminal')" title="Pilih Terminal / Lokasi POS Lain" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-white/10 px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer">
                 <span>🔄</span> <span class="hidden sm:inline">Ganti Terminal</span>
             </button>
-            <button type="button" onclick="bukaModalTutupShift()" title="Tutup Shift Kasir & Rekapitulasi Kas (Z-Report)" class="bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer">
+            <button type="button" id="btn-navbar-closing-shift" onclick="bukaModalTutupShift()" title="Tutup Shift Kasir & Rekapitulasi Kas (Z-Report)" class="bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer">
                 <span>💵</span> <span class="hidden sm:inline">Tutup Shift</span>
             </button>
             <a href="logout.php" title="Keluar / Logout Sesi" onclick="return confirmLogoutKasir(event)" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1" title="Logout">

@@ -1,6 +1,6 @@
 <!-- ======================================================================== -->
 <!-- MODAL TUTUP SHIFT KASIR (Z-REPORT) — TAMPILAN SOLID NON-TRANSPARAN      -->
-<!-- Desain Khusus Kontras Tinggi, Sederhana & Bebas Transparansi            -->
+<!-- Dilengkapi Shift Lifecycle State Machine (Update vs Buka Shift Baru)    -->
 <!-- ======================================================================== -->
 <div id="modal-closing-shift" class="fixed inset-0 z-50 hidden items-center justify-center p-4 transition-all duration-200" style="background-color: rgba(15, 23, 42, 0.75);">
     <div id="cs-modal-card" class="w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[94vh] animate-in fade-in zoom-in-95 duration-200">
@@ -13,7 +13,7 @@
                 </div>
                 <div>
                     <h3 id="cs-title" class="text-base font-black flex items-center gap-2 m-0">
-                        Tutup Shift Kasir
+                        <span id="cs-modal-heading">Tutup Shift Kasir</span>
                         <span style="background-color: #2563eb; color: #ffffff; font-size: 10px; padding: 2px 8px; border-radius: 9999px; font-weight: 800; letter-spacing: 0.5px;">Z-REPORT</span>
                     </h3>
                     <p id="cs-subtitle" class="text-xs m-0 mt-0.5 font-medium">
@@ -28,6 +28,18 @@
 
         <!-- Body Modal (Solid Non-Transparan) -->
         <div class="p-6 overflow-y-auto custom-scroll space-y-4">
+
+            <!-- Banner Notifikasi Jika Shift Sudah Ditutup (Anti-Double Info) -->
+            <div id="cs-status-banner" class="hidden p-3.5 rounded-2xl flex items-center justify-between" style="background-color: #eff6ff; border: 1.5px solid #93c5fd; color: #1e40af;">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-xl">ℹ️</span>
+                    <div>
+                        <div style="font-weight: 800; font-size: 12px;" id="cs-banner-title">Shift Ini Telah Ditutup Resmi</div>
+                        <div style="font-size: 11px; color: #2563eb;" id="cs-banner-desc">Shift sebelumnya telah selesai. Anda dapat mengoreksi uang fisik atau memulai sesi baru.</div>
+                    </div>
+                </div>
+                <span id="cs-banner-badge" style="background-color: #2563eb; color: #ffffff; font-size: 10px; padding: 2px 8px; border-radius: 6px; font-weight: 700;">TERKUNCI</span>
+            </div>
             
             <!-- 1. Baris Informasi Petugas & Jam WIB (Solid Strip) -->
             <div id="cs-info-strip" class="p-3 rounded-2xl flex flex-wrap items-center justify-between gap-2 text-xs">
@@ -128,17 +140,20 @@
 
         </div>
 
-        <!-- Footer Modal (Solid & Kontras Tinggi) -->
-        <div id="cs-footer" class="px-6 py-4 flex items-center justify-between gap-3">
-            <button type="button" onclick="tutupModal('modal-closing-shift')" id="cs-btn-cancel" class="px-4 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer">
+        <!-- Footer Modal (Solid & Kontras Tinggi dengan Multi-Aksi) -->
+        <div id="cs-footer" class="px-6 py-4 flex items-center justify-between gap-2.5">
+            <button type="button" onclick="tutupModal('modal-closing-shift')" id="cs-btn-cancel" class="px-3.5 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer">
                 Batal
             </button>
-            <div class="flex items-center gap-2.5">
-                <button type="button" id="btn-print-zreport" onclick="cetakZReportThermal()" class="px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-sm">
-                    <span>🖨️</span> Cetak Struk Z-Report
+            <div class="flex items-center gap-2">
+                <button type="button" id="btn-print-zreport" onclick="cetakZReportThermal()" class="px-3.5 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-sm">
+                    <span>🖨️</span> <span id="cs-lbl-print">Cetak Z-Report</span>
                 </button>
-                <button type="button" id="btn-submit-closing" onclick="simpanClosingShift()" class="px-5 py-2.5 rounded-xl text-xs font-black transition flex items-center gap-1.5 cursor-pointer shadow-md">
-                    <span>💾</span> Selesaikan & Tutup Shift
+                <button type="button" id="btn-new-shift" onclick="mulaiShiftBaru()" class="hidden px-3.5 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-sm" style="background-color: #3b82f6; color: #ffffff;">
+                    <span>🔓</span> Mulai Shift Baru
+                </button>
+                <button type="button" id="btn-submit-closing" onclick="simpanClosingShift()" class="px-4 py-2.5 rounded-xl text-xs font-black transition flex items-center gap-1.5 cursor-pointer shadow-md">
+                    <span>💾</span> <span id="cs-lbl-submit">Selesaikan & Tutup Shift</span>
                 </button>
             </div>
         </div>
@@ -354,21 +369,6 @@ html:not(.dark) #btn-print-zreport:hover {
     border-color: #94a3b8 !important;
 }
 
-html[data-theme="light"] #btn-submit-closing,
-html.light #btn-submit-closing,
-body.light-theme #btn-submit-closing,
-html:not(.dark) #btn-submit-closing {
-    background-color: #d97706 !important;
-    color: #ffffff !important;
-    border: none !important;
-}
-html[data-theme="light"] #btn-submit-closing:hover,
-html.light #btn-submit-closing:hover,
-body.light-theme #btn-submit-closing:hover,
-html:not(.dark) #btn-submit-closing:hover {
-    background-color: #b45309 !important;
-}
-
 /* -------------------------------------------------------------
    2. TEMA GELAP: SOLID DARK SLATE & KONTRAS TINGGI
    ------------------------------------------------------------- */
@@ -452,11 +452,6 @@ html[data-theme="dark"] #btn-print-zreport {
     border: 1px solid #475569 !important;
     color: #ffffff !important;
 }
-html.dark #btn-submit-closing,
-html[data-theme="dark"] #btn-submit-closing {
-    background-color: #f59e0b !important;
-    color: #0f172a !important;
-}
 </style>
 
 <!-- ======================================================================== -->
@@ -528,9 +523,13 @@ html[data-theme="dark"] #btn-submit-closing {
 
 <script>
 let currentShiftData = {
+    shift_state: 'ACTIVE_PENDING',
+    shift_id: null,
+    shift_number: null,
     kasir_nama: '<?= htmlspecialchars($kasir_aktif ?? 'Kasir') ?>',
     pos_aktif: '<?= htmlspecialchars($pos_aktif ?? 'Kasir Utama') ?>',
     opening_time: '',
+    closing_time: '',
     nota_count: 0,
     cash_sales: 0,
     qris_sales: 0,
@@ -538,7 +537,8 @@ let currentShiftData = {
     opening_cash: 100000,
     actual_cash: 100000,
     expected_cash: 100000,
-    difference: 0
+    difference: 0,
+    notes: ''
 };
 
 function formatRupiahJs(num) {
@@ -546,7 +546,7 @@ function formatRupiahJs(num) {
 }
 
 /**
- * Buka modal tutup shift dan ambil data transaksi berjalan via API
+ * Buka modal tutup shift dan periksa status siklus shift via API
  */
 async function bukaModalTutupShift() {
     bukaModal('modal-closing-shift');
@@ -567,20 +567,84 @@ async function bukaModalTutupShift() {
         const json = await res.json();
         if (json.status === 'success' && json.data) {
             const d = json.data;
+            currentShiftData.shift_state  = d.shift_state;
+            currentShiftData.shift_id     = d.shift_id;
+            currentShiftData.shift_number = d.shift_number;
             currentShiftData.opening_time = d.opening_time;
-            currentShiftData.nota_count = d.nota_count;
-            currentShiftData.cash_sales = d.cash_sales;
-            currentShiftData.qris_sales = d.qris_sales;
-            currentShiftData.total_sales = d.total_sales;
+            currentShiftData.closing_time = d.closing_time;
+            currentShiftData.nota_count   = d.nota_count;
+            currentShiftData.cash_sales   = d.cash_sales;
+            currentShiftData.qris_sales   = d.qris_sales;
+            currentShiftData.total_sales  = d.total_sales;
+            currentShiftData.opening_cash = d.opening_cash;
+            currentShiftData.actual_cash  = d.actual_cash;
+            currentShiftData.difference   = d.difference;
+            currentShiftData.notes        = d.notes || '';
+
+            const banner = document.getElementById('cs-status-banner');
+            const submitBtn = document.getElementById('btn-submit-closing');
+            const submitLbl = document.getElementById('cs-lbl-submit');
+            const newShiftBtn = document.getElementById('btn-new-shift');
+            const printLbl = document.getElementById('cs-lbl-print');
+            const heading = document.getElementById('cs-modal-heading');
+
+            if (d.shift_state === 'ALREADY_CLOSED') {
+                // KONDISI: Shift Terakhir Sudah Ditutup & Belum Ada Transaksi Baru
+                banner.classList.remove('hidden');
+                document.getElementById('cs-banner-title').textContent = `Shift Terakhir Telah Ditutup (No: ${d.shift_number})`;
+                document.getElementById('cs-banner-desc').textContent = `Selesai pukul ${d.closing_time ? d.closing_time.split(' ')[1] : ''} WIB. Belum ada transaksi baru. Anda dapat mengoreksi uang fisik/catatan tanpa membuat data ganda di admin.`;
+                
+                heading.textContent = 'Rekapitulasi Shift (Sudah Ditutup)';
+                submitLbl.textContent = 'Simpan Koreksi Shift';
+                submitBtn.style.backgroundColor = '#2563eb';
+                submitBtn.style.color = '#ffffff';
+                newShiftBtn.classList.remove('hidden');
+                printLbl.textContent = 'Cetak Ulang Z-Report';
+
+                // Pre-fill input
+                document.getElementById('cs-input-float').value = d.opening_cash;
+                document.getElementById('cs-input-actual').value = d.actual_cash;
+                document.getElementById('cs-input-notes').value = d.notes || '';
+
+                // Update tombol navbar kasir
+                const navBtn = document.getElementById('btn-navbar-closing-shift');
+                if (navBtn) {
+                    navBtn.className = "bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/30 px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer";
+                    navBtn.innerHTML = `<span>✅</span> <span class="hidden sm:inline">Shift Selesai</span>`;
+                }
+            } else {
+                // KONDISI: Shift Baru / Ada Transaksi Pending yang Belum Ditutup
+                banner.classList.add('hidden');
+                heading.textContent = 'Tutup Shift Kasir';
+                submitLbl.textContent = 'Selesaikan & Tutup Shift';
+                submitBtn.style.backgroundColor = '#d97706';
+                submitBtn.style.color = '#ffffff';
+                newShiftBtn.classList.add('hidden');
+                printLbl.textContent = 'Cetak Struk Z-Report';
+
+                document.getElementById('cs-input-float').value = d.opening_cash;
+                document.getElementById('cs-input-actual').value = d.actual_cash;
+                document.getElementById('cs-input-notes').value = '';
+
+                // Update tombol navbar kasir
+                const navBtn = document.getElementById('btn-navbar-closing-shift');
+                if (navBtn) {
+                    navBtn.className = "bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer";
+                    navBtn.innerHTML = `<span>💵</span> <span class="hidden sm:inline">Tutup Shift</span>`;
+                }
+            }
 
             const openWib = d.opening_time ? (d.opening_time.split(' ')[1] + ' WIB') : '08:00:00 WIB';
             document.getElementById('cs-opening-time').textContent = openWib;
+            if (d.closing_time) {
+                document.getElementById('cs-closing-time').textContent = (d.closing_time.split(' ')[1] + ' WIB');
+            }
             document.getElementById('cs-tx-count').textContent = d.nota_count;
             document.getElementById('cs-cash-sales').textContent = formatRupiahJs(d.cash_sales);
             document.getElementById('cs-qris-sales').textContent = formatRupiahJs(d.qris_sales);
             document.getElementById('cs-total-sales').textContent = formatRupiahJs(d.total_sales);
 
-            // Default perhitungan awal
+            // Hitung selisih
             hitungSelisihKas();
         }
     } catch (e) {
@@ -636,53 +700,99 @@ function hitungSelisihKas() {
 }
 
 /**
- * Simpan data penutupan shift ke server via REST API
+ * Simpan data penutupan shift (Bisa INSERT shift baru atau UPDATE shift lama)
  */
 async function simpanClosingShift() {
     const btn = document.getElementById('btn-submit-closing');
     btn.disabled = true;
     btn.innerHTML = `<span>⏳</span> Menyimpan...`;
 
-    const kasirNamaVal = currentShiftData.kasir_nama || (document.getElementById('cs-kasir-nama') ? document.getElementById('cs-kasir-nama').textContent.trim() : '') || '<?= htmlspecialchars($kasir_aktif ?? "Kasir") ?>';
-    const posAktifVal = currentShiftData.pos_aktif || (document.getElementById('cs-pos-aktif') ? document.getElementById('cs-pos-aktif').textContent.trim() : '') || '<?= htmlspecialchars($pos_aktif ?? "Kasir Utama") ?>';
-
-    const payload = {
-        kasir_nama: kasirNamaVal,
-        pos_aktif: posAktifVal,
-        outlet_id: <?= intval($outlet_id ?? 1) ?>,
-        opening_time: currentShiftData.opening_time || '<?= date("Y-m-d 08:00:00") ?>',
-        opening_cash: currentShiftData.opening_cash,
-        actual_cash: currentShiftData.actual_cash,
-        notes: document.getElementById('cs-input-notes').value.trim()
-    };
+    const floatVal = parseInt(document.getElementById('cs-input-float').value) || 100000;
+    const actualVal = parseInt(document.getElementById('cs-input-actual').value) || 0;
+    const notesVal = document.getElementById('cs-input-notes').value.trim();
 
     try {
-        const res = await fetch('api.php?action=submit_closing_shift', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-        const json = await res.json();
+        if (currentShiftData.shift_state === 'ALREADY_CLOSED') {
+            // MODE UPDATE: Mengoreksi data shift terakhir (Anti-Duplicate)
+            const payload = {
+                shift_id: currentShiftData.shift_id,
+                opening_cash: floatVal,
+                actual_cash: actualVal,
+                notes: notesVal
+            };
 
-        if (json.status === 'success' && json.data) {
-            currentShiftData.shift_number = json.data.shift_number;
-            
-            // Konfirmasi cetak struk thermal
-            if (confirm("Shift berhasil ditutup dan tersimpan resmi ke sistem!\n\nNomor Shift: " + json.data.shift_number + "\n\nApakah Anda ingin mencetak struk Z-Report sekarang?")) {
-                cetakZReportThermal();
+            const res = await fetch('api.php?action=update_closing_shift', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const json = await res.json();
+
+            if (json.status === 'success') {
+                alert("Koreksi data shift berhasil disimpan!\n\nNomor Shift: " + json.data.shift_number + "\nData telah diperbarui di sistem admin tanpa duplikasi.");
+                tutupModal('modal-closing-shift');
+            } else {
+                alert("Gagal mengoreksi shift: " + (json.message || 'Terjadi kesalahan.'));
             }
-            tutupModal('modal-closing-shift');
-            // Refresh halaman kasir
-            window.location.reload();
         } else {
-            alert("Gagal menutup shift: " + (json.message || 'Terjadi kesalahan sistem.'));
+            // MODE BARU: Menutup shift aktif & mengunci transaksi
+            const kasirNamaVal = currentShiftData.kasir_nama || (document.getElementById('cs-kasir-nama') ? document.getElementById('cs-kasir-nama').textContent.trim() : '') || '<?= htmlspecialchars($kasir_aktif ?? "Kasir") ?>';
+            const posAktifVal = currentShiftData.pos_aktif || (document.getElementById('cs-pos-aktif') ? document.getElementById('cs-pos-aktif').textContent.trim() : '') || '<?= htmlspecialchars($pos_aktif ?? "Kasir Utama") ?>';
+
+            const payload = {
+                kasir_nama: kasirNamaVal,
+                pos_aktif: posAktifVal,
+                outlet_id: <?= intval($outlet_id ?? 1) ?>,
+                opening_time: currentShiftData.opening_time || '<?= date("Y-m-d 08:00:00") ?>',
+                opening_cash: floatVal,
+                actual_cash: actualVal,
+                notes: notesVal
+            };
+
+            const res = await fetch('api.php?action=submit_closing_shift', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const json = await res.json();
+
+            if (json.status === 'success' && json.data) {
+                currentShiftData.shift_number = json.data.shift_number;
+                currentShiftData.shift_id = json.data.shift_id;
+                
+                // Konfirmasi cetak struk thermal
+                if (confirm("Shift berhasil ditutup dan tersimpan resmi ke sistem!\n\nNomor Shift: " + json.data.shift_number + "\n\nApakah Anda ingin mencetak struk Z-Report sekarang?")) {
+                    cetakZReportThermal();
+                }
+                tutupModal('modal-closing-shift');
+                window.location.reload();
+            } else {
+                alert("Gagal menutup shift: " + (json.message || 'Terjadi kesalahan sistem.'));
+            }
         }
     } catch (e) {
-        alert("Terjadi kesalahan jaringan saat menyimpan penutupan shift.");
+        alert("Terjadi kesalahan jaringan saat memproses data shift.");
         console.error(e);
     } finally {
         btn.disabled = false;
-        btn.innerHTML = `<span>💾</span> Selesaikan & Tutup Shift`;
+        btn.innerHTML = (currentShiftData.shift_state === 'ALREADY_CLOSED') 
+            ? `<span>💾</span> Simpan Koreksi Shift`
+            : `<span>💾</span> Selesaikan & Tutup Shift`;
+    }
+}
+
+/**
+ * Memulai sesi shift baru untuk kasir
+ */
+function mulaiShiftBaru() {
+    if (confirm("Mulai sesi shift baru untuk kasir ini?\n\nTransaksi penjualan yang dibuat setelah ini akan otomatis masuk ke rekapitulasi shift baru.")) {
+        tutupModal('modal-closing-shift');
+        const navBtn = document.getElementById('btn-navbar-closing-shift');
+        if (navBtn) {
+            navBtn.className = "bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer";
+            navBtn.innerHTML = `<span>💵</span> <span class="hidden sm:inline">Tutup Shift</span>`;
+        }
+        alert("Sesi shift baru siap. Silakan melayani transaksi baru.");
     }
 }
 
