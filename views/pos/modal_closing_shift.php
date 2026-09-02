@@ -1,110 +1,116 @@
-<!-- MODAL TUTUP SHIFT KASIR & REKAPITULASI KAS (Z-REPORT) -->
-<div id="modal-closing-shift" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden items-center justify-center p-4 transition-all duration-300">
-    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh] animate-in fade-in zoom-in-95 duration-200 text-slate-800 dark:text-white">
+<!-- ======================================================================== -->
+<!-- MODAL TUTUP SHIFT KASIR (Z-REPORT) — TAMPILAN SOLID NON-TRANSPARAN      -->
+<!-- Desain Khusus Kontras Tinggi, Sederhana & Bebas Transparansi            -->
+<!-- ======================================================================== -->
+<div id="modal-closing-shift" class="fixed inset-0 z-50 hidden items-center justify-center p-4 transition-all duration-200" style="background-color: rgba(15, 23, 42, 0.75);">
+    <div id="cs-modal-card" class="w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[94vh] animate-in fade-in zoom-in-95 duration-200">
         
-        <!-- Header Modal: Sederhana & Bersih -->
-        <div class="px-6 py-4 border-b border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-950/60 flex items-center justify-between">
+        <!-- Header Modal (Solid & Tegas) -->
+        <div id="cs-header" class="px-6 py-4 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-2xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-xl text-amber-500 dark:text-amber-400 shadow-sm">
+                <div class="w-10 h-10 rounded-2xl flex items-center justify-center text-xl shadow-sm" style="background-color: #fef3c7; border: 1px solid #fcd34d; color: #b45309;">
                     💵
                 </div>
                 <div>
-                    <h3 class="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+                    <h3 id="cs-title" class="text-base font-black flex items-center gap-2 m-0">
                         Tutup Shift Kasir
-                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-blue-600 text-white font-mono font-bold tracking-wider">Z-REPORT</span>
+                        <span style="background-color: #2563eb; color: #ffffff; font-size: 10px; padding: 2px 8px; border-radius: 9999px; font-weight: 800; letter-spacing: 0.5px;">Z-REPORT</span>
                     </h3>
-                    <p class="text-xs text-slate-500 dark:text-slate-400">
-                        PT Taman Wisata Candi Borobudur &bull; <span class="font-bold text-blue-600 dark:text-blue-400">Zona Waktu WIB</span>
+                    <p id="cs-subtitle" class="text-xs m-0 mt-0.5 font-medium">
+                        PT Taman Wisata Candi Borobudur &bull; <span style="font-weight: 700; color: #2563eb;">WIB (Waktu Indonesia Barat)</span>
                     </p>
                 </div>
             </div>
-            <button type="button" onclick="tutupModal('modal-closing-shift')" class="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/10 transition">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            <button type="button" onclick="tutupModal('modal-closing-shift')" id="cs-btn-close" class="p-2 rounded-xl transition cursor-pointer" title="Tutup Modal">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
         </div>
 
-        <!-- Body Modal: Ringkas, Mudah Dibaca & Kontras Tinggi -->
+        <!-- Body Modal (Solid Non-Transparan) -->
         <div class="p-6 overflow-y-auto custom-scroll space-y-4">
             
-            <!-- 1. Baris Informasi Kasir & Jam WIB (Clean Strip) -->
-            <div class="p-3.5 rounded-2xl bg-slate-100 dark:bg-slate-950/50 border border-slate-200 dark:border-white/5 flex flex-wrap items-center justify-between gap-2 text-xs">
+            <!-- 1. Baris Informasi Petugas & Jam WIB (Solid Strip) -->
+            <div id="cs-info-strip" class="p-3 rounded-2xl flex flex-wrap items-center justify-between gap-2 text-xs">
                 <div>
-                    <span class="text-slate-500 dark:text-slate-400">Petugas:</span>
-                    <strong id="cs-kasir-nama" class="text-slate-900 dark:text-white ml-1"><?= htmlspecialchars($kasir_aktif ?? 'Kasir') ?></strong>
+                    <span id="cs-label-kasir" class="font-medium">Petugas:</span>
+                    <strong id="cs-kasir-nama" class="ml-1 font-bold"><?= htmlspecialchars($kasir_aktif ?? 'Kasir') ?></strong>
                 </div>
                 <div>
-                    <span class="text-slate-500 dark:text-slate-400">Terminal:</span>
-                    <strong id="cs-pos-aktif" class="text-blue-600 dark:text-blue-400 ml-1"><?= htmlspecialchars($pos_aktif ?? 'Kasir Utama') ?></strong>
+                    <span id="cs-label-pos" class="font-medium">Terminal:</span>
+                    <strong id="cs-pos-aktif" class="ml-1 font-bold" style="color: #2563eb;"><?= htmlspecialchars($pos_aktif ?? 'Kasir Utama') ?></strong>
                 </div>
                 <div>
-                    <span class="text-slate-500 dark:text-slate-400">Buka:</span>
-                    <strong id="cs-opening-time" class="font-mono text-slate-700 dark:text-slate-300 ml-1">--:--:-- WIB</strong>
+                    <span id="cs-label-buka" class="font-medium">Buka Shift:</span>
+                    <strong id="cs-opening-time" class="ml-1 font-bold font-mono">--:--:-- WIB</strong>
                 </div>
                 <div>
-                    <span class="text-slate-500 dark:text-slate-400">Tutup:</span>
-                    <strong id="cs-closing-time" class="font-mono text-emerald-600 dark:text-emerald-400 font-bold ml-1"><?= date('H:i:s') ?> WIB</strong>
+                    <span id="cs-label-tutup" class="font-medium">Tutup Shift:</span>
+                    <strong id="cs-closing-time" class="ml-1 font-bold font-mono" style="color: #059669;"><?= date('H:i:s') ?> WIB</strong>
                 </div>
             </div>
 
-            <!-- 2. Ringkasan Omzet Shift (3 Kartu Utama) -->
+            <!-- 2. Tiga Kartu Ringkasan Penjualan (Solid Cards, Kontras Tinggi) -->
             <div class="grid grid-cols-3 gap-3">
-                <div class="p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20">
-                    <span class="text-[11px] font-bold text-emerald-700 dark:text-emerald-400 block">💵 Uang Tunai</span>
-                    <span id="cs-cash-sales" class="text-base sm:text-lg font-black text-emerald-700 dark:text-emerald-400 block mt-0.5">Rp 0</span>
-                    <span class="text-[10px] text-emerald-600/80 dark:text-emerald-500/70 block">Cash di Laci</span>
+                <!-- Penjualan Tunai -->
+                <div class="p-3.5 rounded-2xl" style="background-color: #ecfdf5; border: 1.5px solid #a7f3d0;">
+                    <span style="color: #065f46; font-size: 11px; font-weight: 800; display: block;">💵 Uang Tunai</span>
+                    <span id="cs-cash-sales" style="color: #047857; font-size: 17px; font-weight: 900; display: block; margin-top: 2px;">Rp 0</span>
+                    <span style="color: #059669; font-size: 10px; font-weight: 600; display: block;">Cash di Laci</span>
                 </div>
-                <div class="p-3.5 rounded-2xl bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20">
-                    <span class="text-[11px] font-bold text-blue-700 dark:text-blue-400 block">📱 Non-Tunai</span>
-                    <span id="cs-qris-sales" class="text-base sm:text-lg font-black text-blue-700 dark:text-blue-400 block mt-0.5">Rp 0</span>
-                    <span class="text-[10px] text-blue-600/80 dark:text-blue-500/70 block">QRIS Masuk</span>
+                <!-- Penjualan QRIS -->
+                <div class="p-3.5 rounded-2xl" style="background-color: #eff6ff; border: 1.5px solid #bfdbfe;">
+                    <span style="color: #1e40af; font-size: 11px; font-weight: 800; display: block;">📱 Non-Tunai</span>
+                    <span id="cs-qris-sales" style="color: #1d4ed8; font-size: 17px; font-weight: 900; display: block; margin-top: 2px;">Rp 0</span>
+                    <span style="color: #2563eb; font-size: 10px; font-weight: 600; display: block;">QRIS Masuk</span>
                 </div>
-                <div class="p-3.5 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20">
-                    <span class="text-[11px] font-bold text-indigo-700 dark:text-indigo-400 block">💰 Total Omzet</span>
-                    <span id="cs-total-sales" class="text-base sm:text-lg font-black text-indigo-700 dark:text-indigo-300 block mt-0.5">Rp 0</span>
-                    <span id="cs-tx-count-label" class="text-[10px] text-indigo-600/80 dark:text-indigo-400/70 block"><span id="cs-tx-count">0</span> Nota Sukses</span>
+                <!-- Total Omzet -->
+                <div class="p-3.5 rounded-2xl" style="background-color: #f5f3ff; border: 1.5px solid #ddd6fe;">
+                    <span style="color: #4338ca; font-size: 11px; font-weight: 800; display: block;">💰 Total Omzet</span>
+                    <span id="cs-total-sales" style="color: #4338ca; font-size: 17px; font-weight: 900; display: block; margin-top: 2px;">Rp 0</span>
+                    <span id="cs-tx-count-label" style="color: #6366f1; font-size: 10px; font-weight: 600; display: block;"><span id="cs-tx-count">0</span> Nota Sukses</span>
                 </div>
             </div>
 
-            <!-- 3. Form Rekonsiliasi Kas Laci (Sederhana & Mudah Dipahami) -->
-            <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-white/10 space-y-3.5">
-                <div class="flex items-center justify-between border-b border-slate-200 dark:border-white/10 pb-2">
-                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
-                        <span>🧮</span> Penghitungan Kas Fisik
+            <!-- 3. Form Rekonsiliasi Kas Laci (Solid & Bersih) -->
+            <div id="cs-reconciliation-box" class="p-4 rounded-2xl space-y-3.5">
+                <div id="cs-rec-header" class="flex items-center justify-between pb-2">
+                    <h4 id="cs-rec-title" class="text-xs font-black uppercase tracking-wider m-0 flex items-center gap-1.5">
+                        <span>🧮</span> Penghitungan Fisik Kas
                     </h4>
-                    <span class="text-[11px] text-blue-600 dark:text-blue-400 font-semibold">Otomatis Dihitung</span>
+                    <span style="font-size: 11px; font-weight: 700; color: #2563eb;">Kalkulasi Otomatis</span>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     <!-- Modal Awal Float -->
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                        <label id="cs-label-float" class="block text-xs font-bold mb-1">
                             Modal Awal (*Float*):
                         </label>
                         <div class="relative">
-                            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">Rp</span>
+                            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold" style="color: #64748b;">Rp</span>
                             <input type="number" id="cs-input-float" value="100000" min="0" step="5000" oninput="hitungSelisihKas()" 
-                                   class="w-full pl-10 pr-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-white/20 rounded-xl text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 shadow-sm">
+                                   class="w-full pl-10 pr-3 py-2.5 rounded-xl text-sm font-bold focus:outline-none shadow-sm transition">
                         </div>
-                        <span class="text-[10px] text-slate-500 dark:text-slate-400 mt-1 block">Uang kembalian awal saat shift dibuka.</span>
+                        <span id="cs-sub-float" class="text-[10px] mt-1 block">Uang kembalian awal saat buka shift.</span>
                     </div>
 
                     <!-- Fisik Kas Laci -->
                     <div>
-                        <label class="block text-xs font-bold text-amber-800 dark:text-amber-400 mb-1 flex items-center justify-between">
+                        <label class="block text-xs font-bold mb-1 flex items-center justify-between" style="color: #b45309;">
                             <span>Uang Fisik di Laci:</span>
-                            <span class="text-[11px] text-blue-600 dark:text-blue-400 font-bold cursor-pointer hover:underline" onclick="samakanUangFisik()">[Isi Pas]</span>
+                            <span style="color: #2563eb; font-size: 11px; font-weight: 800; cursor: pointer;" onclick="samakanUangFisik()" title="Isi otomatis dengan uang yang seharusnya ada di laci">[Isi Pas]</span>
                         </label>
                         <div class="relative">
-                            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">Rp</span>
+                            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold" style="color: #b45309;">Rp</span>
                             <input type="number" id="cs-input-actual" value="100000" min="0" step="1000" oninput="hitungSelisihKas()" 
-                                   class="w-full pl-10 pr-3 py-2 bg-white dark:bg-slate-900 border border-amber-500/60 dark:border-amber-500/40 rounded-xl text-sm font-black text-amber-700 dark:text-amber-300 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 shadow-inner">
+                                   class="w-full pl-10 pr-3 py-2.5 rounded-xl text-sm font-black focus:outline-none shadow-sm transition">
                         </div>
-                        <span class="text-[10px] text-slate-500 dark:text-slate-400 mt-1 block">Total uang tunai di laci kasir saat ini.</span>
+                        <span id="cs-sub-actual" class="text-[10px] mt-1 block">Total uang tunai kertas & koin di laci.</span>
                     </div>
                 </div>
 
-                <!-- Hasil Status Selisih Kas (Besar & Jelas) -->
-                <div id="cs-diff-card" class="flex items-center justify-between p-3.5 rounded-xl bg-emerald-100/70 dark:bg-emerald-500/15 border border-emerald-300 dark:border-emerald-500/30 text-emerald-800 dark:text-emerald-300 transition-all duration-200">
+                <!-- Hasil Selisih Kas (Solid Banner) -->
+                <div id="cs-diff-card" class="flex items-center justify-between p-3.5 rounded-xl transition-all duration-200">
                     <div class="flex items-center gap-2">
                         <span class="text-lg">⚖️</span>
                         <span class="text-xs font-black uppercase tracking-wider">Hasil Rekonsiliasi:</span>
@@ -112,26 +118,26 @@
                     <span id="cs-difference-badge" class="text-sm font-black">Rp 0 (Pas / Seimbang)</span>
                 </div>
 
-                <!-- Catatan Kasir (Opsional) -->
+                <!-- Catatan Tambahan -->
                 <div>
-                    <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">Catatan Tambahan (Opsional):</label>
-                    <input type="text" id="cs-input-notes" placeholder="Tuliskan keterangan serah terima jika ada..." 
-                           class="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-white/20 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 shadow-sm">
+                    <label id="cs-label-notes" class="block text-[11px] font-bold mb-1">Catatan Tambahan (Opsional):</label>
+                    <input type="text" id="cs-input-notes" placeholder="Tuliskan keterangan serah terima kas jika ada..." 
+                           class="w-full px-3 py-2 rounded-xl text-xs focus:outline-none shadow-sm transition">
                 </div>
             </div>
 
         </div>
 
-        <!-- Footer Modal: Bersih & Tombol Berbobot -->
-        <div class="px-6 py-4 border-t border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-950/80 flex items-center justify-between gap-3">
-            <button type="button" onclick="tutupModal('modal-closing-shift')" class="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/5 transition cursor-pointer">
+        <!-- Footer Modal (Solid & Kontras Tinggi) -->
+        <div id="cs-footer" class="px-6 py-4 flex items-center justify-between gap-3">
+            <button type="button" onclick="tutupModal('modal-closing-shift')" id="cs-btn-cancel" class="px-4 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer">
                 Batal
             </button>
             <div class="flex items-center gap-2.5">
-                <button type="button" id="btn-print-zreport" onclick="cetakZReportThermal()" class="px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-white/20 text-xs font-bold transition flex items-center gap-1.5 shadow-sm cursor-pointer">
+                <button type="button" id="btn-print-zreport" onclick="cetakZReportThermal()" class="px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-sm">
                     <span>🖨️</span> Cetak Struk Z-Report
                 </button>
-                <button type="button" id="btn-submit-closing" onclick="simpanClosingShift()" class="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/30 transition flex items-center gap-1.5 cursor-pointer">
+                <button type="button" id="btn-submit-closing" onclick="simpanClosingShift()" class="px-5 py-2.5 rounded-xl text-xs font-black transition flex items-center gap-1.5 cursor-pointer shadow-md">
                     <span>💾</span> Selesaikan & Tutup Shift
                 </button>
             </div>
@@ -139,6 +145,319 @@
 
     </div>
 </div>
+
+<!-- ======================================================================== -->
+<!-- CSS KHUSUS NON-TRANSPARAN (SOLID HIGH CONTRAST) MODAL TUTUP SHIFT         -->
+<!-- ======================================================================== -->
+<style id="twb-closing-shift-solid-style">
+/* -------------------------------------------------------------
+   1. TEMA TERANG: SOLID PUTIH BERSIH & BEBAS TRANSPARANSI
+   ------------------------------------------------------------- */
+html[data-theme="light"] #cs-modal-card,
+html.light #cs-modal-card,
+body.light-theme #cs-modal-card,
+html:not(.dark) #cs-modal-card {
+    background-color: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #0f172a !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+}
+
+html[data-theme="light"] #cs-header,
+html.light #cs-header,
+body.light-theme #cs-header,
+html:not(.dark) #cs-header {
+    background-color: #f8fafc !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+}
+
+html[data-theme="light"] #cs-title,
+html.light #cs-title,
+body.light-theme #cs-title,
+html:not(.dark) #cs-title {
+    color: #0f172a !important;
+}
+
+html[data-theme="light"] #cs-subtitle,
+html.light #cs-subtitle,
+body.light-theme #cs-subtitle,
+html:not(.dark) #cs-subtitle {
+    color: #475569 !important;
+}
+
+html[data-theme="light"] #cs-btn-close,
+html.light #cs-btn-close,
+body.light-theme #cs-btn-close,
+html:not(.dark) #cs-btn-close {
+    background-color: #f1f5f9 !important;
+    color: #475569 !important;
+}
+html[data-theme="light"] #cs-btn-close:hover,
+html.light #cs-btn-close:hover,
+body.light-theme #cs-btn-close:hover,
+html:not(.dark) #cs-btn-close:hover {
+    background-color: #e2e8f0 !important;
+    color: #0f172a !important;
+}
+
+/* Strip Info */
+html[data-theme="light"] #cs-info-strip,
+html.light #cs-info-strip,
+body.light-theme #cs-info-strip,
+html:not(.dark) #cs-info-strip {
+    background-color: #f1f5f9 !important;
+    border: 1px solid #e2e8f0 !important;
+    color: #334155 !important;
+}
+html[data-theme="light"] #cs-kasir-nama,
+html.light #cs-kasir-nama,
+body.light-theme #cs-kasir-nama,
+html:not(.dark) #cs-kasir-nama {
+    color: #0f172a !important;
+}
+html[data-theme="light"] #cs-opening-time,
+html.light #cs-opening-time,
+body.light-theme #cs-opening-time,
+html:not(.dark) #cs-opening-time {
+    color: #1e293b !important;
+}
+
+/* Kotak Rekonsiliasi */
+html[data-theme="light"] #cs-reconciliation-box,
+html.light #cs-reconciliation-box,
+body.light-theme #cs-reconciliation-box,
+html:not(.dark) #cs-reconciliation-box {
+    background-color: #f8fafc !important;
+    border: 1px solid #cbd5e1 !important;
+}
+html[data-theme="light"] #cs-rec-header,
+html.light #cs-rec-header,
+body.light-theme #cs-rec-header,
+html:not(.dark) #cs-rec-header {
+    border-bottom: 1px solid #e2e8f0 !important;
+}
+html[data-theme="light"] #cs-rec-title,
+html.light #cs-rec-title,
+body.light-theme #cs-rec-title,
+html:not(.dark) #cs-rec-title {
+    color: #0f172a !important;
+}
+html[data-theme="light"] #cs-label-float,
+html.light #cs-label-float,
+body.light-theme #cs-label-float,
+html:not(.dark) #cs-label-float {
+    color: #1e293b !important;
+}
+html[data-theme="light"] #cs-label-notes,
+html.light #cs-label-notes,
+body.light-theme #cs-label-notes,
+html:not(.dark) #cs-label-notes {
+    color: #334155 !important;
+}
+html[data-theme="light"] #cs-sub-float,
+html[data-theme="light"] #cs-sub-actual,
+html.light #cs-sub-float,
+html.light #cs-sub-actual,
+body.light-theme #cs-sub-float,
+body.light-theme #cs-sub-actual,
+html:not(.dark) #cs-sub-float,
+html:not(.dark) #cs-sub-actual {
+    color: #64748b !important;
+}
+
+/* Input Fields Solid */
+html[data-theme="light"] #cs-input-float,
+html.light #cs-input-float,
+body.light-theme #cs-input-float,
+html:not(.dark) #cs-input-float {
+    background-color: #ffffff !important;
+    border: 2px solid #cbd5e1 !important;
+    color: #0f172a !important;
+}
+html[data-theme="light"] #cs-input-float:focus,
+html.light #cs-input-float:focus,
+body.light-theme #cs-input-float:focus,
+html:not(.dark) #cs-input-float:focus {
+    border-color: #2563eb !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2) !important;
+}
+
+html[data-theme="light"] #cs-input-actual,
+html.light #cs-input-actual,
+body.light-theme #cs-input-actual,
+html:not(.dark) #cs-input-actual {
+    background-color: #ffffff !important;
+    border: 2px solid #f59e0b !important;
+    color: #b45309 !important;
+}
+html[data-theme="light"] #cs-input-actual:focus,
+html.light #cs-input-actual:focus,
+body.light-theme #cs-input-actual:focus,
+html:not(.dark) #cs-input-actual:focus {
+    border-color: #d97706 !important;
+    box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.2) !important;
+}
+
+html[data-theme="light"] #cs-input-notes,
+html.light #cs-input-notes,
+body.light-theme #cs-input-notes,
+html:not(.dark) #cs-input-notes {
+    background-color: #ffffff !important;
+    border: 1.5px solid #cbd5e1 !important;
+    color: #0f172a !important;
+}
+html[data-theme="light"] #cs-input-notes:focus,
+html.light #cs-input-notes:focus,
+body.light-theme #cs-input-notes:focus,
+html:not(.dark) #cs-input-notes:focus {
+    border-color: #2563eb !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2) !important;
+}
+
+/* Footer Solid */
+html[data-theme="light"] #cs-footer,
+html.light #cs-footer,
+body.light-theme #cs-footer,
+html:not(.dark) #cs-footer {
+    background-color: #f8fafc !important;
+    border-top: 1px solid #e2e8f0 !important;
+}
+html[data-theme="light"] #cs-btn-cancel,
+html.light #cs-btn-cancel,
+body.light-theme #cs-btn-cancel,
+html:not(.dark) #cs-btn-cancel {
+    background-color: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #334155 !important;
+}
+html[data-theme="light"] #cs-btn-cancel:hover,
+html.light #cs-btn-cancel:hover,
+body.light-theme #cs-btn-cancel:hover,
+html:not(.dark) #cs-btn-cancel:hover {
+    background-color: #e2e8f0 !important;
+    color: #0f172a !important;
+}
+
+html[data-theme="light"] #btn-print-zreport,
+html.light #btn-print-zreport,
+body.light-theme #btn-print-zreport,
+html:not(.dark) #btn-print-zreport {
+    background-color: #ffffff !important;
+    border: 1.5px solid #cbd5e1 !important;
+    color: #0f172a !important;
+}
+html[data-theme="light"] #btn-print-zreport:hover,
+html.light #btn-print-zreport:hover,
+body.light-theme #btn-print-zreport:hover,
+html:not(.dark) #btn-print-zreport:hover {
+    background-color: #f1f5f9 !important;
+    border-color: #94a3b8 !important;
+}
+
+html[data-theme="light"] #btn-submit-closing,
+html.light #btn-submit-closing,
+body.light-theme #btn-submit-closing,
+html:not(.dark) #btn-submit-closing {
+    background-color: #d97706 !important;
+    color: #ffffff !important;
+    border: none !important;
+}
+html[data-theme="light"] #btn-submit-closing:hover,
+html.light #btn-submit-closing:hover,
+body.light-theme #btn-submit-closing:hover,
+html:not(.dark) #btn-submit-closing:hover {
+    background-color: #b45309 !important;
+}
+
+/* -------------------------------------------------------------
+   2. TEMA GELAP: SOLID DARK SLATE & KONTRAS TINGGI
+   ------------------------------------------------------------- */
+html.dark #cs-modal-card,
+html[data-theme="dark"] #cs-modal-card {
+    background-color: #0f172a !important;
+    border: 1px solid #334155 !important;
+    color: #ffffff !important;
+}
+html.dark #cs-header,
+html[data-theme="dark"] #cs-header {
+    background-color: #1e293b !important;
+    border-bottom: 1px solid #334155 !important;
+}
+html.dark #cs-title,
+html[data-theme="dark"] #cs-title {
+    color: #ffffff !important;
+}
+html.dark #cs-subtitle,
+html[data-theme="dark"] #cs-subtitle {
+    color: #94a3b8 !important;
+}
+html.dark #cs-btn-close,
+html[data-theme="dark"] #cs-btn-close {
+    background-color: #334155 !important;
+    color: #94a3b8 !important;
+}
+html.dark #cs-info-strip,
+html[data-theme="dark"] #cs-info-strip {
+    background-color: #1e293b !important;
+    border: 1px solid #334155 !important;
+    color: #94a3b8 !important;
+}
+html.dark #cs-reconciliation-box,
+html[data-theme="dark"] #cs-reconciliation-box {
+    background-color: #1e293b !important;
+    border: 1px solid #334155 !important;
+}
+html.dark #cs-rec-header,
+html[data-theme="dark"] #cs-rec-header {
+    border-bottom: 1px solid #334155 !important;
+}
+html.dark #cs-rec-title,
+html[data-theme="dark"] #cs-rec-title {
+    color: #f1f5f9 !important;
+}
+html.dark #cs-label-float,
+html.dark #cs-label-notes,
+html[data-theme="dark"] #cs-label-float,
+html[data-theme="dark"] #cs-label-notes {
+    color: #cbd5e1 !important;
+}
+html.dark #cs-input-float,
+html.dark #cs-input-notes,
+html[data-theme="dark"] #cs-input-float,
+html[data-theme="dark"] #cs-input-notes {
+    background-color: #0f172a !important;
+    border: 1.5px solid #475569 !important;
+    color: #ffffff !important;
+}
+html.dark #cs-input-actual,
+html[data-theme="dark"] #cs-input-actual {
+    background-color: #0f172a !important;
+    border: 2px solid #f59e0b !important;
+    color: #fbbf24 !important;
+}
+html.dark #cs-footer,
+html[data-theme="dark"] #cs-footer {
+    background-color: #1e293b !important;
+    border-top: 1px solid #334155 !important;
+}
+html.dark #cs-btn-cancel,
+html[data-theme="dark"] #cs-btn-cancel {
+    background-color: #334155 !important;
+    border: 1px solid #475569 !important;
+    color: #cbd5e1 !important;
+}
+html.dark #btn-print-zreport,
+html[data-theme="dark"] #btn-print-zreport {
+    background-color: #334155 !important;
+    border: 1px solid #475569 !important;
+    color: #ffffff !important;
+}
+html.dark #btn-submit-closing,
+html[data-theme="dark"] #btn-submit-closing {
+    background-color: #f59e0b !important;
+    color: #0f172a !important;
+}
+</style>
 
 <!-- ======================================================================== -->
 <!-- AREA CETAK STRUK THERMAL RESMI Z-REPORT (STANDAR 58mm / 80mm)             -->
@@ -300,13 +619,19 @@ function hitungSelisihKas() {
 
     if (diff === 0) {
         badge.textContent = 'Rp 0 (Pas / Seimbang)';
-        card.className = 'flex items-center justify-between p-3.5 rounded-xl bg-emerald-100/80 dark:bg-emerald-500/15 border border-emerald-300 dark:border-emerald-500/30 text-emerald-800 dark:text-emerald-300 transition-all duration-200';
+        card.style.backgroundColor = '#dcfce7';
+        card.style.border = '1.5px solid #86efac';
+        card.style.color = '#14532d';
     } else if (diff > 0) {
         badge.textContent = `+ ${formatRupiahJs(diff)} (Kelebihan Kas)`;
-        card.className = 'flex items-center justify-between p-3.5 rounded-xl bg-amber-100/80 dark:bg-amber-500/15 border border-amber-300 dark:border-amber-500/30 text-amber-800 dark:text-amber-300 transition-all duration-200';
+        card.style.backgroundColor = '#fef3c7';
+        card.style.border = '1.5px solid #fcd34d';
+        card.style.color = '#92400e';
     } else {
         badge.textContent = `- ${formatRupiahJs(Math.abs(diff))} (Kekurangan Kas)`;
-        card.className = 'flex items-center justify-between p-3.5 rounded-xl bg-rose-100/80 dark:bg-rose-500/15 border border-rose-300 dark:border-rose-500/30 text-rose-800 dark:text-rose-300 transition-all duration-200';
+        card.style.backgroundColor = '#fee2e2';
+        card.style.border = '1.5px solid #fca5a5';
+        card.style.color = '#991b1b';
     }
 }
 

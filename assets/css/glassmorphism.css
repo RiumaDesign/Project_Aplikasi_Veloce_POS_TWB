@@ -828,8 +828,12 @@ html.light .twb-modal-btn-no:hover {
 }
 
 /* ==========================================================================
-   MODAL TUTUP SHIFT KASIR & REKAPITULASI (Z-REPORT) DI TEMA TERANG
+   MODAL TUTUP SHIFT KASIR & REKAPITULASI (Z-REPORT) — SOLID NON-TRANSPARAN
    ========================================================================== */
+html[data-theme="light"] #cs-modal-card,
+html.light #cs-modal-card,
+body.light-theme #cs-modal-card,
+html:not(.dark) #cs-modal-card,
 html[data-theme="light"] #modal-closing-shift > div,
 html.light #modal-closing-shift > div {
     background-color: #ffffff !important;
@@ -838,50 +842,91 @@ html.light #modal-closing-shift > div {
     color: #0f172a !important;
 }
 
-/* Header modal */
-html[data-theme="light"] #modal-closing-shift .bg-slate-950\/60,
-html.light #modal-closing-shift .bg-slate-950\/60 {
+html[data-theme="light"] #cs-header,
+html.light #cs-header,
+body.light-theme #cs-header,
+html:not(.dark) #cs-header {
     background-color: #f8fafc !important;
     border-bottom: 1px solid #e2e8f0 !important;
 }
-html[data-theme="light"] #modal-closing-shift h3,
-html.light #modal-closing-shift h3 {
+html[data-theme="light"] #cs-title,
+html.light #cs-title,
+body.light-theme #cs-title,
+html:not(.dark) #cs-title {
     color: #0f172a !important;
 }
+html[data-theme="light"] #cs-subtitle,
+html.light #cs-subtitle,
+body.light-theme #cs-subtitle,
+html:not(.dark) #cs-subtitle {
+    color: #475569 !important;
+}
 
-/* Strip metadata */
-html[data-theme="light"] #modal-closing-shift .bg-slate-950\/50,
-html.light #modal-closing-shift .bg-slate-950\/50 {
+html[data-theme="light"] #cs-info-strip,
+html.light #cs-info-strip,
+body.light-theme #cs-info-strip,
+html:not(.dark) #cs-info-strip {
     background-color: #f1f5f9 !important;
     border: 1px solid #e2e8f0 !important;
+    color: #334155 !important;
 }
-
-/* Form Rekonsiliasi */
-html[data-theme="light"] #modal-closing-shift .bg-slate-950\/70,
-html.light #modal-closing-shift .bg-slate-950\/70 {
-    background-color: #f8fafc !important;
-    border: 1px solid #e2e8f0 !important;
-}
-html[data-theme="light"] #modal-closing-shift label,
-html.light #modal-closing-shift label {
-    color: #1e293b !important;
-    font-weight: 700 !important;
-}
-
-/* Input Fields & Textarea */
-html[data-theme="light"] #modal-closing-shift input,
-html.light #modal-closing-shift input,
-html[data-theme="light"] #modal-closing-shift textarea,
-html.light #modal-closing-shift textarea {
-    background-color: #ffffff !important;
-    border: 1.5px solid #cbd5e1 !important;
+html[data-theme="light"] #cs-kasir-nama,
+html.light #cs-kasir-nama,
+body.light-theme #cs-kasir-nama,
+html:not(.dark) #cs-kasir-nama {
     color: #0f172a !important;
 }
 
-/* Footer Modal */
-html[data-theme="light"] #modal-closing-shift .bg-slate-950\/80,
-html.light #modal-closing-shift .bg-slate-950\/80 {
+html[data-theme="light"] #cs-reconciliation-box,
+html.light #cs-reconciliation-box,
+body.light-theme #cs-reconciliation-box,
+html:not(.dark) #cs-reconciliation-box {
+    background-color: #f8fafc !important;
+    border: 1px solid #cbd5e1 !important;
+}
+html[data-theme="light"] #cs-rec-title,
+html.light #cs-rec-title,
+body.light-theme #cs-rec-title,
+html:not(.dark) #cs-rec-title {
+    color: #0f172a !important;
+}
+html[data-theme="light"] #cs-label-float,
+html.light #cs-label-float,
+body.light-theme #cs-label-float,
+html:not(.dark) #cs-label-float {
+    color: #1e293b !important;
+}
+
+html[data-theme="light"] #cs-input-float,
+html[data-theme="light"] #cs-input-actual,
+html[data-theme="light"] #cs-input-notes,
+html.light #cs-input-float,
+html.light #cs-input-actual,
+html.light #cs-input-notes,
+body.light-theme #cs-input-float,
+body.light-theme #cs-input-actual,
+body.light-theme #cs-input-notes,
+html:not(.dark) #cs-input-float,
+html:not(.dark) #cs-input-actual,
+html:not(.dark) #cs-input-notes {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+}
+
+html[data-theme="light"] #cs-footer,
+html.light #cs-footer,
+body.light-theme #cs-footer,
+html:not(.dark) #cs-footer {
     background-color: #f8fafc !important;
     border-top: 1px solid #e2e8f0 !important;
 }
+html[data-theme="light"] #cs-btn-cancel,
+html.light #cs-btn-cancel,
+body.light-theme #cs-btn-cancel,
+html:not(.dark) #cs-btn-cancel {
+    background-color: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #334155 !important;
+}
+
 

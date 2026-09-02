@@ -83,6 +83,11 @@ if ($terminals_q) {
     <title>TWB POS — <?= htmlspecialchars($pos_aktif) ?></title>
     <link rel="icon" type="image/png" href="assets/images/logo_twb.png">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class'
+        }
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/glassmorphism.css?v=<?= filemtime(__DIR__ . '/assets/css/glassmorphism.css') ?>">
     <script src="assets/js/theme.js?v=<?= filemtime(__DIR__ . '/assets/js/theme.js') ?>"></script>

@@ -6,6 +6,11 @@
     <title>TWB Admin Khusus — Master Multi-Outlet & Vending Machine Borobudur</title>
     <link rel="icon" type="image/png" href="assets/images/logo_twb.png">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class'
+        }
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/glassmorphism.css?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/css/glassmorphism.css') ?>">
