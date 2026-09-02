@@ -531,9 +531,12 @@ switch ($action) {
         require_once __DIR__ . '/controllers/ShiftController.php';
         $shiftCtrl = new ShiftController($conn);
 
-        $payload = !empty($input_data) ? $input_data : $_POST;
-        if (empty($payload['kasir_nama']) && !empty($_SESSION['kasir'])) {
-            $payload['kasir_nama'] = $_SESSION['kasir'];
+        $rawInput = file_get_contents('php://input');
+        $jsonInput = !empty($rawInput) ? json_decode($rawInput, true) : null;
+        $payload = (!empty($jsonInput) && is_array($jsonInput)) ? $jsonInput : $_POST;
+
+        if (empty($payload['kasir_nama'])) {
+            $payload['kasir_nama'] = $_SESSION['kasir'] ?? $_SESSION['kasir_nama'] ?? $_SESSION['admin_nama'] ?? $_SESSION['username'] ?? 'Kasir';
         }
 
         $res = $shiftCtrl->closeShift($payload);

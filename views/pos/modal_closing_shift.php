@@ -1,22 +1,22 @@
 <!-- MODAL TUTUP SHIFT KASIR & REKAPITULASI KAS (Z-REPORT) -->
 <div id="modal-closing-shift" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden items-center justify-center p-4 transition-all duration-300">
-    <div class="bg-slate-900 border border-white/10 w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh] animate-in fade-in zoom-in-95 duration-200">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh] animate-in fade-in zoom-in-95 duration-200 text-slate-800 dark:text-white">
         
         <!-- Header Modal -->
-        <div class="px-6 py-4 border-b border-white/10 bg-slate-950/60 flex items-center justify-between">
+        <div class="px-6 py-4 border-b border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-950/60 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-2xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-xl text-amber-400">
+                <div class="w-10 h-10 rounded-2xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-xl text-amber-500 dark:text-amber-400 shadow-sm">
                     💵
                 </div>
                 <div>
-                    <h3 class="text-base font-black text-white flex items-center gap-2">
+                    <h3 class="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
                         Tutup Shift & Rekapitulasi Kasir
-                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 font-mono font-bold">Z-Report</span>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-400 font-mono font-bold">Z-Report</span>
                     </h3>
-                    <p class="text-xs text-slate-400">PT Taman Wisata Candi Borobudur (TWB)</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">PT Taman Wisata Candi Borobudur (TWB)</p>
                 </div>
             </div>
-            <button type="button" onclick="tutupModal('modal-closing-shift')" class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition">
+            <button type="button" onclick="tutupModal('modal-closing-shift')" class="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
         </div>
@@ -24,94 +24,94 @@
         <!-- Body Modal -->
         <div class="p-6 overflow-y-auto custom-scroll space-y-5">
             
-            <!-- Metadata Strip -->
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 p-3 rounded-2xl bg-slate-950/50 border border-white/5 text-xs">
+            <!-- Metadata Strip (Adaptif Terang/Gelap) -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 p-3.5 rounded-2xl bg-slate-100 dark:bg-slate-950/50 border border-slate-200 dark:border-white/5 text-xs shadow-sm">
                 <div>
-                    <span class="text-[10px] text-slate-400 block">Petugas Kasir</span>
-                    <span id="cs-kasir-nama" class="font-bold text-white"><?= htmlspecialchars($kasir_aktif ?? 'Kasir') ?></span>
+                    <span class="text-[10px] text-slate-500 dark:text-slate-400 block font-medium">Petugas Kasir</span>
+                    <span id="cs-kasir-nama" class="font-bold text-slate-900 dark:text-white"><?= htmlspecialchars($kasir_aktif ?? 'Kasir') ?></span>
                 </div>
                 <div>
-                    <span class="text-[10px] text-slate-400 block">Terminal / Lokasi</span>
-                    <span id="cs-pos-aktif" class="font-bold text-blue-400"><?= htmlspecialchars($pos_aktif ?? 'Kasir Utama') ?></span>
+                    <span class="text-[10px] text-slate-500 dark:text-slate-400 block font-medium">Terminal / Lokasi</span>
+                    <span id="cs-pos-aktif" class="font-bold text-blue-600 dark:text-blue-400"><?= htmlspecialchars($pos_aktif ?? 'Kasir Utama') ?></span>
                 </div>
                 <div>
-                    <span class="text-[10px] text-slate-400 block">Waktu Buka Shift</span>
-                    <span id="cs-opening-time" class="font-mono text-slate-300">--:--:--</span>
+                    <span class="text-[10px] text-slate-500 dark:text-slate-400 block font-medium">Waktu Buka Shift</span>
+                    <span id="cs-opening-time" class="font-mono text-slate-700 dark:text-slate-300 font-semibold">--:--:--</span>
                 </div>
                 <div>
-                    <span class="text-[10px] text-slate-400 block">Waktu Penutupan</span>
-                    <span id="cs-closing-time" class="font-mono text-emerald-400 font-bold"><?= date('H:i:s') ?></span>
+                    <span class="text-[10px] text-slate-500 dark:text-slate-400 block font-medium">Waktu Penutupan</span>
+                    <span id="cs-closing-time" class="font-mono text-emerald-600 dark:text-emerald-400 font-bold"><?= date('H:i:s') ?></span>
                 </div>
             </div>
 
             <!-- Ringkasan Penjualan Sistem -->
             <div>
-                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5 flex items-center gap-1.5">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-2.5 flex items-center gap-1.5">
                     <span>📊</span> Penjualan Tercatat Sistem
                 </h4>
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <div class="p-3.5 rounded-2xl bg-slate-800/40 border border-white/5">
-                        <span class="text-[10px] text-slate-400 block">Total Nota Transaksi</span>
-                        <span id="cs-tx-count" class="text-lg font-black text-white">0</span>
-                        <span class="text-[10px] text-slate-500 block">Struk Berhasil</span>
+                    <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm">
+                        <span class="text-[10px] text-slate-500 dark:text-slate-400 block font-medium">Total Nota Transaksi</span>
+                        <span id="cs-tx-count" class="text-lg font-black text-slate-900 dark:text-white">0</span>
+                        <span class="text-[10px] text-slate-400 dark:text-slate-500 block">Struk Berhasil</span>
                     </div>
-                    <div class="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
-                        <span class="text-[10px] text-emerald-400 block">Penjualan Tunai</span>
-                        <span id="cs-cash-sales" class="text-lg font-black text-emerald-400">Rp 0</span>
+                    <div class="p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 shadow-sm">
+                        <span class="text-[10px] text-emerald-600 dark:text-emerald-400 block font-medium">Penjualan Tunai</span>
+                        <span id="cs-cash-sales" class="text-lg font-black text-emerald-600 dark:text-emerald-400">Rp 0</span>
                         <span class="text-[10px] text-emerald-500/70 block">Cash di Laci</span>
                     </div>
-                    <div class="p-3.5 rounded-2xl bg-blue-500/10 border border-blue-500/20">
-                        <span class="text-[10px] text-blue-400 block">Penjualan QRIS</span>
-                        <span id="cs-qris-sales" class="text-lg font-black text-blue-400">Rp 0</span>
+                    <div class="p-3.5 rounded-2xl bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 shadow-sm">
+                        <span class="text-[10px] text-blue-600 dark:text-blue-400 block font-medium">Penjualan QRIS</span>
+                        <span id="cs-qris-sales" class="text-lg font-black text-blue-600 dark:text-blue-400">Rp 0</span>
                         <span class="text-[10px] text-blue-500/70 block">Non-Tunai Masuk</span>
                     </div>
-                    <div class="p-3.5 rounded-2xl bg-indigo-500/10 border border-indigo-500/20">
-                        <span class="text-[10px] text-indigo-400 block">Grand Total Omzet</span>
-                        <span id="cs-total-sales" class="text-lg font-black text-indigo-300">Rp 0</span>
-                        <span class="text-[10px] text-indigo-400/70 block">Tunai + QRIS</span>
+                    <div class="p-3.5 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 shadow-sm">
+                        <span class="text-[10px] text-indigo-600 dark:text-indigo-400 block font-medium">Grand Total Omzet</span>
+                        <span id="cs-total-sales" class="text-lg font-black text-indigo-600 dark:text-indigo-300">Rp 0</span>
+                        <span class="text-[10px] text-indigo-500/70 block">Tunai + QRIS</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Form Rekonsiliasi Kas Fisik -->
-            <div class="p-4.5 rounded-2xl bg-slate-950/70 border border-white/10 space-y-4">
-                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center justify-between">
+            <!-- Form Rekonsiliasi Kas Fisik (Kontras Tinggi & Eye-Catching) -->
+            <div class="p-4.5 rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-white/10 space-y-4 shadow-sm">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-300 flex items-center justify-between">
                     <span class="flex items-center gap-1.5"><span>🧮</span> Rekonsiliasi & Penghitungan Fisik Laci</span>
-                    <span class="text-[10px] text-blue-400 font-normal">Kalkulasi Otomatis</span>
+                    <span class="text-[10px] text-blue-600 dark:text-blue-400 font-semibold">Kalkulasi Otomatis</span>
                 </h4>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <!-- Modal Awal Kasir -->
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5">
+                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-400 mb-1.5">
                             Modal Awal Kasir (*Float*):
                         </label>
                         <div class="relative">
-                            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-500">Rp</span>
+                            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">Rp</span>
                             <input type="number" id="cs-input-float" value="100000" min="0" step="5000" oninput="hitungSelisihKas()" 
-                                   class="w-full pl-10 pr-3 py-2 bg-slate-900 border border-white/10 rounded-xl text-sm font-bold text-white focus:outline-none focus:border-blue-500">
+                                   class="w-full pl-10 pr-3 py-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-white/10 rounded-xl text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 shadow-sm">
                         </div>
-                        <span class="text-[10px] text-slate-500 mt-1 block">Uang kembalian awal saat buka kasir.</span>
+                        <span class="text-[10px] text-slate-500 dark:text-slate-400 mt-1 block">Uang kembalian awal saat buka kasir.</span>
                     </div>
 
                     <!-- Uang Kas Fisik yang Dihitung -->
                     <div>
-                        <label class="block text-xs font-semibold text-amber-400 mb-1.5 flex items-center justify-between">
+                        <label class="block text-xs font-semibold text-amber-700 dark:text-amber-400 mb-1.5 flex items-center justify-between">
                             <span>Uang Fisik Dihitung di Laci:</span>
-                            <span class="text-[10px] text-slate-400 cursor-pointer hover:underline" onclick="samakanUangFisik()">[Hitung Pas]</span>
+                            <span class="text-[10px] text-blue-600 dark:text-slate-400 font-bold cursor-pointer hover:underline" onclick="samakanUangFisik()">[Hitung Pas]</span>
                         </label>
                         <div class="relative">
-                            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-500">Rp</span>
+                            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">Rp</span>
                             <input type="number" id="cs-input-actual" value="100000" min="0" step="1000" oninput="hitungSelisihKas()" 
-                                   class="w-full pl-10 pr-3 py-2 bg-slate-900 border border-amber-500/40 rounded-xl text-sm font-black text-amber-300 focus:outline-none focus:border-amber-400 shadow-inner">
+                                   class="w-full pl-10 pr-3 py-2.5 bg-white dark:bg-slate-900 border border-amber-500/60 dark:border-amber-500/40 rounded-xl text-sm font-black text-amber-600 dark:text-amber-300 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 shadow-inner">
                         </div>
-                        <span class="text-[10px] text-slate-500 mt-1 block">Hitung seluruh uang kertas & koin di laci.</span>
+                        <span class="text-[10px] text-slate-500 dark:text-slate-400 mt-1 block">Hitung seluruh uang kertas & koin di laci.</span>
                     </div>
                 </div>
 
-                <!-- Kartu Hasil Rekonsiliasi Selisih Fisik Kas Laci -->
-                <div class="pt-2 border-t border-white/5">
-                    <div id="cs-diff-card" class="flex items-center justify-between p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 transition-all duration-300">
+                <!-- Kartu Hasil Rekonsiliasi Selisih Fisik Kas Laci (Mandiri & Jelas) -->
+                <div class="pt-2 border-t border-slate-200 dark:border-white/5">
+                    <div id="cs-diff-card" class="flex items-center justify-between p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-300 dark:border-emerald-500/30 text-emerald-700 dark:text-emerald-400 transition-all duration-300 shadow-sm">
                         <div class="flex items-center gap-2">
                             <span class="text-base">⚖️</span>
                             <span class="text-xs font-bold uppercase tracking-wider">Status Selisih Kas:</span>
@@ -122,27 +122,28 @@
 
                 <!-- Catatan Penutupan Shift -->
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5">Catatan Kasir (Opsional):</label>
+                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-400 mb-1.5">Catatan Kasir (Opsional):</label>
                     <textarea id="cs-input-notes" rows="2" placeholder="Tuliskan keterangan serah terima kas atau alasan selisih jika ada..." 
-                              class="w-full p-2.5 bg-slate-900 border border-white/10 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"></textarea>
+                              class="w-full p-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-white/10 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 shadow-sm"></textarea>
                 </div>
             </div>
 
         </div>
 
         <!-- Footer Aksi Modal -->
-        <div class="px-6 py-4 border-t border-white/10 bg-slate-950/80 flex items-center justify-between gap-3">
-            <button type="button" onclick="tutupModal('modal-closing-shift')" class="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-white/5 transition">
+        <div class="px-6 py-4 border-t border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-950/80 flex items-center justify-between gap-3">
+            <button type="button" onclick="tutupModal('modal-closing-shift')" class="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/5 transition">
                 Batal
             </button>
             <div class="flex items-center gap-2">
-                <button type="button" id="btn-print-zreport" onclick="cetakZReportThermal()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-white/10 text-xs font-bold transition flex items-center gap-1.5">
+                <button type="button" id="btn-print-zreport" onclick="cetakZReportThermal()" class="px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-white/10 text-xs font-bold transition flex items-center gap-1.5 shadow-sm cursor-pointer">
                     <span>🖨️</span> Cetak Z-Report
                 </button>
-                <button type="button" id="btn-submit-closing" onclick="simpanClosingShift()" class="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/30 transition flex items-center gap-1.5">
+                <button type="button" id="btn-submit-closing" onclick="simpanClosingShift()" class="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/30 transition flex items-center gap-1.5 cursor-pointer">
                     <span>💾</span> Simpan & Selesaikan Shift
                 </button>
             </div>
+        </div>
         </div>
 
     </div>
@@ -298,11 +299,14 @@ async function simpanClosingShift() {
     btn.disabled = true;
     btn.innerHTML = `<span>⏳</span> Memproses...`;
 
+    const kasirNamaVal = currentShiftData.kasir_nama || (document.getElementById('cs-kasir-nama') ? document.getElementById('cs-kasir-nama').textContent.trim() : '') || '<?= htmlspecialchars($kasir_aktif ?? "Kasir") ?>';
+    const posAktifVal = currentShiftData.pos_aktif || (document.getElementById('cs-pos-aktif') ? document.getElementById('cs-pos-aktif').textContent.trim() : '') || '<?= htmlspecialchars($pos_aktif ?? "Kasir Utama") ?>';
+
     const payload = {
-        kasir_nama: currentShiftData.kasir_nama,
-        pos_aktif: currentShiftData.pos_aktif,
-        outlet_id: 1,
-        opening_time: currentShiftData.opening_time,
+        kasir_nama: kasirNamaVal,
+        pos_aktif: posAktifVal,
+        outlet_id: <?= intval($outlet_id ?? 1) ?>,
+        opening_time: currentShiftData.opening_time || '<?= date("Y-m-d 08:00:00") ?>',
         opening_cash: currentShiftData.opening_cash,
         actual_cash: currentShiftData.actual_cash,
         notes: document.getElementById('cs-input-notes').value.trim()
@@ -351,7 +355,8 @@ function cetakZReportThermal() {
     document.getElementById('zr-print-total').textContent = formatRupiahJs(currentShiftData.total_sales);
     document.getElementById('zr-print-float').textContent = formatRupiahJs(currentShiftData.opening_cash);
     document.getElementById('zr-print-cashin').textContent = formatRupiahJs(currentShiftData.cash_sales);
-    document.getElementById('zr-print-expected').textContent = formatRupiahJs(currentShiftData.expected_cash);
+    const zrExp = document.getElementById('zr-print-expected');
+    if (zrExp) zrExp.textContent = formatRupiahJs(currentShiftData.expected_cash);
     document.getElementById('zr-print-actual').textContent = formatRupiahJs(currentShiftData.actual_cash);
     
     const diff = currentShiftData.difference;

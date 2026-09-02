@@ -826,3 +826,62 @@ html.light .twb-modal-btn-no:hover {
     background: #e2e8f0 !important;
     color: #0f172a !important;
 }
+
+/* ==========================================================================
+   MODAL TUTUP SHIFT KASIR & REKAPITULASI (Z-REPORT) DI TEMA TERANG
+   ========================================================================== */
+html[data-theme="light"] #modal-closing-shift > div,
+html.light #modal-closing-shift > div {
+    background-color: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.25) !important;
+    color: #0f172a !important;
+}
+
+/* Header modal */
+html[data-theme="light"] #modal-closing-shift .bg-slate-950\/60,
+html.light #modal-closing-shift .bg-slate-950\/60 {
+    background-color: #f8fafc !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+}
+html[data-theme="light"] #modal-closing-shift h3,
+html.light #modal-closing-shift h3 {
+    color: #0f172a !important;
+}
+
+/* Strip metadata */
+html[data-theme="light"] #modal-closing-shift .bg-slate-950\/50,
+html.light #modal-closing-shift .bg-slate-950\/50 {
+    background-color: #f1f5f9 !important;
+    border: 1px solid #e2e8f0 !important;
+}
+
+/* Form Rekonsiliasi */
+html[data-theme="light"] #modal-closing-shift .bg-slate-950\/70,
+html.light #modal-closing-shift .bg-slate-950\/70 {
+    background-color: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+}
+html[data-theme="light"] #modal-closing-shift label,
+html.light #modal-closing-shift label {
+    color: #1e293b !important;
+    font-weight: 700 !important;
+}
+
+/* Input Fields & Textarea */
+html[data-theme="light"] #modal-closing-shift input,
+html.light #modal-closing-shift input,
+html[data-theme="light"] #modal-closing-shift textarea,
+html.light #modal-closing-shift textarea {
+    background-color: #ffffff !important;
+    border: 1.5px solid #cbd5e1 !important;
+    color: #0f172a !important;
+}
+
+/* Footer Modal */
+html[data-theme="light"] #modal-closing-shift .bg-slate-950\/80,
+html.light #modal-closing-shift .bg-slate-950\/80 {
+    background-color: #f8fafc !important;
+    border-top: 1px solid #e2e8f0 !important;
+}
+
