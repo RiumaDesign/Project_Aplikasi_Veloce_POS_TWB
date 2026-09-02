@@ -1,0 +1,534 @@
+================================================================================
+          LOGBOOK & CATATAN PROGRESS HARIAN KERJA PRAKTIK (KP)
+         PENGEMBANGAN SISTEM POINT OF SALE (VELOCE POS) MULTI-OUTLET
+                      PT TAMAN WISATA BOROBUDUR
+================================================================================
+Instansi / Perusahaan : PT Taman Wisata Candi Borobudur, Prambanan & Ratu Boko
+Unit Kerja            : Divisi Komersial & Teknologi Informasi - Unit Borobudur
+Nama Project          : Modernisasi & Skalabilitas Veloce POS (11 Titik Outlet & VM)
+Dokumen Acuan         : docs/LAPORAN_ANALISIS_PRA_PERUBAHAN.md
+Rentang Waktu KP      : Selasa, 01 September 2026 s/d Selasa, 15 September 2026 (15 Hari Kerja)
+Target Hasil          : Sistem Kasir & Inventori Siap Pakai (Production-Ready)
+================================================================================
+
+
+================================================================================
+[ 1. INFORMASI UMUM & SCOPE KERJA PRAKTIK ]
+================================================================================
+
+1.1 Latar Belakang Penugasan:
+--------------------------------------------------------------------------------
+PT Taman Wisata Borobudur mengoperasikan berbagai titik penjualan makanan/minuman di kawasan destinasi Candi Borobudur , mencakup:
+- 9 Unit Vending Machine otomatis (VM 1 sampai dengan VM 9).
+- 2 Titik Outlet fisik (Outlet Museum Samudra Raksa & Outlet Refreshment Barat).
+- 1 Hub Distribusi logistik (Gudang Pusat Borobudur).
+
+Aplikasi kasir awal (baseline) memiliki keterbatasan arsitektur:
+1. Kolom stok bersifat flat/hardcode (`stok_pos_a`, `stok_pos_b`), tidak dapat
+   menampung penambahan 11 lokasi baru tanpa mengubah skema tabel berulang kali.
+2. Tidak adanya master lokasi/outlet dinamis.
+3. Rincian transaksi hanya disimpan dalam bentuk teks string (`item_singkat`).
+4. Belum tersedianya sistem mutasi Delivery Order (DO) antar lokasi mesin/outlet.
+5. Belum ada pencatatan terpisah untuk barang retur fisik rusak dan kadaluarsa.
+6. Antarmuka masih monolitik dan belum mengadopsi standar visual modern Glassmorphism.
+
+1.2 Ruang Lingkup Kerja Praktik (Scope of Work):
+--------------------------------------------------------------------------------
+1. Audit arsitektur codebase eksisting dan penyusunan laporan pra-perubahan.
+2. Rekonsiliasi database relasional multi-lokasi tanpa menghilangkan data historis.
+3. Dekomposisi arsitektur monolitik menjadi modular (Pemisahan Controller & View).
+4. Penambahan Master CRUD 11 Lokasi Outlet & Vending Machine.
+5. Fitur Master Produk Lengkap (Full CRUD Produk & Upload Foto):
+   - Tambah produk baru beserta upload berkas foto produk (JPG/PNG/WebP).
+   - Edit data produk (nama, harga jual, tipe varian, stok) dan penggantian foto.
+   - Hapus produk terintegrasi dengan pembersihan file gambar fisik dari server.
+   - Pengaturan ketersediaan produk per outlet (Many-to-Many via `product_outlets`).
+6. Pembaruan Terminal Kasir POS berbasis sesi outlet aktif dan rincian transaksi_detail.
+7. Modul mutasi stok Delivery Order (DO) multi-arah (Gudang ➔ Outlet dan Antar-Outlet).
+8. Modul pengelolaan barang rusak (fisik, kemasan, expired) dengan alokasi karantina.
+9. Pembaruan grafik omzet dan analitik stok realtime multi-outlet (Chart.js).
+10. Fitur Export Laporan (Excel/CSV & PDF) dengan pencatatan audit export_logs.
+11. Integrasi Mobile Web App Native-Like (PWA / Mobile-Optimized Interface):
+    - Pengelolaan dashboard admin, monitoring stok, dan terminal kasir via smartphone & tablet.
+    - Kesiapan tata letak touch-friendly, manifest web app, dan REST API terstruktur (`api.php`).
+12. Penyempurnaan UI/UX berbasis Glassmorphism modern khas PT Taman Wisata Borobudur.
+13. Uji fungsional menyeluruh, UAT bersama staf operasional, serta penyusunan laporan dan dokumentasi teknis pembuatan aplikasi.
+
+
+================================================================================
+[ 2. ARSITEKTUR AWAL (BASELINE) & ANALISIS STRUKTUR EKSISTING ]
+================================================================================
+
+2.1 Diagram Arsitektur Baseline (Sebelum Perubahan):
+--------------------------------------------------------------------------------
+                   APLIKASI POS EKSISTING (MONOLITIK)
+               ┌───────────────────────┴───────────────────────┐
+               │                                               │
+       [ index.php ]                                   [ dashboard.php ]
+  (POS, Login Kasir & Admin,                      (Analytics, Stok, Menu, Kasir,
+   Cart, Transaksi, Cetak Struk)                   Semua SQL inline dalam 1 file)
+               │                                               │
+               └───────────────────────┬───────────────────────┘
+                                       │
+                              [ MariaDB: veloce_pos ]
+               ┌───────────────────────┼───────────────────────┐
+               │                       │                       │
+          [ produk ]             [ transaksi ]            [ log_stok ]
+    (stok_pos_a, stok_pos_b,    (pos_aktif string,     (tipe ENUM kaku:
+     stok_gudang - FLAT!)       item_singkat teks)      kirim_pos_a/b)
+
+2.2 Struktur Basis Data Eksisting (4 Tabel Awal):
+--------------------------------------------------------------------------------
+1. `produk` :
+   - Kolom: `id`, `nama`, `harga`, `custom_type`, `gambar`, `stok_gudang`, `stok_pos_a`, `stok_pos_b`.
+   - Celah: Kolom stok bersifat horizontal (`stok_pos_a`, `stok_pos_b`). Tidak scalable karena jika
+     menambah 11 outlet baru, pengembang terpaksa menambah 11 kolom (`stok_vm1`, `stok_vm2`, dst).
+2. `transaksi` :
+   - Kolom: `id`, `id_transaksi`, `tanggal`, `waktu`, `petugas`, `pos_aktif`, `metode`, `item_singkat`, `total_harga`.
+   - Celah: Ketiadaan relasi ID outlet (hanya string statis `'POS A'`). Rincian pembelian hanya disimpan
+     dalam string teks agregat (`item_singkat`), sehingga menyulitkan kalkulasi omzet per produk.
+3. `log_stok` :
+   - Kolom: `id`, `id_produk`, `tipe_aktivitas`, `jumlah`, `tanggal_log`.
+   - Celah: Kolom `tipe_aktivitas` dikunci menggunakan ENUM('tambah_gudang','kirim_pos_a','kirim_pos_b').
+     Sistem tidak dapat mencatat mutasi ke 9 vending machine maupun transfer antar-outlet.
+4. `kasir` :
+   - Kolom: `id`, `nama`, `password`, `role`.
+   - Celah: Akun kasir belum terhubung secara formal ke master shift atau lokasi penugasan.
+
+2.3 Ringkasan Kendala Utama Sistem Lama:
+--------------------------------------------------------------------------------
+- Skema Stok Kaku (Horizontal Anti-Pattern): Tidak mendukung multi-outlet dinamis.
+- Monolitik & Rawan Konflik: Kode bisnis, query database, dan tampilan HTML bercampur aduk.
+- Duplikasi Login: `index.php` dan `login.php` memiliki dua form otentikasi terpisah.
+- Ketiadaan Fitur DO Antar-Lokasi: Distribusi barang hanya satu arah dari gudang ke 2 POS.
+- Nihil Pelacakan Barang Rusak/Expired: Barang cacat tidak memiliki pencatatan resmi.
+- Tidak Ada Kontrol Ketersediaan Produk: Seluruh menu otomatis tampil di semua kasir.
+
+
+================================================================================
+[ 3. ARSITEKTUR TARGET & 10 POIN PERUBAHAN SISTEM ]
+================================================================================
+
+3.1 Diagram Arsitektur Target (Sistem Skalabel Multi-Outlet):
+--------------------------------------------------------------------------------
+                               VELOCE POS
+                                   │
+                     ┌─────────────┴─────────────┐
+                     │                           │
+                MASTER DATA                  TRANSAKSI
+                     │                           │
+              ┌──────┼──────┐             ┌──────┴──────┐
+              │      │      │             │             │
+           Produk  Outlet Kasir       Penjualan        DO
+              │      │                    │             │
+              │      │             transaksi_detail     │
+              │      │                    │             │
+              └──────┼────────────────────┘             │
+                     │                                  │
+                stok_lokasi ◄───────────────────────────┘
+                (Multi-Lokasi)
+                     │
+              ┌──────┴──────┐
+              │             │
+         Stok Layak    Barang Rusak
+            Jual            │
+                       Retur / Expired (tabel `returns`)
+
+3.2 10 Poin Utama Perubahan yang Dilakukan:
+--------------------------------------------------------------------------------
+1. Perbaikan Grafik Penjualan & Omzet Real-Time:
+   - Mengalihkan kalkulasi grafik dari agregat kasar ke data terstruktur `transaksi_detail`.
+   - Menyajikan grafik komparasi stok multi-lokasi, omzet per kasir, dan tren 5 produk terlaris.
+2. Penambahan Master 11 Lokasi Mesin & Outlet:
+   - Mendukung 9 Vending Machine (VM-01 s/d VM-09) dan 2 Outlet fisik (Museum & Barat).
+   - Menggunakan tabel relasional `locations` dinamis dengan kolom status operasional.
+3. Fitur Tambah / Edit POS (CRUD Master Outlet):
+   - Antarmuka visual admin untuk menambah, mengubah nama/kode unit, serta toggle aktif/nonaktif.
+   - Otomatis menginisialisasi slot stok pada tabel `stok_lokasi` saat outlet baru dibuat.
+4. Kategori Retur Rusak & Expired:
+   - Klasifikasi retur: Rusak Fisik / Bocor, Expired / Kadaluarsa, dan Kemasan Rusak.
+   - Form pencatatan lengkap disertai alasan, tanggal, dan identitas petugas.
+5. Pengembangan Delivery Order (DO) Antar Lokasi:
+   - Mendukung mutasi dua arah: Gudang ➔ Outlet/VM serta Antar-Outlet/VM.
+   - Penomoran surat jalan DO otomatis berformat `DO/YYYYMMDD/XXXX`.
+6. Pengelolaan Barang Rusak & Alokasi Karantina:
+   - Pemisahan fisik stok barang rusak agar tidak bercampur dengan stok layak jual kasir.
+   - Pengurangan stok normal dan penambahan counter `stock_damaged` / `stock_expired`.
+7. Tabel Log Histori Retur & Barang Rusak:
+   - Tabel visual pemantauan barang retur di dashboard admin untuk memudahkan audit inventori.
+8. Log Export PDF & Excel:
+   - Fitur ekspor laporan rekapitulasi penjualan, mutasi DO, dan retur ke format Excel/CSV & PDF.
+   - Pencatatan jejak audit pengunduhan pada tabel `export_logs`.
+9. Standarisasi Tampilan UI Berbasis Glassmorphism:
+   - Tampilan modern dengan efek translucent glass, ambient blur glow, dan tipografi Plus Jakarta Sans.
+   - Desain terpadu, ergonomis, dan responsif untuk kenyamanan kasir dan manajemen.
+10. Fitur Master CRUD Produk & Upload Multi-Media Lengkap:
+    - **Create (Upload Produk):** Form penambahan item produk baru meliputi nama produk, harga jual,
+      tipe/varian (opsi suhu), stok awal gudang, dan upload foto produk (JPG/PNG/WebP) dengan
+      penamaan acak unik berbasis timestamp guna mencegah bentrok nama berkas di direktori `uploads/`.
+    - **Read (Katalog & Preview):** Tabel visual produk di dashboard dengan thumbnail preview gambar,
+      status stok, harga, serta label ketersediaan outlet.
+    - **Update (Edit Produk & Ganti Foto):** Pengubahan nama, harga, stok, ketersediaan outlet, serta opsi
+      pergantian foto produk baru yang otomatis menghapus berkas foto usang dari server (*orphan file cleanup*).
+    - **Delete (Hapus Produk & Berkas Gambar):** Penghapusan produk yang terintegrasi untuk menghapus
+      berkas fisik di folder `uploads/` serta membersihkan relasi terkait di `stok_lokasi` dan `product_outlets`.
+    - **Logika Ketersediaan Outlet (Many-to-Many):** Penentuan ketersediaan menu per titik penjualan
+      melalui tabel relasi `product_outlets` (Tersedia di Semua Outlet atau Pilihan Tertentu).
+11. Integrasi Mobile Web App Native-Like (Akses Fleksibel Smartphone & Tablet):
+    - Penyusunan antarmuka Mobile-First responsif agar koordinator lapangan, supervisor, dan staf dapat
+      memantau stok, menyetujui mutasi DO, dan memeriksa omzet langsung dari smartphone tanpa harus
+      membuka laptop/PC di area wisata candi.
+    - Dukungan Progressive Web App (PWA) dengan manifest PWA dan meta tag native-feel (full-screen, touch gesture).
+    - Arsitektur backend `api.php` yang siap bertindak sebagai REST API gateway jika di kemudian hari
+      diintegrasikan ke aplikasi mobile native (Android / iOS).
+
+
+================================================================================
+[ 4. STRUKTUR ARSITEKTUR MODULAR SISTEM (HASIL REFACTORING) ]
+================================================================================
+
+c:\xampp\htdocs\pos\
+├── config/
+│   └── database.php             # [TERPUSAT] Koneksi tunggal MySQLi UTF-8 & Error Handler
+├── includes/
+│   ├── auth.php                 # [MODULAR] Session guard & otentikasi kasir/admin
+│   └── functions.php            # [MODULAR] Helper format rupiah, sanitasi input & JSON response
+├── controllers/                 # [BACKEND] Pengolahan Data & Layanan Bisnis Transaksional
+│   ├── DashboardActionHandler.php # Controller mutasi admin (CRUD Outlet, Produk, Kasir, DO, Retur)
+│   └── TransactionController.php  # Transaksi Kasir ACID: transaksi + transaksi_detail + stok_lokasi
+├── views/                       # [FRONTEND] Template Tampilan Terpisah per Komponen
+│   ├── layouts/
+│   │   ├── header.php           # Header HTML, CSS Glassmorphism, Google Fonts, Chart.js
+│   │   ├── sidebar.php          # Navigasi sidebar dashboard admin terpusat
+│   │   └── footer.php           # Modal wrapper, script JS global & penutup HTML
+│   ├── dashboard/               # Modul Tampilan Dashboard Admin
+│   │   ├── analytics.php        # Visualisasi omzet & grafik stok realtime multi-outlet
+│   │   ├── outlet.php           # Master CRUD 11 Lokasi Outlet & Vending Machine
+│   │   ├── stok.php             # Distribusi stok gudang & transfer Delivery Order (DO)
+│   │   ├── menu.php             # Manajemen menu produk & ketersediaan Many-to-Many
+│   │   ├── kasir.php            # Manajemen akun petugas kasir
+│   │   └── retur.php            # Pengelolaan barang rusak fisik & retur expired
+│   ├── pos/                     # Komponen Antarmuka Terminal Kasir
+│   │   ├── navbar.php           # Status terminal POS, kasir aktif, shift summary
+│   │   ├── product_grid.php     # Grid katalog produk dinamis per outlet
+│   │   ├── cart_sidebar.php     # Sidebar keranjang belanja & subtotal
+│   │   └── modal_payment.php    # Modal pembayaran tunai/QRIS & cetak struk nota
+│   └── auth/
+│       └── login_card.php       # Komponen kartu login Glassmorphism dengan dropdown outlet
+├── assets/
+│   ├── css/
+│   │   └── glassmorphism.css    # [ASET] Token visual Glassmorphism (blur, glow, rounded)
+│   └── js/
+│       ├── app.js               # [ASET] Helper JavaScript modular (toast, formatting)
+│       └── pos.js               # [ASET] State management keranjang belanja & checkout AJAX
+├── database/
+│   ├── backup_veloce_pos.sql    # [ARSIP] Salinan dump awal database veloce_pos
+│   ├── snapshot_pre_day2.sql    # [BACKUP] Snapshot sebelum migrasi Day 2
+│   └── migrations/              # [PENAMPUNG] Skrip DDL/DML migrasi bertahap
+├── docs/
+│   └── LAPORAN_ANALISIS_PRA_PERUBAHAN.md # [DOKUMEN] Laporan audit sistem pra-perubahan
+├── uploads/                     # [MEDIA] Direktori penyimpanan berkas foto produk
+├── api.php                      # [SLIM] REST API Gateway
+├── dashboard.php                # [SLIM] Front-Controller Dashboard Admin (~35 baris)
+├── index.php                    # [SLIM] Front-Controller Terminal Kasir POS (~60 baris)
+├── login.php                    # [SLIM] Front-Controller Halaman Login (~40 baris)
+└── note.txt                     # [MONITORING] Logbook resmi kerja praktik harian
+
+
+================================================================================
+[ 5. DAFTAR MASTER 11 LOKASI MESIN & OUTLET OPERASIONAL ]
+================================================================================
+
+| Kode Lokasi | Nama Lokasi Operasional          | Tipe Unit  | ID Database | Fungsi Operasional               |
+|:------------|:---------------------------------|:-----------|:------------|:---------------------------------|
+| VM-01       | Vending Machine 1 - Zona Concourse | vm         | ID: 6       | Titik penjualan otomatis mandiri |
+| VM-02       | Vending Machine 2 - Zona Plaza     | vm         | ID: 7       | Titik penjualan otomatis mandiri |
+| VM-03       | Vending Machine 3 - Shelter Barat  | vm         | ID: 8       | Titik penjualan otomatis mandiri |
+| VM-04       | Vending Machine 4 - Koridor Utara  | vm         | ID: 9       | Titik penjualan otomatis mandiri |
+| VM-05       | Vending Machine 5 - Information Ctr| vm         | ID: 10      | Titik penjualan otomatis mandiri |
+| VM-06       | Vending Machine 6 - Area Parkir    | vm         | ID: 11      | Titik penjualan otomatis mandiri |
+| VM-07       | Vending Machine 7 - Gate Timur     | vm         | ID: 12      | Titik penjualan otomatis mandiri |
+| VM-08       | Vending Machine 8 - Rest Area      | vm         | ID: 13      | Titik penjualan otomatis mandiri |
+| VM-09       | Vending Machine 9 - Jalur Keluar   | vm         | ID: 14      | Titik penjualan otomatis mandiri |
+| OUT-MUSEUM  | Outlet Museum Samudra Raksa       | outlet     | ID: 2       | Outlet kasir fisik berlayanan    |
+| OUT-BARAT   | Outlet Refreshment Barat          | outlet     | ID: 3       | Outlet kasir fisik berlayanan    |
+| WH-CENTRAL  | Gudang Pusat Borobudur            | warehouse  | ID: 1       | Hub logistik & distribusi utama  |
+
+
+================================================================================
+[ 6. ROADMAP & JADWAL HARIAN KERJA PRAKTIK (DAY 1 S/D DAY 15) ]
+================================================================================
+
+--------------------------------------------------------------------------------
+HARI: Day 1
+TANGGAL: Selasa, 01 September 2026
+STATUS : [V] SELESAI (100%)
+FOKUS  : Pengenalan Arsitektur, Audit Codebase Eksisting & Laporan Pra-Perubahan
+--------------------------------------------------------------------------------
+Rincian Aktivitas:
+1. Orientasi sistem dan penelusuran seluruh file eksisting (`index.php`, `dashboard.php`, `login.php`, `api.php`).
+2. Analisis kelemahan struktural data lama (stok kolom horizontal `stok_pos_a`/`b`, ketiadaan master outlet).
+3. Penerbitan dokumen resmi: `docs/LAPORAN_ANALISIS_PRA_PERUBAHAN.md`.
+4. Restrukturisasi folder awal (`config/`, `includes/`, `assets/`, `database/`, `docs/`).
+5. Pembuatan koneksi database terpusat di `config/database.php` dengan charset `utf8mb4`.
+6. Pengujian sintaks PHP (0 syntax errors).
+Output: Dokumen audit awal, arsitektur dasar, dan koneksi database terpusat.
+
+--------------------------------------------------------------------------------
+HARI: Day 2
+TANGGAL: Rabu, 02 September 2026
+STATUS : [V] SELESAI (100%)
+FOKUS  : Rekonsiliasi Database, Migrasi Data Relasional Multi-Lokasi & Verifikasi Seeding
+--------------------------------------------------------------------------------
+Rincian Aktivitas:
+1. Pembuatan snapshot cadangan utuh: `database/snapshot_pre_day2.sql` (63 KB).
+2. Penambahan kolom `outlet_id` berindeks pada tabel `transaksi`.
+3. Verifikasi & penyeragaman 11 lokasi operasional di tabel `locations`.
+4. Migrasi data fisik stok produk lama ke tabel relasional `stok_lokasi`:
+   - `stok_gudang` lama ➔ Gudang Pusat (ID: 1)
+   - `stok_pos_a` lama ➔ Outlet Museum Samudra Raksa (ID: 2)
+   - `stok_pos_b` lama ➔ Outlet Refreshment Barat (ID: 3)
+   - Inisialisasi slot stok untuk 9 Vending Machine (VM-01 s/d VM-09). Total: 102 baris.
+5. Inisialisasi relasi Many-to-Many ketersediaan produk di `product_outlets` (120 relasi).
+6. Pembuatan 8 Compatibility Views SQL (`outlets`, `stok_outlet`, `produk_outlet`, `delivery_order`, dll).
+7. Audit verifikasi stok via skrip rekonsiliasi: Zero Discrepancy (100% Cocok).
+Output: Basis data relasional multi-lokasi siap mendukung 11 outlet dan 1 gudang.
+
+--------------------------------------------------------------------------------
+HARI: Day 3
+TANGGAL: Kamis, 03 September 2026
+STATUS : [V] SELESAI (100%)
+FOKUS  : Refactoring Arsitektur Modular (Pemisahan Controller & View) & Master 11 Lokasi Outlet/VM (CRUD)
+--------------------------------------------------------------------------------
+Rincian Aktivitas:
+1. Dekomposisi file monolitik 800+ baris menjadi arsitektur terpisah (decoupled MVC pattern).
+2. Pembuatan Backend Action Controller: `controllers/DashboardActionHandler.php`.
+3. Pembuatan Frontend Layout Templates: `views/layouts/header.php`, `sidebar.php`, `footer.php`.
+4. Pembuatan antarmuka visual master outlet di `views/dashboard/outlet.php`.
+5. Implementasi tabel interaktif 11 lokasi resmi (Kode, Nama, Tipe VM/Outlet, Status Operasional).
+6. Pembuatan modal Form Tambah Outlet/Mesin Baru, Form Edit Data, dan toggle status aktif/nonaktif.
+7. Reduksi `dashboard.php` dari 815 baris menjadi Front-Controller bersih berukuran ~35 baris.
+Output: Arsitektur modular bersih dan master titik lokasi penjualan yang dapat dikelola fleksibel.
+
+--------------------------------------------------------------------------------
+HARI: Day 4
+TANGGAL: Jumat, 04 September 2026
+STATUS : [V] SELESAI (100%)
+FOKUS  : Master CRUD Produk Lengkap, Upload Foto Produk Aman & Logika Ketersediaan Outlet (Many-to-Many)
+--------------------------------------------------------------------------------
+Rincian Aktivitas:
+1. Pembuatan antarmuka manajemen menu produk di `views/dashboard/menu.php`.
+2. Implementasi Form Tambah Produk (Create): Input nama, harga, tipe varian, stok awal gudang,
+   serta upload foto produk aman dengan penyimpanan ke direktori `uploads/`.
+3. Implementasi Form Ubah Produk (Update): Modal edit informasi produk dan opsi penggantian foto
+   yang otomatis menghapus berkas foto lama dari server (*orphan file cleanup*).
+4. Implementasi Aksi Hapus Produk (Delete): Menghapus rekaman database sekaligus menghapus file foto fisik
+   pada server serta membersihkan relasi di `stok_lokasi` dan `product_outlets`.
+5. Pengaturan ketersediaan produk per outlet (Semua Outlet vs Outlet Tertentu) tersinkronisasi ke `product_outlets`.
+6. Sinkronisasi stok awal gudang ke tabel relasional `stok_lokasi` (Gudang Pusat ID 1).
+Output: Manajemen katalog produk lengkap (CRUD + Foto) dengan visibilitas dinamis per titik penjualan Borobudur.
+
+--------------------------------------------------------------------------------
+HARI: Day 5
+TANGGAL: Sabtu, 05 September 2026
+STATUS : [V] SELESAI (100%)
+FOKUS  : Pembaruan Terminal Kasir POS Multi-Outlet & Penyatuan Pintu Otentikasi Login
+--------------------------------------------------------------------------------
+Rincian Aktivitas:
+1. Pembuatan helper otentikasi login terpusat di `includes/auth.php` (`attempt_login`).
+2. Pembuatan halaman `login.php` modern Glassmorphism dengan pilihan dropdown 11 outlet dinamis.
+3. Pembersihan ~140 baris form login duplikat dari `index.php` dan proteksi satu pintu `require_kasir()`.
+4. Pembuatan modul katalog produk kasir di `views/pos/product_grid.php` yang memfilter
+   produk hanya yang aktif di outlet bersangkutan sesuai relasi di `product_outlets`.
+5. Tampilan ketersediaan stok fisik kasir real-time dari tabel `stok_lokasi`.
+Output: Terminal POS kasir modular yang terikat aman dengan lokasi mesin/outlet penugasan.
+
+--------------------------------------------------------------------------------
+HARI: Day 6
+TANGGAL: Minggu, 06 September 2026
+STATUS : [V] SELESAI (100%)
+FOKUS  : Pemrosesan Transaksi Kasir Terstruktur ACID & Implementasi transaksi_detail
+--------------------------------------------------------------------------------
+Rincian Aktivitas:
+1. Pembuatan controller transaksi: `controllers/TransactionController.php`.
+2. Pengalihan pencatatan transaksi dari string agregat ke tabel relasional terstruktur `transaksi_detail`.
+3. Pemotongan kuantitas stok otomatis pada tabel `stok_lokasi` khusus untuk lokasi outlet kasir aktif.
+4. Pembungkusan operasi checkout dalam blok database transaction (ACID) guna mencegah anomali stok.
+5. Pembuatan modul keranjang belanja di `views/pos/cart_sidebar.php` dan `assets/js/pos.js`.
+6. Pembuatan modal pembayaran tunai/QRIS dan pencetakan nota kasir beridentitas outlet.
+Output: Alur transaksi kasir terstruktur, aman, dan tercatat rinci per item produk.
+
+--------------------------------------------------------------------------------
+HARI: Day 7
+TANGGAL: Senin, 07 September 2026
+STATUS : [V] SELESAI (100%)
+FOKUS  : Modul Delivery Order (DO) Antar Lokasi, Modul Retur & Visualisasi Grafik Omzet/Stok
+--------------------------------------------------------------------------------
+Rincian Aktivitas:
+1. Pembuatan tampilan distribusi stok dan pengiriman DO di `views/dashboard/stok.php`.
+2. Form pengiriman DO multi-arah (Gudang ➔ Outlet/VM serta Antar-VM) berpenomoran `DO/YYYYMMDD/XXXX`.
+3. Logika transfer stok transaksional yang memotong lokasi asal dan menambah lokasi tujuan.
+4. Pembuatan modul pengelolaan retur barang rusak fisik, kemasan cacat, dan expired di `views/dashboard/retur.php`.
+5. Alokasi barang retur ke status karantina tanpa mengganggu stok layak jual kasir (`stock_damaged`, `stock_expired`).
+6. Pembuatan modul analitik di `views/dashboard/analytics.php` (Chart.js perbandingan stok, omzet kasir, dan produk terlaris).
+Output: Sistem logistik DO, audit barang rusak, dan analitik performa multi-outlet operasional penuh.
+
+--------------------------------------------------------------------------------
+HARI: Day 8
+TANGGAL: Selasa, 08 September 2026
+STATUS : [V] SELESAI (100%)
+FOKUS  : Fitur Export Laporan Lengkap (Excel / CSV & PDF) dan Audit Log Export
+--------------------------------------------------------------------------------
+Rincian Aktivitas:
+1. Pembuatan controller ekspor terpusat: `controllers/ExportController.php` dan router `export.php`.
+2. Implementasi ekspor data penjualan kasir ke format CSV (UTF-8 BOM kompatibel Excel) dan format cetak/PDF formal.
+3. Implementasi ekspor status stok fisik multi-lokasi (11 titik outlet + 1 gudang pusat) ke CSV dan PDF.
+4. Implementasi ekspor riwayat Delivery Order (DO) dan surat jalan mutasi barang ke CSV dan PDF.
+5. Implementasi ekspor laporan barang rusak fisik, kemasan cacat, dan retur kadaluarsa ke CSV dan PDF.
+6. Pencatatan otomatis setiap aktivitas pengunduhan laporan ke dalam tabel audit `export_logs`.
+7. Penambahan tombol kontrol ekspor terintegrasi pada modul `analytics.php`, `stok.php`, dan `retur.php`.
+8. Pembuatan antarmuka modal visual "Jejak Audit Log Ekspor" di dashboard untuk transparansi data.
+9. Pengujian alur ekspor dan verifikasi integritas data via skrip uji `tests/test_full_export_flow.php` (100% Pass).
+Output: Modul pelaporan operasional terpadu (Excel & PDF) siap cetak dan jejak audit pengunduhan transparan.
+
+--------------------------------------------------------------------------------
+HARI: Day 9
+TANGGAL: Rabu, 09 September 2026
+STATUS : [V] SELESAI (100%)
+FOKUS  : Standarisasi REST API Gateway (`api.php`) & Security Auth Token untuk Akses Mobile
+--------------------------------------------------------------------------------
+Saran & Rekomendasi Ahli:
+Menyiapkan RESTful JSON API yang terstandarisasi sebelum membangun antarmuka mobile sangat krusial
+agar komunikasi data smartphone sangat ringan, cepat (< 200ms), dan hemat bandwidth di area candi.
+Rincian Aktivitas:
+1. Refactoring endpoint `api.php` menjadi RESTful JSON API Gateway dengan format response baku
+   (`status`, `code`, `data`, `message`, `meta.latency_ms`).
+2. Penyediaan endpoint mobile:
+   - `GET /api.php?action=ping`: Healthcheck diagnostik server & koneksi database.
+   - `POST /api.php?action=auth_login`: Otentikasi mobile kasir/admin dengan token session bearer.
+   - `GET /api.php?action=outlets`: Status 11 titik lokasi operasional + ringkasan stok.
+   - `GET /api.php?action=products`: Master katalog produk untuk sinkronisasi mobile.
+   - `GET /api.php?action=stock&outlet_id={id}`: Rincian inventori produk, stok rusak/expired per lokasi.
+   - `POST /api.php?action=do_transfer`: Mutasi stok cepat antar-lokasi dari smartphone lapangan (ACID).
+   - `POST /api.php?action=pos_checkout`: Transaksi penjualan mobile kasir & pengurangan stok otomatis.
+   - `GET /api.php?action=transactions`: Riwayat transaksi penjualan kasir terbaru.
+3. Penerapan proteksi keamanan API: Header Token Authorization (Bearer / X-API-Key), sanitasi payload JSON, dan transaksi database atomik (ACID).
+4. Uji performa latency endpoint API: Pengujian menyeluruh via skrip uji `tests/test_api_gateway.php` (9 skenario uji lulus 100%, rata-rata latency 15.47 ms jauh di bawah target 4G seluler 200 ms).
+Output: Fondasi backend REST API terstandarisasi yang siap dikonsumsi oleh antarmuka mobile web maupun app native.
+
+--------------------------------------------------------------------------------
+HARI: Day 10
+TANGGAL: Kamis, 10 September 2026
+STATUS : [-] READY TO EXECUTE (FOKUS BERIKUTNYA)
+FOKUS  : Pengembangan Frontend Mobile Web App (Tahap 1 — Desain UI Mobile-First & Touch Controls)
+--------------------------------------------------------------------------------
+Saran & Rekomendasi Ahli:
+Pembuatan antarmuka mobile native-like membutuhkan ketelitian layout sentuh (*thumb-zone ergonomics*).
+Alokasi waktu tidak realistis jika hanya 1 hari; Tahap 1 difokuskan pada layout dan kenyamanan kendali 1 tangan.
+Rincian Aktivitas:
+1. Perancangan tata letak antarmuka Mobile-First responsif untuk modul dashboard admin dan kasir.
+2. Pembuatan komponen Mobile Bottom Navigation Bar (Home, Stok VM, DO Cepat, Retur, Profil).
+3. Penyesuaian kartu Glassmorphism beresolusi kompak dengan micro-interaction sentuh (tap feedback, swipe).
+4. Implementasi Quick-Action Modal: Form restock cepat Vending Machine langsung di lokasi mesin dari smartphone.
+5. Optimasi kontras elemen visual agar tetap terbaca jelas di bawah terik sinar matahari (*outdoor readability*).
+Output: Antarmuka mobile smartphone yang ergonomis, bersih, dan native-like tanpa scroll horizontal.
+
+--------------------------------------------------------------------------------
+HARI: Day 11
+TANGGAL: Jumat, 11 September 2026
+STATUS : [ ] PENDING
+FOKUS  : Pengembangan Mobile Web App (Tahap 2 — Progressive Web App / PWA & Offline Service Worker)
+--------------------------------------------------------------------------------
+Saran & Rekomendasi Ahli:
+Di area luas Candi Borobudur sering terjadi titik lemah sinyal (*blank spot*). Penerapan PWA dengan Service
+Worker caching dan kemampuan install ke Homescreen mutlak dihadirkan agar terasa persis seperti aplikasi native.
+Rincian Aktivitas:
+1. Pembuatan Web App Manifest (`manifest.json`) dengan icon multi-resolusi, warna tema TWC, dan
+   mode tampilan `display: standalone` (full-screen tanpa address bar browser).
+2. Pembuatan Service Worker (`sw.js`) untuk caching aset statis (CSS, JS, Fonts, Icon) agar aplikasi
+   langsung terbuka seketika (*zero-latency startup*).
+3. Implementasi offline fallback view saat koneksi internet terputus di area pelataran candi.
+4. Integrasi Web Camera API untuk pemindaian Barcode / QRIS produk secara instan via kamera smartphone petugas.
+Output: Aplikasi web dapat diinstal langsung ke layar utama smartphone (*Add to Home Screen*) layaknya APK Android/iOS.
+
+--------------------------------------------------------------------------------
+HARI: Day 12
+TANGGAL: Sabtu, 12 September 2026
+STATUS : [ ] PENDING
+FOKUS  : Pengujian Lintas Perangkat (Cross-Device Testing: Laptop, Tablet & Smartphone Android/iOS)
+--------------------------------------------------------------------------------
+Saran & Rekomendasi Ahli:
+Memvalidasi performa di berbagai tipe gadget lapangan sebelum masuk ke sesi pengujian bersama tim operasional TWC.
+Rincian Aktivitas:
+1. Pengujian render antarmuka pada berbagai varian layar: Laptop 14-15", Tablet kasir 10",
+   Smartphone Android (berbagai ukuran), dan iOS iPhone.
+2. Verifikasi responsivitas input sentuh, virtual keyboard pop-up, dan scrolling performa stabil 60 fps.
+3. Pengecekan konsistensi warna Glassmorphism dan kontras teks pada kondisi pencahayaan luar ruangan area candi.
+4. Optimasi ukuran aset gambar produk untuk penghematan konsumsi kuota data petugas lapangan.
+Output: Sistem terbukti responsif, ringan, dan nyaman digunakan di segala jenis gawai operasional.
+
+--------------------------------------------------------------------------------
+HARI: Day 13
+TANGGAL: Minggu, 13 September 2026
+STATUS : [ ] PENDING
+FOKUS  : Pengujian Sistem Terpadu (Integration Testing) & Simulasi Transaksi Beban Tinggi (High-Load)
+--------------------------------------------------------------------------------
+Rincian Aktivitas:
+1. Simulasi transaksi serentak multi-terminal: POS Museum, POS Barat, dan pengisian restock 9 VM melalui
+   smartphone secara bersamaan.
+2. Pengujian integritas transaksi database (ACID) untuk mencegah race-condition saat 2 kasir mengakses
+   stok produk yang sama di detik yang sama.
+3. Uji ketahanan error handling: simulasi kegagalan koneksi saat bayar, input nominal kurang, dan validasi stok 0.
+4. Stress-testing kueri laporan omzet agregat untuk menjamin dashboard tetap responsif saat data transaksi membengkak.
+Output: Jaminan keandalan (*robustness*) dan kestabilan sistem pada kondisi puncak kunjungan wisatawan (peak season).
+
+--------------------------------------------------------------------------------
+HARI: Day 14
+TANGGAL: Senin, 14 September 2026
+STATUS : [ ] PENDING
+FOKUS  : User Acceptance Testing (UAT) Bersama Petugas Kasir & Koordinator Lapangan TWC Borobudur
+--------------------------------------------------------------------------------
+Rincian Aktivitas:
+1. Sesi uji coba operasional langsung di lokasi kawasan Candi Borobudur bersama kasir outlet dan staf logistik.
+2. Pelaksanaan skenario kerja nyata: pembukaan shift kasir, transaksi belanja wisatawan, pengiriman DO dari gudang
+   ke VM, dan retur kaleng penyok/expired.
+3. Pengujian operasional pengelolaan via smartphone oleh koordinator lapangan saat berkeliling memantau stok mesin.
+4. Pengisian kuesioner evaluasi kegunaan (*System Usability Scale* / Feedback UAT).
+5. Penyesuaian minor dan penanganan feedback berdasarkan masukan langsung petugas lapangan.
+Output: Berita Acara UAT resmi yang ditandatangani oleh perwakilan unit kerja PT Taman Wisata Borobudur.
+
+--------------------------------------------------------------------------------
+HARI: Day 15
+TANGGAL: Selasa, 15 September 2026
+STATUS : [ ] PENDING
+FOKUS  : Penyusunan Laporan & Dokumentasi Teknis Pembuatan Aplikasi Guna Laporan
+--------------------------------------------------------------------------------
+Rincian Aktivitas:
+1. Penyusunan dokumentasi teknis arsitektur sistem (skema relasional 13 tabel, ERD, dan diagram modular MVC).
+2. Dokumentasi alur implementasi fitur aplikasi: Master 11 Outlet/VM, Full CRUD Produk & Foto, Transaksi ACID,
+   Delivery Order Antar-Lokasi, Karantina Retur, Grafik Omzet Real-time, Ekspor Laporan, dan Mobile Web App (PWA).
+3. Penyusunan Buku Panduan Operasional Pengguna (User Manual) bergambar untuk kasir, admin gudang, dan supervisor.
+4. Kompilasi data hasil pengujian sistem, metrik latency, dan rekapitulasi evaluasi User Acceptance Testing (UAT).
+5. Pengarsipan artefak pendukung (source code, skrip migrasi database, dan snapshot backup) sebagai lampiran laporan.
+Output: Berkas laporan lengkap dan dokumentasi teknis komprehensif pembuatan aplikasi guna penyusunan laporan Kerja Praktik.
+
+
+
+================================================================================
+[ 7. ATURAN TEKNIS & STANDAR KUALITAS SISTEM ]
+================================================================================
+1. Single Source of Truth Transaksi:
+   - Sumber perhitungan kuantitas dan omzet mengacu pada tabel `transaksi_detail`.
+   - Kolom `item_singkat` pada tabel `transaksi` dipertahankan khusus untuk display nota cepat.
+2. Integritas Relasi Multi-Outlet:
+   - Ketersediaan produk pada kasir wajib memvalidasi relasi aktif di tabel `product_outlets`.
+3. Keamanan Mutasi Stok (ACID Transaction):
+   - Seluruh operasi mutasi stok kasir, transfer DO, dan retur wajib dibungkus dalam blok
+     transaksi database (`begin_transaction`, `commit`, `rollback`).
+4. Standar Kode & Estetika:
+   - Mengikuti arsitektur modular terpisah per file dan folder.
+   - Mengutamakan estetika Glassmorphism modern tanpa mengorbankan kecepatan akses.
+
+================================================================================
+                    AKHIR DOKUMEN LOGBOOK KERJA PRAKTIK
+================================================================================

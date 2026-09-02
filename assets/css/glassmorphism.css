@@ -1,0 +1,828 @@
+/**
+ * Veloce POS - Glassmorphism & Adaptive Theme Tokens
+ * Dark Mode & Light Mode Engine (Solid High-Contrast Buttons)
+ */
+
+:root {
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-bg-dark: rgba(15, 23, 42, 0.75);
+    --glass-border: rgba(255, 255, 255, 0.25);
+    --glass-border-dark: rgba(255, 255, 255, 0.08);
+    --glass-blur: blur(16px);
+    --glass-blur-lg: blur(24px);
+    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+    --glass-shadow-lg: 0 12px 40px 0 rgba(0, 0, 0, 0.25);
+}
+
+.glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+}
+
+.glass-card-dark {
+    background: var(--glass-bg-dark);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border-dark);
+    box-shadow: var(--glass-shadow-lg);
+}
+
+.glass-pill {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.glass-input {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    transition: all 0.2s ease;
+}
+
+.glass-input:focus {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+}
+
+/* ==========================================================================
+   MODE TERANG (LIGHT THEME) - SOLID & HIGH CONTRAST
+   Mengatasi tombol transparan dan memberikan kontras tajam berkualitas tinggi
+   ========================================================================== */
+
+html[data-theme="light"],
+html.light {
+    color-scheme: light;
+}
+
+html[data-theme="light"] body,
+html.light body,
+body.light-theme {
+    background-color: #f1f5f9 !important;
+    color: #0f172a !important;
+}
+
+/* 1. Kontainer Latar & Panel Utama */
+html[data-theme="light"] .bg-slate-950,
+html.light .bg-slate-950,
+html[data-theme="light"] .bg-slate-900,
+html.light .bg-slate-900,
+html[data-theme="light"] header,
+html.light header,
+html[data-theme="light"] aside,
+html.light aside {
+    background-color: #ffffff !important;
+    border-color: #e2e8f0 !important;
+    color: #0f172a !important;
+}
+
+/* 2. Kartu Glassmorphism & Item Produk */
+html[data-theme="light"] .glass-card-dark,
+html.light .glass-card-dark,
+html[data-theme="light"] .item-produk,
+html.light .item-produk {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.03) !important;
+    color: #0f172a !important;
+}
+html[data-theme="light"] .item-produk:hover,
+html.light .item-produk:hover {
+    border-color: #2563eb !important;
+    box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.15) !important;
+}
+
+/* 3. OPTIMALISASI TOMBOL BELI (+ Beli) PADA KATALOG PRODUK */
+html[data-theme="light"] .item-produk button:not(:disabled),
+html.light .item-produk button:not(:disabled),
+html[data-theme="light"] .bg-blue-600\/20,
+html.light .bg-blue-600\/20 {
+    background-color: #2563eb !important;
+    color: #ffffff !important;
+    border: 1px solid #1d4ed8 !important;
+    font-weight: 700 !important;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25) !important;
+}
+html[data-theme="light"] .item-produk button:not(:disabled):hover,
+html.light .item-produk button:not(:disabled):hover {
+    background-color: #1d4ed8 !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4) !important;
+}
+
+/* 4. OPTIMALISASI TOMBOL KOSONG / DISABLED */
+html[data-theme="light"] button:disabled,
+html.light button:disabled,
+html[data-theme="light"] .bg-slate-800:disabled,
+html.light .bg-slate-800:disabled {
+    background-color: #f1f5f9 !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #94a3b8 !important;
+    cursor: not-allowed !important;
+    box-shadow: none !important;
+}
+
+/* 5. OPTIMALISASI TOMBOL KONTROL & AKSI (SOLID, TEGAS & JELAS) */
+/* A. Tombol Netral / Slate (Ganti Terminal, CSV, Keluar Sesi, Tombol Print) */
+html[data-theme="light"] .bg-slate-800:not(:disabled),
+html.light .bg-slate-800:not(:disabled),
+html[data-theme="light"] button.bg-slate-800,
+html.light button.bg-slate-800 {
+    background-color: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #1e293b !important;
+    font-weight: 700 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+}
+html[data-theme="light"] .bg-slate-800:not(:disabled):hover,
+html.light .bg-slate-800:not(:disabled):hover,
+html[data-theme="light"] button.bg-slate-800:hover,
+html.light button.bg-slate-800:hover {
+    background-color: #f1f5f9 !important;
+    border-color: #94a3b8 !important;
+    color: #0f172a !important;
+}
+
+/* B. Tombol Ubah / Kuning Amber */
+html[data-theme="light"] .bg-amber-500\/10,
+html.light .bg-amber-500\/10 {
+    background-color: #fef3c7 !important;
+    border: 1px solid #fcd34d !important;
+    color: #92400e !important;
+    font-weight: 700 !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+}
+html[data-theme="light"] .bg-amber-500\/10:hover,
+html.light .bg-amber-500\/10:hover {
+    background-color: #fde68a !important;
+    border-color: #f59e0b !important;
+    color: #78350f !important;
+}
+
+/* C. Tombol Hapus / Logout / Merah Rose */
+html[data-theme="light"] .bg-rose-500\/10,
+html.light .bg-rose-500\/10 {
+    background-color: #fee2e2 !important;
+    border: 1px solid #fca5a5 !important;
+    color: #b91c1c !important;
+    font-weight: 700 !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+}
+html[data-theme="light"] .bg-rose-500\/10:hover,
+html.light .bg-rose-500\/10:hover {
+    background-color: #fecaca !important;
+    border-color: #ef4444 !important;
+    color: #991b1b !important;
+}
+
+/* D. Tombol Sukses / Hijau Emerald (Export Excel) */
+html[data-theme="light"] .bg-emerald-500\/10,
+html.light .bg-emerald-500\/10 {
+    background-color: #dcfce7 !important;
+    border: 1px solid #86efac !important;
+    color: #15803d !important;
+    font-weight: 700 !important;
+}
+html[data-theme="light"] .bg-emerald-600,
+html.light .bg-emerald-600 {
+    background-color: #10b981 !important;
+    color: #ffffff !important;
+    border: 1px solid #059669 !important;
+    font-weight: 700 !important;
+}
+
+/* E. Tombol Primer Utama (Bayar Sekarang, Simpan, Tambah) */
+html[data-theme="light"] .bg-blue-600,
+html.light .bg-blue-600,
+html[data-theme="light"] button.bg-blue-600,
+html.light button.bg-blue-600,
+html[data-theme="light"] a.bg-blue-600,
+html.light a.bg-blue-600 {
+    background-color: #2563eb !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3) !important;
+}
+html[data-theme="light"] .bg-blue-600:hover,
+html.light .bg-blue-600:hover {
+    background-color: #1d4ed8 !important;
+}
+
+/* 6. SWITCHER TEMA SEGMENTED PILL PADA MODE TERANG */
+html[data-theme="light"] .theme-toggle-btn,
+html.light .theme-toggle-btn {
+    background-color: #e2e8f0 !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+}
+html[data-theme="light"] .theme-pill-light,
+html.light .theme-pill-light {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1) !important;
+    font-weight: 800 !important;
+}
+html[data-theme="light"] .theme-pill-dark,
+html.light .theme-pill-dark {
+    background-color: transparent !important;
+    color: #64748b !important;
+    box-shadow: none !important;
+}
+
+/* 7. TIPOGRAFI TEKS KONTRAS TINGGI */
+html[data-theme="light"] .text-white,
+html.light .text-white,
+html[data-theme="light"] .text-slate-100,
+html.light .text-slate-100,
+html[data-theme="light"] .text-slate-200,
+html.light .text-slate-200 {
+    color: #0f172a !important;
+}
+html[data-theme="light"] .text-slate-300,
+html.light .text-slate-300,
+html[data-theme="light"] .text-slate-400,
+html.light .text-slate-400 {
+    color: #475569 !important;
+}
+html[data-theme="light"] .text-slate-500,
+html.light .text-slate-500 {
+    color: #64748b !important;
+}
+
+/* Pertahankan teks putih pada elemen di dalam tombol solid */
+html[data-theme="light"] .bg-blue-600 *,
+html.light .bg-blue-600 *,
+html[data-theme="light"] .bg-emerald-600 *,
+html.light .bg-emerald-600 *,
+html[data-theme="light"] .bg-indigo-600 *,
+html.light .bg-indigo-600 *,
+html[data-theme="light"] .bg-rose-600 *,
+html.light .bg-rose-600 * {
+    color: #ffffff !important;
+}
+
+/* 8. FORMULIR, INPUT PENCARIAN & SELECT */
+html[data-theme="light"] input,
+html.light input,
+html[data-theme="light"] select,
+html.light select,
+html[data-theme="light"] textarea,
+html.light textarea {
+    background-color: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #0f172a !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+html[data-theme="light"] input:focus,
+html.light input:focus,
+html[data-theme="light"] select:focus,
+html.light select:focus {
+    border-color: #2563eb !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
+}
+
+/* 9. BADGE STOK & STATUS PILLS KONTRAS TINGGI DI SEMUA MENU (LIGHT THEME) */
+
+/* KUNING / AMBER (10 Outlet Tertentu, Expired, Adjustment, Ubah) */
+html[data-theme="light"] .bg-amber-500\/20, html.light .bg-amber-500\/20,
+html[data-theme="light"] .bg-amber-500\/10, html.light .bg-amber-500\/10,
+html[data-theme="light"] .bg-yellow-500\/20, html.light .bg-yellow-500\/20 { 
+    background-color: #fef3c7 !important; 
+    border: 1px solid #fcd34d !important; 
+    color: #92400e !important; 
+}
+html[data-theme="light"] .text-amber-300, html.light .text-amber-300,
+html[data-theme="light"] .text-amber-400, html.light .text-amber-400,
+html[data-theme="light"] .text-yellow-300, html.light .text-yellow-300,
+html[data-theme="light"] .text-yellow-400, html.light .text-yellow-400 { 
+    color: #92400e !important; 
+    font-weight: 800 !important; 
+}
+
+/* BIRU (Semua Outlet Global, Admin/Owner, DO Transfer, Titik Lokasi) */
+html[data-theme="light"] .bg-blue-500\/20, html.light .bg-blue-500\/20,
+html[data-theme="light"] .bg-blue-500\/10, html.light .bg-blue-500\/10,
+html[data-theme="light"] .bg-blue-600\/20, html.light .bg-blue-600\/20 { 
+    background-color: #eff6ff !important; 
+    border: 1px solid #bfdbfe !important; 
+    color: #1e40af !important; 
+}
+html[data-theme="light"] .text-blue-300, html.light .text-blue-300,
+html[data-theme="light"] .text-blue-400, html.light .text-blue-400 { 
+    color: #1e40af !important; 
+    font-weight: 800 !important; 
+}
+
+/* HIJAU / EMERALD (Kasir Terminal, Outlet Fisik, Aktif, Inbound) */
+html[data-theme="light"] .bg-emerald-500\/20, html.light .bg-emerald-500\/20,
+html[data-theme="light"] .bg-emerald-500\/10, html.light .bg-emerald-500\/10,
+html[data-theme="light"] .bg-emerald-600\/20, html.light .bg-emerald-600\/20,
+html[data-theme="light"] .bg-green-500\/20, html.light .bg-green-500\/20 { 
+    background-color: #ecfdf5 !important; 
+    border: 1px solid #a7f3d0 !important; 
+    color: #065f46 !important; 
+}
+html[data-theme="light"] .text-emerald-300, html.light .text-emerald-300,
+html[data-theme="light"] .text-emerald-400, html.light .text-emerald-400,
+html[data-theme="light"] .text-green-400, html.light .text-green-400 { 
+    color: #065f46 !important; 
+    font-weight: 800 !important; 
+}
+
+/* MERAH / ROSE (Rusak Fisik, Tidak Aktif, Stok Habis, Nonaktif, Hapus) */
+html[data-theme="light"] .bg-rose-500\/20, html.light .bg-rose-500\/20,
+html[data-theme="light"] .bg-rose-500\/10, html.light .bg-rose-500\/10,
+html[data-theme="light"] .bg-red-500\/20, html.light .bg-red-500\/20 { 
+    background-color: #fff1f2 !important; 
+    border: 1px solid #fecdd3 !important; 
+    color: #9f1239 !important; 
+}
+html[data-theme="light"] .text-rose-300, html.light .text-rose-300,
+html[data-theme="light"] .text-rose-400, html.light .text-rose-400 { 
+    color: #9f1239 !important; 
+    font-weight: 800 !important; 
+}
+
+/* UNGU / INDIGO / VIOLET (Vending Machine, Penjualan Kasir) */
+html[data-theme="light"] .bg-indigo-500\/20, html.light .bg-indigo-500\/20,
+html[data-theme="light"] .bg-indigo-500\/10, html.light .bg-indigo-500\/10,
+html[data-theme="light"] .bg-violet-500\/20, html.light .bg-violet-500\/20,
+html[data-theme="light"] .bg-purple-500\/20, html.light .bg-purple-500\/20 { 
+    background-color: #f5f3ff !important; 
+    border: 1px solid #ddd6fe !important; 
+    color: #5b21b6 !important; 
+}
+html[data-theme="light"] .text-indigo-300, html.light .text-indigo-300,
+html[data-theme="light"] .text-indigo-400, html.light .text-indigo-400,
+html[data-theme="light"] .text-violet-300, html.light .text-violet-300,
+html[data-theme="light"] .text-violet-400, html.light .text-violet-400,
+html[data-theme="light"] .text-purple-300, html.light .text-purple-300,
+html[data-theme="light"] .text-purple-400, html.light .text-purple-400 { 
+    color: #5b21b6 !important; 
+    font-weight: 800 !important; 
+}
+
+/* ABU-ABU / SLATE (Netral & Tipe Umum) */
+html[data-theme="light"] .bg-slate-500\/20, html.light .bg-slate-500\/20,
+html[data-theme="light"] .bg-slate-700\/50, html.light .bg-slate-700\/50 { 
+    background-color: #f1f5f9 !important; 
+    border: 1px solid #cbd5e1 !important; 
+    color: #334155 !important; 
+}
+
+/* Border Pill & Badges */
+html[data-theme="light"] .border-amber-500\/30, html.light .border-amber-500\/30 { border-color: #fcd34d !important; }
+html[data-theme="light"] .border-blue-500\/30, html.light .border-blue-500\/30 { border-color: #bfdbfe !important; }
+html[data-theme="light"] .border-emerald-500\/30, html.light .border-emerald-500\/30 { border-color: #a7f3d0 !important; }
+html[data-theme="light"] .border-rose-500\/30, html.light .border-rose-500\/30 { border-color: #fecdd3 !important; }
+html[data-theme="light"] .border-indigo-500\/30, html.light .border-indigo-500\/30,
+html[data-theme="light"] .border-purple-500\/30, html.light .border-purple-500\/30 { border-color: #ddd6fe !important; }
+
+
+/* 10. KERANJANG BELANJA (CART SIDEBAR) LENGKAP */
+html[data-theme="light"] aside.cart-sidebar-panel,
+html.light aside.cart-sidebar-panel,
+html[data-theme="light"] aside,
+html.light aside {
+    background-color: #ffffff !important;
+    border-left: 1px solid #e2e8f0 !important;
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.04) !important;
+}
+html[data-theme="light"] .cart-header-panel,
+html.light .cart-header-panel {
+    background-color: #ffffff !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+}
+html[data-theme="light"] .cart-header-panel h2,
+html.light .cart-header-panel h2 {
+    color: #0f172a !important;
+}
+html[data-theme="light"] #cart-item-count,
+html.light #cart-item-count {
+    color: #64748b !important;
+}
+html[data-theme="light"] #cart-items-wrapper,
+html.light #cart-items-wrapper {
+    background-color: #f8fafc !important;
+}
+html[data-theme="light"] #empty-cart-state p,
+html.light #empty-cart-state p {
+    color: #64748b !important;
+}
+html[data-theme="light"] #cart-items-wrapper h4,
+html.light #cart-items-wrapper h4 {
+    color: #0f172a !important;
+}
+html[data-theme="light"] #cart-items-wrapper p,
+html.light #cart-items-wrapper p {
+    color: #64748b !important;
+}
+html[data-theme="light"] #cart-items-wrapper .bg-slate-950,
+html.light #cart-items-wrapper .bg-slate-950 {
+    background-color: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+}
+html[data-theme="light"] #cart-items-wrapper button,
+html.light #cart-items-wrapper button {
+    color: #1e293b !important;
+}
+html[data-theme="light"] #cart-items-wrapper button:hover,
+html.light #cart-items-wrapper button:hover {
+    background-color: #f1f5f9 !important;
+    color: #0f172a !important;
+}
+html[data-theme="light"] #cart-items-wrapper span.text-emerald-400,
+html.light #cart-items-wrapper span.text-emerald-400 {
+    color: #059669 !important;
+}
+
+/* Panel Checkout Bawah (Menghilangkan Background Gelap pada Mode Terang) */
+html[data-theme="light"] #cart-checkout-box,
+html.light #cart-checkout-box,
+html[data-theme="light"] .cart-checkout-panel,
+html.light .cart-checkout-panel,
+html[data-theme="light"] .bg-slate-950\/60,
+html.light .bg-slate-950\/60 {
+    background-color: #ffffff !important;
+    border-top: 1px solid #e2e8f0 !important;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05) !important;
+}
+html[data-theme="light"] .label-subtotal,
+html.light .label-subtotal,
+html[data-theme="light"] #cart-checkout-box span.text-slate-400,
+html.light #cart-checkout-box span.text-slate-400 {
+    color: #64748b !important;
+    font-weight: 600 !important;
+}
+html[data-theme="light"] #cart-subtotal,
+html.light #cart-subtotal {
+    color: #0f172a !important;
+    font-weight: 700 !important;
+}
+html[data-theme="light"] .border-divider-subtotal,
+html.light .border-divider-subtotal,
+html[data-theme="light"] #cart-checkout-box .border-white\/5,
+html.light #cart-checkout-box .border-white\/5 {
+    border-color: #e2e8f0 !important;
+}
+html[data-theme="light"] .label-total-tagihan,
+html.light .label-total-tagihan,
+html[data-theme="light"] #cart-checkout-box span.text-white,
+html.light #cart-checkout-box span.text-white {
+    color: #0f172a !important;
+    font-weight: 900 !important;
+}
+html[data-theme="light"] #cart-grand-total,
+html.light #cart-grand-total {
+    color: #059669 !important;
+    font-weight: 900 !important;
+}
+html[data-theme="light"] #btn-checkout:not(:disabled),
+html.light #btn-checkout:not(:disabled) {
+    background-color: #2563eb !important;
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35) !important;
+}
+html[data-theme="light"] #btn-checkout:not(:disabled):hover,
+html.light #btn-checkout:not(:disabled):hover {
+    background-color: #1d4ed8 !important;
+}
+html[data-theme="light"] #btn-checkout:disabled,
+html.light #btn-checkout:disabled {
+    background-color: #f1f5f9 !important;
+    color: #94a3b8 !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: none !important;
+}
+
+/* Pembatas */
+html[data-theme="light"] .divide-white\/5 > :not([hidden]) ~ :not([hidden]),
+html.light .divide-white\/5 > :not([hidden]) ~ :not([hidden]) {
+    border-color: #e2e8f0 !important;
+}
+html[data-theme="light"] .border-white\/5,
+html.light .border-white\/5,
+html[data-theme="light"] .border-white\/10,
+html.light .border-white\/10 {
+    border-color: #e2e8f0 !important;
+}
+
+/* 11. MODAL */
+html[data-theme="light"] .fixed.inset-0.bg-black\/70,
+html.light .fixed.inset-0.bg-black\/70,
+html[data-theme="light"] .fixed.inset-0.bg-black\/80,
+html.light .fixed.inset-0.bg-black\/80 {
+    background-color: rgba(15, 23, 42, 0.5) !important;
+    backdrop-filter: blur(8px) !important;
+}
+html[data-theme="light"] .fixed.inset-0 .glass-card-dark,
+html.light .fixed.inset-0 .glass-card-dark {
+    background-color: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+}
+html[data-theme="light"] #modal-bayar .bg-blue-600\/10,
+html.light #modal-bayar .bg-blue-600\/10 {
+    background-color: #eff6ff !important;
+    border: 1px solid #bfdbfe !important;
+}
+html[data-theme="light"] #modal-bayar #modal-total-display,
+html.light #modal-bayar #modal-total-display {
+    color: #059669 !important;
+    font-weight: 900 !important;
+}
+html[data-theme="light"] #modal-bayar #btn-metode-cash,
+html.light #modal-bayar #btn-metode-cash {
+    background-color: #eff6ff !important;
+    border: 1.5px solid #2563eb !important;
+    color: #1d4ed8 !important;
+}
+html[data-theme="light"] #modal-bayar #btn-metode-qris,
+html.light #modal-bayar #btn-metode-qris {
+    background-color: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #475569 !important;
+}
+html[data-theme="light"] #modal-bayar #nominal-bayar,
+html.light #modal-bayar #nominal-bayar {
+    background-color: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #0f172a !important;
+}
+html[data-theme="light"] #modal-bayar #kembalian-display,
+html.light #modal-bayar #kembalian-display {
+    color: #0f172a !important;
+    font-weight: 800 !important;
+}
+html[data-theme="light"] #modal-bayar #btn-proses-transaksi,
+html.light #modal-bayar #btn-proses-transaksi {
+    background-color: #059669 !important;
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    box-shadow: 0 4px 14px rgba(5, 150, 105, 0.3) !important;
+}
+html[data-theme="light"] #modal-bayar #btn-proses-transaksi:hover,
+html.light #modal-bayar #btn-proses-transaksi:hover {
+    background-color: #047857 !important;
+}
+
+/* ========================================================================= */
+/* 11. OPTIMALISASI KATALOG PRODUK & BADGE STOK DI MODE TERANG               */
+/* ========================================================================= */
+/* Badge Sisa Stok Produk - Kontras Tinggi Mint & Teks Emerald Pekat */
+html[data-theme="light"] .badge-sisa-stok,
+html.light .badge-sisa-stok,
+html[data-theme="light"] .item-produk .badge-sisa-stok,
+html.light .item-produk .badge-sisa-stok {
+    background-color: #ecfdf5 !important;
+    border: 1.5px solid #a7f3d0 !important;
+    color: #065f46 !important;
+    font-weight: 800 !important;
+    box-shadow: 0 2px 4px rgba(6, 95, 70, 0.12) !important;
+}
+
+/* Kotak Pembungkus Gambar Produk Bersih (Tidak Gelap di Latar Putih) */
+html[data-theme="light"] .product-img-wrapper,
+html.light .product-img-wrapper,
+html[data-theme="light"] .item-produk .aspect-square,
+html.light .item-produk .aspect-square {
+    background-color: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+}
+
+/* Overlay & Badge Stok Habis di Mode Terang */
+html[data-theme="light"] .product-empty-overlay,
+html.light .product-empty-overlay {
+    background-color: rgba(255, 255, 255, 0.88) !important;
+}
+html[data-theme="light"] .badge-stok-habis,
+html.light .badge-stok-habis {
+    background-color: #fee2e2 !important;
+    border: 1.5px solid #fca5a5 !important;
+    color: #9f1239 !important;
+    font-weight: 900 !important;
+    box-shadow: 0 2px 5px rgba(185, 28, 28, 0.12) !important;
+}
+
+/* Judul & Harga Produk di Mode Terang */
+html[data-theme="light"] .item-produk h3,
+html.light .item-produk h3 {
+    color: #0f172a !important;
+    font-weight: 800 !important;
+}
+html[data-theme="light"] .item-produk p.text-blue-400,
+html.light .item-produk p.text-blue-400 {
+    color: #1d4ed8 !important;
+    font-weight: 900 !important;
+}
+
+/* Input Pencarian Produk */
+html[data-theme="light"] #cari-produk,
+html.light #cari-produk {
+    background-color: #ffffff !important;
+    border: 1.5px solid #cbd5e1 !important;
+    color: #0f172a !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+}
+html[data-theme="light"] #cari-produk::placeholder,
+html.light #cari-produk::placeholder {
+    color: #94a3b8 !important;
+}
+
+/* Stepper Keranjang Belanja (+/- Item) di Mode Terang */
+html[data-theme="light"] .cart-stepper,
+html.light .cart-stepper {
+    background-color: #f1f5f9 !important;
+    border: 1px solid #cbd5e1 !important;
+}
+html[data-theme="light"] .cart-stepper button,
+html.light .cart-stepper button {
+    color: #334155 !important;
+}
+html[data-theme="light"] .cart-stepper button:hover,
+html.light .cart-stepper button:hover {
+    background-color: #e2e8f0 !important;
+    color: #0f172a !important;
+}
+html[data-theme="light"] .cart-stepper span,
+html.light .cart-stepper span {
+    color: #0f172a !important;
+    font-weight: 800 !important;
+}
+
+/* Mini Summary Badge Navbar di Mode Terang */
+html[data-theme="light"] header .bg-white\/5,
+html.light header .bg-white\/5 {
+    background-color: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+}
+
+/* ========================================================================= */
+/* 12. TWB BULLETPROOF CUSTOM MODAL DIALOG (STANDALONE PURE CSS - ZERO FAIL)*/
+/* ========================================================================= */
+.twb-modal-backdrop {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 9999999 !important;
+    display: none;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 16px !important;
+    background: rgba(2, 6, 23, 0.85) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    box-sizing: border-box !important;
+}
+
+.twb-modal-backdrop.is-active {
+    display: flex !important;
+}
+
+.twb-modal-card {
+    position: relative !important;
+    width: 100% !important;
+    max-width: 420px !important;
+    border-radius: 24px !important;
+    padding: 28px 24px 24px 24px !important;
+    text-align: center !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+    animation: twbModalZoomIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+    background: #0f172a !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+    color: #f8fafc !important;
+}
+
+@keyframes twbModalZoomIn {
+    from { opacity: 0; transform: scale(0.92); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.twb-modal-glow-line {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 5px !important;
+    background: linear-gradient(90deg, #f43f5e, #ef4444) !important;
+}
+
+.twb-modal-icon-container {
+    width: 60px !important;
+    height: 60px !important;
+    margin: 0 auto 16px auto !important;
+    border-radius: 18px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 28px !important;
+    background: rgba(244, 63, 94, 0.12) !important;
+    border: 1px solid rgba(244, 63, 94, 0.25) !important;
+}
+
+#twb-modal-heading,
+.twb-modal-heading {
+    font-size: 17px !important;
+    font-weight: 900 !important;
+    color: #ffffff !important;
+    margin: 0 0 8px 0 !important;
+    line-height: 1.3 !important;
+}
+
+#twb-modal-subtext,
+.twb-modal-subtext {
+    font-size: 13px !important;
+    color: #94a3b8 !important;
+    margin: 0 0 24px 0 !important;
+    line-height: 1.5 !important;
+}
+
+.twb-modal-btn-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 12px !important;
+}
+
+.twb-modal-btn-no {
+    padding: 12px 16px !important;
+    border-radius: 14px !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    transition: all 0.15s ease !important;
+    background: #1e293b !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #cbd5e1 !important;
+}
+
+.twb-modal-btn-no:hover {
+    background: #334155 !important;
+    color: #ffffff !important;
+}
+
+.twb-modal-btn-yes {
+    padding: 12px 16px !important;
+    border-radius: 14px !important;
+    font-size: 13px !important;
+    font-weight: 800 !important;
+    cursor: pointer !important;
+    transition: all 0.15s ease !important;
+    background: #e11d48 !important;
+    border: none !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 14px rgba(225, 29, 72, 0.4) !important;
+}
+
+.twb-modal-btn-yes:hover {
+    background: #be123c !important;
+}
+
+/* Light Theme Overrides */
+html[data-theme="light"] .twb-modal-backdrop,
+html.light .twb-modal-backdrop {
+    background: rgba(15, 23, 42, 0.6) !important;
+}
+
+html[data-theme="light"] .twb-modal-card,
+html.light .twb-modal-card {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+    color: #0f172a !important;
+}
+
+html[data-theme="light"] .twb-modal-heading,
+html.light .twb-modal-heading {
+    color: #0f172a !important;
+}
+
+html[data-theme="light"] .twb-modal-subtext,
+html.light .twb-modal-subtext {
+    color: #475569 !important;
+}
+
+html[data-theme="light"] .twb-modal-btn-no,
+html.light .twb-modal-btn-no {
+    background: #f1f5f9 !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #334155 !important;
+}
+
+html[data-theme="light"] .twb-modal-btn-no:hover,
+html.light .twb-modal-btn-no:hover {
+    background: #e2e8f0 !important;
+    color: #0f172a !important;
+}
