@@ -3,6 +3,8 @@
  * Helper Fungsi Umum - Veloce POS
  */
 
+date_default_timezone_set('Asia/Jakarta');
+
 if (!function_exists('format_rupiah')) {
     function format_rupiah($angka) {
         return 'Rp ' . number_format(floatval($angka), 0, ',', '.');

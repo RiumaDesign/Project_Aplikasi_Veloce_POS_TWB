@@ -90,20 +90,25 @@ if ($terminals_q) {
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         @media print {
-            body * { visibility: hidden; }
+            body * { visibility: hidden !important; }
             #area-cetak-nota, #area-cetak-nota *,
-            #area-cetak-zreport, #area-cetak-zreport * { visibility: visible; }
+            #area-cetak-zreport, #area-cetak-zreport * { 
+                visibility: visible !important; 
+            }
             #area-cetak-nota, #area-cetak-zreport {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 76mm;
-                max-width: 76mm;
-                margin: 0 auto;
-                padding: 4mm 6mm;
+                display: block !important;
+                visibility: visible !important;
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 76mm !important;
+                max-width: 76mm !important;
+                margin: 0 auto !important;
+                padding: 4mm 6mm !important;
                 background: #ffffff !important;
                 color: #000000 !important;
-                font-family: 'Courier New', Courier, monospace;
+                font-family: 'Courier New', Courier, monospace !important;
+                z-index: 9999999 !important;
             }
             #area-cetak-nota img, #area-cetak-zreport img {
                 filter: grayscale(100%) contrast(200%);

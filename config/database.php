@@ -23,5 +23,10 @@ if ($conn->connect_error) {
     die("Koneksi Database Gagal: " . $conn->connect_error);
 }
 
-// Set karakter encoding ke utf8mb4
+// Set zona waktu terpusat ke Waktu Indonesia Barat (WIB / UTC+7)
+date_default_timezone_set('Asia/Jakarta');
+
+// Set karakter encoding ke utf8mb4 dan zona waktu MySQL
 $conn->set_charset("utf8mb4");
+$conn->query("SET time_zone = '+07:00'");
+
