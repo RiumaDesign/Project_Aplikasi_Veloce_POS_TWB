@@ -132,7 +132,6 @@
                     👁️
                 </button>
             </div>
-            <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-1 font-medium">*Default password kasir: <span class="font-mono font-bold text-blue-600 dark:text-blue-400">kasir123</span></p>
         </div>
 
         <!-- Dropdown Lokasi Terminal / Outlet -->
@@ -183,7 +182,6 @@
                     👁️
                 </button>
             </div>
-            <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-1">*Akun default: <span class="font-mono font-bold text-indigo-600 dark:text-indigo-400">admin</span> / <span class="font-mono font-bold text-indigo-600 dark:text-indigo-400">admin123</span></p>
         </div>
 
         <button type="submit" class="w-full py-3.5 rounded-2xl text-xs font-black transition-all shadow-lg cursor-pointer flex items-center justify-center gap-2" style="background-color: #4f46e5; color: #ffffff;">
