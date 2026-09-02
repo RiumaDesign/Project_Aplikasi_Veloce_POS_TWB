@@ -1,0 +1,25 @@
+{
+  "name": "Veloce POS - PT Taman Wisata Borobudur",
+  "short_name": "Veloce POS",
+  "description": "Aplikasi Kasir & Point of Sale Resmi PT Taman Wisata Borobudur Multi-Outlet & Vending Machine",
+  "start_url": "index.php",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#020617",
+  "theme_color": "#1e40af",
+  "lang": "id-ID",
+  "icons": [
+    {
+      "src": "assets/images/logo_twb.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/images/logo_twb.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -79,7 +79,14 @@ if ($terminals_q) {
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Veloce POS">
+    <meta name="theme-color" content="#020617">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="assets/images/logo_twb.png">
     <title>TWB POS — <?= htmlspecialchars($pos_aktif) ?></title>
     <link rel="icon" type="image/png" href="assets/images/logo_twb.png">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -548,6 +555,24 @@ if ($terminals_q) {
             background-color: #f8fafc !important;
             border: 1px solid #e2e8f0 !important;
         }
+
+        /* Mobile Segmented Switcher & Quick Cart Bar di Mode Terang */
+        html[data-theme="light"] #mobile-swap-nav,
+        html.light #mobile-swap-nav {
+            background-color: #ffffff !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+        }
+        html[data-theme="light"] #mobile-swap-nav .bg-slate-950\/80,
+        html.light #mobile-swap-nav .bg-slate-950\/80 {
+            background-color: #f1f5f9 !important;
+            border-color: #cbd5e1 !important;
+        }
+        html[data-theme="light"] #tab-btn-catalog:not(.bg-blue-600),
+        html.light #tab-btn-catalog:not(.bg-blue-600),
+        html[data-theme="light"] #tab-btn-cart:not(.bg-blue-600),
+        html.light #tab-btn-cart:not(.bg-blue-600) {
+            color: #64748b !important;
+        }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 antialiased h-screen h-[100dvh] flex flex-col overflow-hidden select-none">
@@ -555,10 +580,50 @@ if ($terminals_q) {
     <!-- 1. Header / Navbar Kasir -->
     <?php require_once __DIR__ . '/views/pos/navbar.php'; ?>
 
-    <!-- 2. Konten Utama: Product Grid & Cart Sidebar -->
-    <div class="flex-1 flex overflow-hidden min-h-0">
+    <!-- 1b. Segmented Mobile Swap Switcher Bar (Khusus Layar HP / Tablet lg:hidden) -->
+    <div id="mobile-swap-nav" class="lg:hidden bg-slate-900 border-b border-white/10 p-2 flex items-center sticky top-0 z-20 shadow-md">
+        <div class="grid grid-cols-2 gap-2 w-full p-1 bg-slate-950/80 rounded-2xl border border-white/10">
+            <button type="button" id="tab-btn-catalog" onclick="switchMobileTab('catalog')"
+                    class="py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition duration-200 shadow-md bg-blue-600 text-white font-black cursor-pointer">
+                <span>🛍️</span> <span>Menu Produk</span>
+            </button>
+            <button type="button" id="tab-btn-cart" onclick="switchMobileTab('cart')"
+                    class="py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition duration-200 text-slate-400 hover:text-white cursor-pointer">
+                <span>🛒</span> <span>Keranjang</span>
+                <span id="mobile-cart-badge" class="hidden bg-emerald-500 text-slate-950 font-black text-[10px] px-1.5 py-0.5 rounded-full">0</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 2. Konten Utama: Product Grid & Cart Sidebar (Swap Mode di Mobile) -->
+    <div class="flex-1 flex overflow-hidden min-h-0 relative">
         <?php require_once __DIR__ . '/views/pos/product_grid.php'; ?>
         <?php require_once __DIR__ . '/views/pos/cart_sidebar.php'; ?>
+    </div>
+
+    <!-- 2b. Floating Mobile Quick-Cart Pill (Khusus HP saat kasir browsing di tab Menu & ada isi keranjang) -->
+    <div id="mobile-floating-cart-bar" class="lg:hidden fixed bottom-4 left-4 right-4 z-30 transition-all duration-300 transform translate-y-32 opacity-0 pointer-events-none">
+        <div onclick="switchMobileTab('cart')" class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-3.5 rounded-2xl shadow-2xl shadow-blue-600/50 flex items-center justify-between border border-blue-400/30 cursor-pointer active:scale-98 transition">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center font-bold text-lg">
+                    🛒
+                </div>
+                <div>
+                    <div class="text-xs font-medium text-blue-100 flex items-center gap-1.5">
+                        <span id="floating-item-count" class="font-bold">0 Item</span>
+                        <span>•</span>
+                        <span class="text-[11px] text-blue-200">Lihat Rincian</span>
+                    </div>
+                    <div id="floating-total-price" class="text-sm font-black font-mono tracking-tight">
+                        Rp 0
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 px-3.5 py-2 rounded-xl text-xs font-bold transition">
+                <span>Keranjang</span>
+                <span class="text-sm">➔</span>
+            </div>
+        </div>
     </div>
 
     <!-- 3. Modal Pembayaran & Cetak Nota -->
@@ -573,7 +638,7 @@ if ($terminals_q) {
     <!-- 6. Modal Konfirmasi & Alert Kustom -->
     <?php require_once __DIR__ . '/views/layouts/modal_custom.php'; ?>
 
-    <!-- 6. Skrip Eksternal -->
+    <!-- 7. Skrip Eksternal -->
     <script src="assets/js/app.js?v=<?= filemtime(__DIR__ . '/assets/js/app.js') ?>"></script>
     <script src="assets/js/pos.js?v=<?= filemtime(__DIR__ . '/assets/js/pos.js') ?>"></script>
     <script>
@@ -584,6 +649,15 @@ if ($terminals_q) {
         function tutupModal(id) {
             const el = document.getElementById(id);
             if (el) { el.classList.add('hidden'); el.classList.remove('flex'); }
+        }
+
+        // Registrasi PWA Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('Veloce POS: PWA Service Worker Aktif [', reg.scope, ']'))
+                    .catch(err => console.log('Veloce POS: Service Worker gagal:', err));
+            });
         }
     </script>
 </body>

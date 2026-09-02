@@ -1,11 +1,11 @@
-<!-- Grid Katalog Produk Kasir -->
-<div class="flex-1 p-6 overflow-y-auto min-h-0 h-full custom-scroll pb-28">
-    <div class="flex items-center justify-between mb-6">
+<!-- Grid Katalog Produk Kasir (Mobile Catalog View) -->
+<div id="mobile-catalog-view" class="flex-1 p-4 sm:p-6 overflow-y-auto min-h-0 h-full custom-scroll pb-32 w-full flex flex-col">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <div>
             <h2 class="text-xl font-bold text-white tracking-tight">Katalog Produk</h2>
             <p class="text-xs text-slate-400">Pilih item untuk ditambahkan ke keranjang belanja</p>
         </div>
-        <div class="relative w-64">
+        <div class="relative w-full sm:w-64">
             <input type="text" id="cari-produk" onkeyup="filterProduk(this.value)" placeholder="Cari nama produk..." class="w-full bg-slate-900 border border-white/10 rounded-2xl px-4 py-2.5 text-xs text-white placeholder-slate-500 outline-none focus:border-blue-500 transition">
             <span class="absolute right-3.5 top-2.5 text-slate-500 text-xs">🔍</span>
         </div>

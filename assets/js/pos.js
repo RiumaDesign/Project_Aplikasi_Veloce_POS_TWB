@@ -94,6 +94,7 @@ function renderCart() {
         subtotalEl.innerText = 'Rp 0';
         countEl.innerText = '0 Item Dipilih';
         btnCheckout.setAttribute('disabled', 'disabled');
+        updateFloatingCartBar();
         return;
     }
 
@@ -127,6 +128,7 @@ function renderCart() {
     subtotalEl.innerText = formatRupiah(grand);
     countEl.innerText = `${totalPcs} Item Dipilih`;
     btnCheckout.removeAttribute('disabled');
+    updateFloatingCartBar();
 }
 
 function bukaModalBayar() {
@@ -357,6 +359,9 @@ function cetakNotaBelanja() {
  */
 function tutupModalStruk() {
     tutupModal('modal-struk');
+    if (window.innerWidth < 1024) {
+        switchMobileTab('catalog');
+    }
     if (window.VeloceApp && window.VeloceApp.showToast) {
         window.VeloceApp.showToast('Siap melayani transaksi berikutnya.', 'info');
     }
@@ -391,4 +396,131 @@ function cetakUlangNotaTerakhir() {
         lastReceipt.kembalian,
         lastReceipt.items
     );
+}
+
+/* ==========================================================================
+ * SISTEM SWAP TAMPILAN MOBILE PWA (KATALOG MENU VS KERANJANG BELANJA)
+ * ========================================================================== */
+let currentMobileTab = 'catalog';
+
+/**
+ * Beralih antara tab Katalog Menu Produk dan Keranjang Belanja pada layar HP
+ */
+function switchMobileTab(target) {
+    currentMobileTab = target;
+    const catView = document.getElementById('mobile-catalog-view');
+    const cartView = document.getElementById('mobile-cart-view');
+    const btnCat = document.getElementById('tab-btn-catalog');
+    const btnCart = document.getElementById('tab-btn-cart');
+    const floatingBar = document.getElementById('mobile-floating-cart-bar');
+
+    if (!catView || !cartView) return;
+
+    if (target === 'cart') {
+        // Tampilkan Keranjang, Sembunyikan Katalog di HP
+        catView.classList.add('hidden');
+        catView.classList.remove('flex');
+        
+        cartView.classList.remove('hidden');
+        cartView.classList.add('flex');
+
+        // Perbarui gaya tombol tab switcher
+        if (btnCart && btnCat) {
+            btnCart.className = "py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition duration-200 shadow-md bg-blue-600 text-white font-black cursor-pointer";
+            btnCat.className = "py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition duration-200 text-slate-400 hover:text-white cursor-pointer";
+        }
+
+        // Sembunyikan quick-cart floating bar saat sedang berada di keranjang
+        if (floatingBar) {
+            floatingBar.classList.add('translate-y-32', 'opacity-0', 'pointer-events-none');
+            floatingBar.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
+        }
+    } else {
+        // Tampilkan Katalog, Sembunyikan Keranjang di HP
+        catView.classList.remove('hidden');
+        catView.classList.add('flex');
+
+        cartView.classList.add('hidden');
+        cartView.classList.remove('flex');
+
+        // Perbarui gaya tombol tab switcher
+        if (btnCat && btnCart) {
+            btnCat.className = "py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition duration-200 shadow-md bg-blue-600 text-white font-black cursor-pointer";
+            btnCart.className = "py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition duration-200 text-slate-400 hover:text-white cursor-pointer";
+        }
+
+        // Tampilkan floating bar jika ada barang di keranjang
+        updateFloatingCartBar();
+    }
+}
+
+/**
+ * Update realtime badge item keranjang dan bilah floating quick-cart
+ */
+function updateFloatingCartBar() {
+    const floatingBar = document.getElementById('mobile-floating-cart-bar');
+    const badge = document.getElementById('mobile-cart-badge');
+    const floatingCount = document.getElementById('floating-item-count');
+    const floatingTotal = document.getElementById('floating-total-price');
+
+    const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+    const totalPrice = hitungTotal();
+
+    // 1. Perbarui angka badge pada tab Keranjang
+    if (badge) {
+        if (totalQty > 0) {
+            badge.innerText = totalQty;
+            badge.classList.remove('hidden');
+        } else {
+            badge.classList.add('hidden');
+        }
+    }
+
+    // 2. Perbarui tampilan bilah floating quick-cart di bawah
+    if (floatingBar && floatingCount && floatingTotal) {
+        floatingCount.innerText = `${totalQty} Item`;
+        floatingTotal.innerText = formatRupiah(totalPrice);
+
+        // Hanya tampilkan jika layar di tab katalog dan ada item di keranjang
+        if (totalQty > 0 && currentMobileTab === 'catalog') {
+            floatingBar.classList.remove('translate-y-32', 'opacity-0', 'pointer-events-none');
+            floatingBar.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
+        } else {
+            floatingBar.classList.add('translate-y-32', 'opacity-0', 'pointer-events-none');
+            floatingBar.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
+        }
+    }
+}
+
+// 3. Gesture Sentuh / Touch Swipe untuk beralih layar layaknya App Native
+let touchStartX = 0;
+let touchEndX = 0;
+
+document.addEventListener('touchstart', e => {
+    if (window.innerWidth >= 1024) return;
+    if (e.changedTouches && e.changedTouches.length > 0) {
+        touchStartX = e.changedTouches[0].screenX;
+    }
+}, { passive: true });
+
+document.addEventListener('touchend', e => {
+    if (window.innerWidth >= 1024) return;
+    if (e.changedTouches && e.changedTouches.length > 0) {
+        touchEndX = e.changedTouches[0].screenX;
+        handleMobileSwipe();
+    }
+}, { passive: true });
+
+function handleMobileSwipe() {
+    const swipeDistance = touchEndX - touchStartX;
+    // Ambang batas geser minimal 75px
+    if (Math.abs(swipeDistance) < 75) return;
+
+    if (swipeDistance < -75 && currentMobileTab === 'catalog') {
+        // Geser Kiri (Swipe Left) -> Beralih ke Keranjang
+        switchMobileTab('cart');
+    } else if (swipeDistance > 75 && currentMobileTab === 'cart') {
+        // Geser Kanan (Swipe Right) -> Beralih ke Katalog Menu
+        switchMobileTab('catalog');
+    }
 }
