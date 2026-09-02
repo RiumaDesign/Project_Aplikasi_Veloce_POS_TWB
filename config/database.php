@@ -1,17 +1,38 @@
 <?php
 /**
  * Konfigurasi Database Terpusat - Veloce POS
- * Mendukung Lingkungan Lokal (XAMPP) & Cloud Deployment (Vercel, Railway, cPanel)
+ * Mendukung Lingkungan Lokal (XAMPP) & Cloud Deployment (Railway, Vercel, cPanel)
  */
 
-// Membaca kredensial dari Environment Variables (Mendukung Vercel, Railway MYSQLHOST, dsb) atau fallback ke lokal XAMPP
-$db_host = getenv('DB_HOST') ?: (getenv('MYSQLHOST') ?: (isset($_SERVER['DB_HOST']) ? $_SERVER['DB_HOST'] : (isset($_SERVER['MYSQLHOST']) ? $_SERVER['MYSQLHOST'] : "localhost")));
-$db_user = getenv('DB_USER') ?: (getenv('MYSQLUSER') ?: (isset($_SERVER['DB_USER']) ? $_SERVER['DB_USER'] : (isset($_SERVER['MYSQLUSER']) ? $_SERVER['MYSQLUSER'] : "root")));
-$db_pass = getenv('DB_PASS') !== false ? getenv('DB_PASS') : (getenv('DB_PASSWORD') !== false ? getenv('DB_PASSWORD') : (getenv('MYSQLPASSWORD') !== false ? getenv('MYSQLPASSWORD') : (isset($_SERVER['DB_PASS']) ? $_SERVER['DB_PASS'] : (isset($_SERVER['MYSQLPASSWORD']) ? $_SERVER['MYSQLPASSWORD'] : ""))));
-$db_name = getenv('DB_NAME') ?: (getenv('MYSQLDATABASE') ?: (isset($_SERVER['DB_NAME']) ? $_SERVER['DB_NAME'] : (isset($_SERVER['MYSQLDATABASE']) ? $_SERVER['MYSQLDATABASE'] : "veloce_pos")));
-$db_port = intval(getenv('DB_PORT') ?: (getenv('MYSQLPORT') ?: (isset($_SERVER['DB_PORT']) ? $_SERVER['DB_PORT'] : (isset($_SERVER['MYSQLPORT']) ? $_SERVER['MYSQLPORT'] : 3306))));
+// 1. Cek ketersediaan ekstensi MySQLi
+if (!class_exists('mysqli')) {
+    http_response_code(500);
+    die("Server Configuration Notice: Ekstensi PHP 'mysqli' sedang diaktifkan oleh builder Railway/Nixpacks. Silakan tunggu beberapa saat.");
+}
 
-// Inisialisasi koneksi MySQLi dengan port pendukung
+// 2. Parsing URL Connection String jika disediakan Railway (MYSQL_URL / DATABASE_URL)
+$raw_url = getenv('MYSQL_URL') ?: (getenv('DATABASE_URL') ?: (getenv('MYSQL_PRIVATE_URL') ?: ''));
+$parsed_host = null; $parsed_user = null; $parsed_pass = null; $parsed_name = null; $parsed_port = null;
+
+if (!empty($raw_url)) {
+    $p = parse_url($raw_url);
+    if ($p) {
+        $parsed_host = $p['host'] ?? null;
+        $parsed_user = $p['user'] ?? null;
+        $parsed_pass = $p['pass'] ?? null;
+        $parsed_name = isset($p['path']) ? ltrim($p['path'], '/') : null;
+        $parsed_port = isset($p['port']) ? intval($p['port']) : null;
+    }
+}
+
+// 3. Membaca kredensial dari Environment Variables (Mendukung format Railway, Vercel, & manual)
+$db_host = $parsed_host ?: (getenv('DB_HOST') ?: (getenv('MYSQLHOST') ?: (getenv('MYSQL_HOST') ?: (isset($_SERVER['DB_HOST']) ? $_SERVER['DB_HOST'] : (isset($_SERVER['MYSQLHOST']) ? $_SERVER['MYSQLHOST'] : "localhost")))));
+$db_user = $parsed_user ?: (getenv('DB_USER') ?: (getenv('MYSQLUSER') ?: (getenv('MYSQL_USER') ?: (isset($_SERVER['DB_USER']) ? $_SERVER['DB_USER'] : (isset($_SERVER['MYSQLUSER']) ? $_SERVER['MYSQLUSER'] : "root")))));
+$db_pass = $parsed_pass !== null ? $parsed_pass : (getenv('DB_PASS') !== false ? getenv('DB_PASS') : (getenv('DB_PASSWORD') !== false ? getenv('DB_PASSWORD') : (getenv('MYSQLPASSWORD') !== false ? getenv('MYSQLPASSWORD') : (getenv('MYSQL_PASSWORD') !== false ? getenv('MYSQL_PASSWORD') : (isset($_SERVER['DB_PASS']) ? $_SERVER['DB_PASS'] : (isset($_SERVER['MYSQLPASSWORD']) ? $_SERVER['MYSQLPASSWORD'] : ""))))));
+$db_name = $parsed_name ?: (getenv('DB_NAME') ?: (getenv('MYSQLDATABASE') ?: (getenv('MYSQL_DATABASE') ?: (isset($_SERVER['DB_NAME']) ? $_SERVER['DB_NAME'] : (isset($_SERVER['MYSQLDATABASE']) ? $_SERVER['MYSQLDATABASE'] : "veloce_pos")))));
+$db_port = $parsed_port ?: intval(getenv('DB_PORT') ?: (getenv('MYSQLPORT') ?: (getenv('MYSQL_PORT') ?: (isset($_SERVER['DB_PORT']) ? $_SERVER['DB_PORT'] : (isset($_SERVER['MYSQLPORT']) ? $_SERVER['MYSQLPORT'] : 3306)))));
+
+// 4. Inisialisasi koneksi MySQLi dengan port pendukung
 mysqli_report(MYSQLI_REPORT_OFF);
 $conn = @new mysqli($db_host, $db_user, $db_pass, $db_name, $db_port);
 

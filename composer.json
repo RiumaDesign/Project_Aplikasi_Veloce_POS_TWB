@@ -1,0 +1,12 @@
+{
+  "name": "riuma/veloce-pos",
+  "description": "Veloce POS PT Taman Wisata Borobudur",
+  "type": "project",
+  "require": {
+    "php": ">=8.1",
+    "ext-mysqli": "*",
+    "ext-pdo_mysql": "*",
+    "ext-json": "*",
+    "ext-session": "*"
+  }
+}
