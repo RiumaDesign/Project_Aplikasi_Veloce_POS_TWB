@@ -24,7 +24,7 @@ $currentPageTitle = $pageTitles[$page ?? 'analytics'] ?? 'Dashboard Admin';
 
 <!-- TOPBAR UTILITY HEADER -->
 <header id="admin-topbar" class="w-full bg-slate-950/80 backdrop-blur-xl border-b border-white/10 sticky top-0 z-20 px-4 md:px-8 py-2.5 transition-colors duration-300">
-    <div class="max-w-7xl mx-auto flex items-center justify-end gap-3.5">
+    <div class="w-full flex items-center justify-end gap-3.5">
         
         <!-- Badge Status Real-time Online -->
         <div class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px] font-bold">

@@ -123,15 +123,6 @@ function toggleSidebar() {
             btnShow.classList.remove('flex');
         }
     }
-    if (mainContent) {
-        if (isCollapsed) {
-            mainContent.classList.remove('max-w-7xl');
-            mainContent.classList.add('max-w-full');
-        } else {
-            mainContent.classList.add('max-w-7xl');
-            mainContent.classList.remove('max-w-full');
-        }
-    }
     localStorage.setItem('twb_sidebar_collapsed', isCollapsed ? 'true' : 'false');
 }
 
@@ -141,15 +132,10 @@ function toggleSidebar() {
     if (isCollapsed) {
         const sidebar = document.getElementById('sidebar-nav');
         const btnShow = document.getElementById('btn-show-sidebar');
-        const mainContent = document.getElementById('main-content');
         if (sidebar) sidebar.classList.add('sidebar-collapsed');
         if (btnShow) {
             btnShow.classList.remove('hidden');
             btnShow.classList.add('flex');
-        }
-        if (mainContent) {
-            mainContent.classList.remove('max-w-7xl');
-            mainContent.classList.add('max-w-full');
         }
     }
 })();
