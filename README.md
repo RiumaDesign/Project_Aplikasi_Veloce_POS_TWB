@@ -41,6 +41,12 @@ Aplikasi ini mengintegrasikan seluruh operasional kasir retail fisik, mesin otom
 - Dialog konfirmasi mandiri (*Pure Standalone CSS & JS - Zero Dependency*) menggantikan pop-up native browser `alert()` dan `confirm()`.
 - Animasi halus, penataan terpusat z-index tinggi, dukungan navigasi keyboard (`Escape` untuk batal), dan tampilan adaptif di Dark/Light Mode.
 
+### 5. Pusat Notifikasi & Sistem Peringatan Real-time Admin
+- **Top Navigation Bar:** Navigasi atas Glassmorphism modern dengan tombol toggle sidebar, breadcrumbs, dan indikator status online.
+- **Peringatan Stok Otomatis:** Deteksi cerdas stok menipis ($\le 10$ pcs) dan stok kritis/habis ($0 - 3$ pcs) di seluruh gudang, outlet museum, outlet barat, dan vending machine VM 1-9+.
+- **Dropdown Lonceng Interaktif:** Dilengkapi lencana merah menyala (*pulse badge counter*), tab filter (*Semua, Stok Kritis, Retur, Sistem*), waktu lampau ramah (*time ago*), tombol tautan aksi langsung, serta fungsi *Tandai Semua Dibaca*.
+- **Polling Real-time:** Polling otomatis di latar belakang setiap 30 detik tanpa perlu memuat ulang (*reload*) halaman.
+
 ---
 
 ## 🛠️ Arsitektur & Teknologi

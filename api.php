@@ -462,6 +462,57 @@ switch ($action) {
         break;
 
     // ----------------------------------------------------------------------
+    // PUSAT NOTIFIKASI ADMIN (Peringatan Stok, Transaksi & Retur)
+    // ----------------------------------------------------------------------
+    case 'notifications':
+        require_once __DIR__ . '/controllers/NotificationController.php';
+        $notifCtrl = new NotificationController($conn);
+        
+        // Pindai alert otomatis terbaru
+        $notifCtrl->syncLiveAlerts();
+
+        $limit = intval($_GET['limit'] ?? 25);
+        $category = $_GET['category'] ?? null;
+        $unreadOnly = isset($_GET['unread_only']) && ($_GET['unread_only'] === '1' || $_GET['unread_only'] === 'true');
+
+        $notifs = $notifCtrl->getNotifications($limit, $category, $unreadOnly);
+        $unreadCount = $notifCtrl->getUnreadCount();
+
+        send_api_response("success", 200, "Notifikasi admin berhasil dimuat.", [
+            "unread_count"  => $unreadCount,
+            "notifications" => $notifs
+        ]);
+        break;
+
+    case 'mark_notification_read':
+        require_once __DIR__ . '/controllers/NotificationController.php';
+        $notifCtrl = new NotificationController($conn);
+
+        $id = intval($_POST['id'] ?? $_GET['id'] ?? $input_data['id'] ?? 0);
+        if ($id <= 0) {
+            send_api_response("error", 400, "Parameter ID notifikasi wajib dikirimkan.");
+        }
+
+        $res = $notifCtrl->markAsRead($id);
+        $unreadCount = $notifCtrl->getUnreadCount();
+
+        send_api_response("success", 200, "Notifikasi berhasil ditandai telah dibaca.", [
+            "id"           => $id,
+            "unread_count" => $unreadCount
+        ]);
+        break;
+
+    case 'mark_all_notifications_read':
+        require_once __DIR__ . '/controllers/NotificationController.php';
+        $notifCtrl = new NotificationController($conn);
+
+        $notifCtrl->markAllAsRead();
+        send_api_response("success", 200, "Seluruh notifikasi berhasil ditandai sudah dibaca.", [
+            "unread_count" => 0
+        ]);
+        break;
+
+    // ----------------------------------------------------------------------
     // Default: Endpoint Tidak Dikenal
     // ----------------------------------------------------------------------
     default:

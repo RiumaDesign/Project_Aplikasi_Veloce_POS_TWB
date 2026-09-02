@@ -196,6 +196,52 @@
             border-color: #f87171 !important;
             color: #991b1b !important;
         }
+
+        /* ========================================================================= */
+        /* TOPBAR & PUSAT NOTIFIKASI DI TEMA TERANG                                 */
+        /* ========================================================================= */
+        html[data-theme="light"] #admin-topbar,
+        html.light #admin-topbar {
+            background-color: rgba(255, 255, 255, 0.95) !important;
+            border-bottom-color: #e2e8f0 !important;
+        }
+        html[data-theme="light"] #notif-dropdown-menu,
+        html.light #notif-dropdown-menu {
+            background: #ffffff !important;
+            border-color: #e2e8f0 !important;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+        }
+        html[data-theme="light"] #notif-dropdown-menu > div:first-child,
+        html.light #notif-dropdown-menu > div:first-child {
+            background-color: #f8fafc !important;
+            border-bottom-color: #e2e8f0 !important;
+        }
+        html[data-theme="light"] #notif-dropdown-menu > div:nth-child(2),
+        html.light #notif-dropdown-menu > div:nth-child(2) {
+            background-color: #f1f5f9 !important;
+            border-bottom-color: #e2e8f0 !important;
+        }
+        html[data-theme="light"] #notif-dropdown-menu > div:last-child,
+        html.light #notif-dropdown-menu > div:last-child {
+            background-color: #f8fafc !important;
+            border-top-color: #e2e8f0 !important;
+        }
+        html[data-theme="light"] .notif-item,
+        html.light .notif-item {
+            border-bottom-color: #f1f5f9 !important;
+        }
+        html[data-theme="light"] .notif-item:hover,
+        html.light .notif-item:hover {
+            background-color: #f8fafc !important;
+        }
+        html[data-theme="light"] .notif-item.border-rose-500,
+        html.light .notif-item.border-rose-500 {
+            background-color: #fff1f2 !important;
+        }
+        html[data-theme="light"] .notif-item.border-amber-500,
+        html.light .notif-item.border-amber-500 {
+            background-color: #fffbeb !important;
+        }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-100 antialiased min-h-screen flex">

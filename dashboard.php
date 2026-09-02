@@ -30,8 +30,11 @@ if (!in_array($page, $allowed_pages)) {
 require_once __DIR__ . '/views/layouts/header.php';
 require_once __DIR__ . '/views/layouts/sidebar.php';
 
+echo '<div class="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">';
+require_once __DIR__ . '/views/layouts/topbar.php';
 echo '<main id="main-content" class="flex-1 p-6 md:p-8 max-w-7xl mx-auto w-full overflow-y-auto min-w-0 transition-all duration-300">';
 require_once __DIR__ . '/views/dashboard/' . $page . '.php';
 echo '</main>';
+echo '</div>';
 
 require_once __DIR__ . '/views/layouts/footer.php';
