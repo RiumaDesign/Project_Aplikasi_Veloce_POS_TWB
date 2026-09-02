@@ -67,11 +67,6 @@
             </div>
         </div>
 
-        <a href="index.php" class="sidebar-pos-link flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-900 transition border border-transparent hover:border-white/10">
-            <span class="flex items-center gap-2"><span>🛒</span> Ke Terminal POS</span>
-            <span class="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-md font-mono">Buka</span>
-        </a>
-        
         <a href="dashboard.php?action=logout" onclick="return confirmLogoutAdmin(event)" class="sidebar-logout-btn flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition bg-rose-500/10 text-rose-400 border border-rose-500/30 hover:bg-rose-500/20 cursor-pointer">
             <span class="flex items-center gap-2 pointer-events-none"><span>🚪</span> Keluar Sesi Admin</span>
             <span class="text-[9px] bg-rose-500/20 text-rose-300 px-1.5 py-0.5 rounded font-mono uppercase tracking-wider pointer-events-none">Keluar</span>

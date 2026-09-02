@@ -22,149 +22,123 @@ $pageTitles = [
 $currentPageTitle = $pageTitles[$page ?? 'analytics'] ?? 'Dashboard Admin';
 ?>
 
-<!-- TOPBAR NAVIGATION -->
-<header id="admin-topbar" class="w-full bg-slate-950/80 backdrop-blur-xl border-b border-white/10 sticky top-0 z-20 px-4 md:px-8 py-3 transition-colors duration-300">
-    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+<!-- TOPBAR UTILITY HEADER -->
+<header id="admin-topbar" class="w-full bg-slate-950/80 backdrop-blur-xl border-b border-white/10 sticky top-0 z-20 px-4 md:px-8 py-2.5 transition-colors duration-300">
+    <div class="max-w-7xl mx-auto flex items-center justify-end gap-3.5">
         
-        <!-- Sisi Kiri: Toggle Sidebar & Breadcrumb -->
-        <div class="flex items-center gap-3 min-w-0">
-            <!-- Tombol Buka/Tutup Sidebar -->
-            <button type="button" onclick="toggleSidebar()" class="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 transition flex items-center justify-center shrink-0" title="Sembunyikan / Tampilkan Menu Sidebar">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        <!-- Badge Status Real-time Online -->
+        <div class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px] font-bold">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>Sistem Real-time</span>
+        </div>
+
+        <!-- NOTIFIKASI LONCENG & DROPDOWN -->
+        <div class="relative" id="notif-dropdown-wrapper">
+            <button type="button" id="btn-notif-toggle" onclick="toggleNotifDropdown()" class="relative p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 transition flex items-center justify-center focus:outline-none" title="Pusat Notifikasi & Peringatan Admin">
+                <!-- Bell Icon SVG -->
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
                 </svg>
+                
+                <!-- Lencana Jumlah Belum Dibaca (Pulsing Badge) -->
+                <span id="notif-badge-counter" class="<?= ($unreadCount > 0) ? 'flex' : 'hidden' ?> absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-rose-500 text-white text-[10px] font-black rounded-full items-center justify-center border-2 border-slate-950 shadow-lg shadow-rose-500/50 animate-bounce">
+                    <?= ($unreadCount > 99) ? '99+' : $unreadCount ?>
+                </span>
             </button>
 
-            <!-- Breadcrumb Navigation -->
-            <div class="flex items-center gap-2 overflow-hidden text-xs">
-                <span class="text-slate-400 font-semibold hidden sm:inline">Admin Khusus</span>
-                <span class="text-slate-600 hidden sm:inline">/</span>
-                <span class="font-bold text-white truncate"><?= $currentPageTitle ?></span>
-            </div>
-        </div>
-
-        <!-- Sisi Kanan: Status Online, Notifikasi Lonceng & Profil -->
-        <div class="flex items-center gap-3 shrink-0">
-            
-            <!-- Badge Status Real-time Online -->
-            <div class="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px] font-bold">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span>Sistem Real-time</span>
-            </div>
-
-            <!-- NOTIFIKASI LONCENG & DROPDOWN -->
-            <div class="relative" id="notif-dropdown-wrapper">
-                <button type="button" id="btn-notif-toggle" onclick="toggleNotifDropdown()" class="relative p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 transition flex items-center justify-center focus:outline-none" title="Pusat Notifikasi & Peringatan Admin">
-                    <!-- Bell Icon SVG -->
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
-                    </svg>
-                    
-                    <!-- Lencana Jumlah Belum Dibaca (Pulsing Badge) -->
-                    <span id="notif-badge-counter" class="<?= ($unreadCount > 0) ? 'flex' : 'hidden' ?> absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-rose-500 text-white text-[10px] font-black rounded-full items-center justify-center border-2 border-slate-950 shadow-lg shadow-rose-500/50 animate-bounce">
-                        <?= ($unreadCount > 99) ? '99+' : $unreadCount ?>
-                    </span>
-                </button>
-
-                <!-- DROPDOWN PANEL NOTIFIKASI (SOLID ZERO-BLEED THROUGH) -->
-                <div id="notif-dropdown-menu" class="hidden absolute right-0 mt-3 w-80 sm:w-96 rounded-3xl border shadow-2xl overflow-hidden z-50 transition-all duration-200">
-                    
-                    <!-- Header Dropdown -->
-                    <div class="notif-header p-4 flex items-center justify-between gap-2">
-                        <div class="flex items-center gap-2">
-                            <span class="text-base">🔔</span>
-                            <div>
-                                <h4 class="text-xs font-black uppercase tracking-wider text-white">Notifikasi Admin</h4>
-                                <p class="text-[10px] text-slate-400">Peringatan stok, transaksi & retur</p>
-                            </div>
+            <!-- DROPDOWN PANEL NOTIFIKASI (SOLID ZERO-BLEED THROUGH) -->
+            <div id="notif-dropdown-menu" class="hidden absolute right-0 mt-3 w-80 sm:w-96 rounded-3xl border shadow-2xl overflow-hidden z-50 transition-all duration-200">
+                
+                <!-- Header Dropdown -->
+                <div class="notif-header p-4 flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-2">
+                        <span class="text-base">🔔</span>
+                        <div>
+                            <h4 class="text-xs font-black uppercase tracking-wider text-white">Notifikasi Admin</h4>
+                            <p class="text-[10px] text-slate-400">Peringatan stok, transaksi & retur</p>
                         </div>
-                        <button type="button" onclick="markAllNotifsRead()" class="text-[10px] font-bold text-blue-400 hover:text-blue-300 hover:underline transition">
-                            Tandai Semua Dibaca
-                        </button>
                     </div>
+                    <button type="button" onclick="markAllNotifsRead()" class="text-[10px] font-bold text-blue-400 hover:text-blue-300 hover:underline transition">
+                        Tandai Semua Dibaca
+                    </button>
+                </div>
 
-                    <!-- Filter Kategori Tabs -->
-                    <div class="notif-tabs-bar flex items-center px-2 py-1.5 gap-1 overflow-x-auto text-[10px] font-bold text-slate-400">
-                        <button type="button" onclick="filterNotifCategory('all')" class="notif-tab-btn px-2.5 py-1 rounded-lg bg-blue-600 text-white transition active-tab" data-cat="all">Semua</button>
-                        <button type="button" onclick="filterNotifCategory('stok_kritis')" class="notif-tab-btn px-2.5 py-1 rounded-lg hover:bg-white/5 transition" data-cat="stok_kritis">⚠️ Stok Kritis</button>
-                        <button type="button" onclick="filterNotifCategory('retur_barang')" class="notif-tab-btn px-2.5 py-1 rounded-lg hover:bg-white/5 transition" data-cat="retur_barang">📦 Retur</button>
-                        <button type="button" onclick="filterNotifCategory('sistem')" class="notif-tab-btn px-2.5 py-1 rounded-lg hover:bg-white/5 transition" data-cat="sistem">⚙️ Sistem</button>
-                    </div>
+                <!-- Filter Kategori Tabs -->
+                <div class="notif-tabs-bar flex items-center px-2 py-1.5 gap-1 overflow-x-auto text-[10px] font-bold text-slate-400">
+                    <button type="button" onclick="filterNotifCategory('all')" class="notif-tab-btn px-2.5 py-1 rounded-lg bg-blue-600 text-white transition active-tab" data-cat="all">Semua</button>
+                    <button type="button" onclick="filterNotifCategory('stok_kritis')" class="notif-tab-btn px-2.5 py-1 rounded-lg hover:bg-white/5 transition" data-cat="stok_kritis">⚠️ Stok Kritis</button>
+                    <button type="button" onclick="filterNotifCategory('retur_barang')" class="notif-tab-btn px-2.5 py-1 rounded-lg hover:bg-white/5 transition" data-cat="retur_barang">📦 Retur</button>
+                    <button type="button" onclick="filterNotifCategory('sistem')" class="notif-tab-btn px-2.5 py-1 rounded-lg hover:bg-white/5 transition" data-cat="sistem">⚙️ Sistem</button>
+                </div>
 
-                    <!-- List Kontainer Notifikasi -->
-                    <div id="notif-items-list" class="max-h-80 overflow-y-auto divide-y divide-white/5">
-                        <?php if (empty($initialNotifs)): ?>
-                            <div class="p-8 text-center text-slate-400">
-                                <span class="text-2xl block mb-1">🎉</span>
-                                <span class="text-xs font-bold text-slate-300">Belum ada notifikasi baru</span>
-                                <p class="text-[10px] text-slate-500 mt-0.5">Semua persediaan dan transaksi terpantau aman.</p>
-                            </div>
-                        <?php else: ?>
-                            <?php foreach ($initialNotifs as $nt): 
-                                $isUnread = (intval($nt['is_read']) === 0);
-                                $typeStyle = match($nt['type']) {
-                                    'danger'  => 'border-rose-500',
-                                    'warning' => 'border-amber-500',
-                                    'success' => 'border-emerald-500',
-                                    default   => 'border-blue-500'
-                                };
-                                $icon = match($nt['category']) {
-                                    'stok_kritis'   => ($nt['type'] === 'danger' ? '🔴' : '⚡'),
-                                    'transaksi_baru'=> '🛒',
-                                    'retur_barang'  => '📦',
-                                    'mutasi_stok'   => '🚚',
-                                    default         => '🔔'
-                                };
-                            ?>
-                                <div class="notif-item p-3.5 transition flex items-start gap-3 relative cursor-pointer border-l-4 <?= $typeStyle ?> <?= $isUnread ? 'font-semibold' : 'opacity-75' ?>" 
-                                     data-id="<?= $nt['id'] ?>" 
-                                     data-cat="<?= $nt['category'] ?>"
-                                     onclick="handleNotifClick(<?= $nt['id'] ?>, '<?= htmlspecialchars($nt['link_url'] ?? '') ?>')">
-                                    <span class="text-lg shrink-0 mt-0.5"><?= $icon ?></span>
-                                    <div class="flex-1 min-w-0">
-                                        <div class="flex items-center justify-between gap-1 mb-0.5">
-                                            <span class="text-xs font-bold text-white truncate"><?= htmlspecialchars($nt['title']) ?></span>
-                                            <span class="text-[9px] text-slate-400 whitespace-nowrap shrink-0"><?= $nt['time_ago'] ?></span>
-                                        </div>
-                                        <p class="text-[11px] text-slate-300 line-clamp-2 leading-relaxed"><?= htmlspecialchars($nt['message']) ?></p>
-                                        <?php if (!empty($nt['link_url'])): ?>
-                                            <span class="text-[10px] text-blue-400 font-bold hover:underline inline-block mt-1">Periksa Detail ➔</span>
-                                        <?php endif; ?>
+                <!-- List Kontainer Notifikasi -->
+                <div id="notif-items-list" class="max-h-80 overflow-y-auto divide-y divide-white/5">
+                    <?php if (empty($initialNotifs)): ?>
+                        <div class="p-8 text-center text-slate-400">
+                            <span class="text-2xl block mb-1">🎉</span>
+                            <span class="text-xs font-bold text-slate-300">Belum ada notifikasi baru</span>
+                            <p class="text-[10px] text-slate-500 mt-0.5">Semua persediaan dan transaksi terpantau aman.</p>
+                        </div>
+                    <?php else: ?>
+                        <?php foreach ($initialNotifs as $nt): 
+                            $isUnread = (intval($nt['is_read']) === 0);
+                            $typeStyle = match($nt['type']) {
+                                'danger'  => 'border-rose-500',
+                                'warning' => 'border-amber-500',
+                                'success' => 'border-emerald-500',
+                                default   => 'border-blue-500'
+                            };
+                            $icon = match($nt['category']) {
+                                'stok_kritis'   => ($nt['type'] === 'danger' ? '🔴' : '⚡'),
+                                'transaksi_baru'=> '🛒',
+                                'retur_barang'  => '📦',
+                                'mutasi_stok'   => '🚚',
+                                default         => '🔔'
+                            };
+                        ?>
+                            <div class="notif-item p-3.5 transition flex items-start gap-3 relative cursor-pointer border-l-4 <?= $typeStyle ?> <?= $isUnread ? 'font-semibold' : 'opacity-75' ?>" 
+                                 data-id="<?= $nt['id'] ?>" 
+                                 data-cat="<?= $nt['category'] ?>"
+                                 onclick="handleNotifClick(<?= $nt['id'] ?>, '<?= htmlspecialchars($nt['link_url'] ?? '') ?>')">
+                                <span class="text-lg shrink-0 mt-0.5"><?= $icon ?></span>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center justify-between gap-1 mb-0.5">
+                                        <span class="text-xs font-bold text-white truncate"><?= htmlspecialchars($nt['title']) ?></span>
+                                        <span class="text-[9px] text-slate-400 whitespace-nowrap shrink-0"><?= $nt['time_ago'] ?></span>
                                     </div>
-                                    <?php if ($isUnread): ?>
-                                        <span class="w-2 h-2 rounded-full bg-blue-400 shrink-0 mt-1.5" title="Belum dibaca"></span>
+                                    <p class="text-[11px] text-slate-300 line-clamp-2 leading-relaxed"><?= htmlspecialchars($nt['message']) ?></p>
+                                    <?php if (!empty($nt['link_url'])): ?>
+                                        <span class="text-[10px] text-blue-400 font-bold hover:underline inline-block mt-1">Periksa Detail ➔</span>
                                     <?php endif; ?>
                                 </div>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </div>
+                                <?php if ($isUnread): ?>
+                                    <span class="w-2 h-2 rounded-full bg-blue-400 shrink-0 mt-1.5" title="Belum dibaca"></span>
+                                <?php endif; ?>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
 
-                    <!-- Footer Dropdown -->
-                    <div class="notif-footer p-2.5 text-center">
-                        <a href="dashboard.php?page=stok" class="text-[11px] font-bold text-slate-400 hover:text-white transition">
-                            Lihat Manajemen Stok Seluruh Outlet ➔
-                        </a>
-                    </div>
+                <!-- Footer Dropdown -->
+                <div class="notif-footer p-2.5 text-center">
+                    <a href="dashboard.php?page=stok" class="text-[11px] font-bold text-slate-400 hover:text-white transition">
+                        Lihat Manajemen Stok Seluruh Outlet ➔
+                    </a>
                 </div>
             </div>
-
-            <!-- Pintasan Buka Terminal Kasir POS -->
-            <a href="index.php" target="_blank" class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600/20 hover:bg-blue-600 text-blue-300 hover:text-white text-xs font-bold border border-blue-500/30 transition shadow-sm" title="Buka Terminal Kasir POS di Tab Baru">
-                <span>🛒</span> <span class="hidden md:inline">Kasir POS</span>
-            </a>
-
-            <!-- Avatar Profil Admin Khusus -->
-            <div class="flex items-center gap-2 pl-2 border-l border-white/10">
-                <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white font-black text-xs shadow-md border border-white/20 shrink-0">
-                    AK
-                </div>
-                <div class="hidden xl:block text-left">
-                    <span class="text-xs font-bold text-white block leading-tight">Admin Khusus</span>
-                    <span class="text-[9px] text-blue-400 font-mono block">Superadmin TWB</span>
-                </div>
-            </div>
-
         </div>
+
+        <!-- Avatar Profil Admin Khusus -->
+        <div class="flex items-center gap-2 pl-2 border-l border-white/10">
+            <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white font-black text-xs shadow-md border border-white/20 shrink-0">
+                AK
+            </div>
+            <div class="hidden sm:block text-left">
+                <span class="text-xs font-bold text-white block leading-tight">Admin Khusus</span>
+                <span class="text-[9px] text-blue-400 font-mono block">Superadmin TWB</span>
+            </div>
+        </div>
+
     </div>
 </header>
 
