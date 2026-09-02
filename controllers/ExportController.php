@@ -58,6 +58,23 @@ class ExportController {
         $endDate = $filters['end_date'] ?? '';
         $outletId = intval($filters['outlet_id'] ?? 0);
         $kasirNama = $filters['petugas'] ?? '';
+        $periodType = strtolower($filters['period_type'] ?? '');
+
+        // Penanganan otomatis rentang tanggal berdasarkan tipe periode
+        if ($periodType === 'harian') {
+            if (empty($startDate)) $startDate = date('Y-m-d');
+            if (empty($endDate)) $endDate = date('Y-m-d');
+        } elseif ($periodType === 'mingguan') {
+            if (empty($startDate)) $startDate = date('Y-m-d', strtotime('-6 days'));
+            if (empty($endDate)) $endDate = date('Y-m-d');
+        } elseif ($periodType === 'bulanan') {
+            if (empty($startDate)) $startDate = date('Y-m-01');
+            if (empty($endDate)) $endDate = date('Y-m-t');
+        }
+
+        $filters['start_date'] = $startDate;
+        $filters['end_date'] = $endDate;
+        $filters['period_type'] = $periodType;
 
         $conditions = ["1=1"];
         if (!empty($startDate) && !empty($endDate)) {
@@ -95,7 +112,11 @@ class ExportController {
         $totalRecords = count($data);
         $timestamp = date('Ymd_His');
         $ext = ($format === 'pdf' ? 'html' : ($format === 'excel' ? 'xls' : 'csv'));
-        $fileName = "Laporan_Penjualan_TWC_{$timestamp}.{$ext}";
+        $prefix = "Laporan_Penjualan";
+        if ($periodType === 'harian') $prefix = "Laporan_Penjualan_Harian";
+        elseif ($periodType === 'mingguan') $prefix = "Laporan_Penjualan_Mingguan";
+        elseif ($periodType === 'bulanan') $prefix = "Laporan_Penjualan_Bulanan";
+        $fileName = "{$prefix}_TWC_{$timestamp}.{$ext}";
 
         // Audit Logging
         $this->logExport($format, 'penjualan', $filters, $totalRecords, $fileName);
@@ -1082,11 +1103,29 @@ HTML;
     }
 
     private function renderPdfPenjualan($data, $grandTotal, $filters) {
+        $pType = strtolower($filters['period_type'] ?? '');
+        $startDate = $filters['start_date'] ?? '';
+        $endDate = $filters['end_date'] ?? '';
+        
+        $title = "Laporan Rekapitulasi Penjualan Kasir Multi-Outlet";
         $periode = 'Seluruh Data Historis';
-        if (!empty($filters['start_date']) && !empty($filters['end_date'])) {
-            $periode = "Periode: " . htmlspecialchars($filters['start_date']) . " s/d " . htmlspecialchars($filters['end_date']);
+
+        if ($pType === 'harian' || (!empty($startDate) && $startDate === $endDate)) {
+            $title = "Laporan Rekapitulasi Penjualan Harian";
+            $tglIndo = !empty($startDate) ? date('d F Y', strtotime($startDate)) : date('d F Y');
+            $periode = "Periode Harian: {$tglIndo}";
+        } elseif ($pType === 'mingguan') {
+            $title = "Laporan Rekapitulasi Penjualan Mingguan";
+            $periode = "Periode Mingguan: " . (!empty($startDate) ? date('d M Y', strtotime($startDate)) : '') . " s/d " . (!empty($endDate) ? date('d M Y', strtotime($endDate)) : '');
+        } elseif ($pType === 'bulanan') {
+            $title = "Laporan Rekapitulasi Penjualan Bulanan";
+            $bulanIndo = !empty($startDate) ? date('F Y', strtotime($startDate)) : date('F Y');
+            $periode = "Periode Bulanan: {$bulanIndo}";
+        } elseif (!empty($startDate) && !empty($endDate)) {
+            $periode = "Periode: " . date('d/m/Y', strtotime($startDate)) . " s/d " . date('d/m/Y', strtotime($endDate));
         }
-        echo $this->renderPdfHeader("Laporan Rekapitulasi Transaksi Penjualan Kasir", $periode);
+
+        echo $this->renderPdfHeader($title, $periode);
         ?>
         <table>
             <thead>

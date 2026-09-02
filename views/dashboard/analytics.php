@@ -160,7 +160,21 @@ foreach ($produk_sales_map as $p) {
             <p class="text-xs text-slate-400">Pantau omzet real-time, volume transaksi, dan komparasi stok multi-lokasi.</p>
         </div>
         <div class="flex flex-wrap items-center gap-3">
-            <form method="GET" action="dashboard.php" class="glass-card-dark border border-white/10 p-2 rounded-2xl flex flex-wrap items-center gap-2">
+            <!-- Tombol Pintasan Cepat Periode -->
+            <div class="flex items-center gap-1 bg-slate-900/80 border border-white/10 p-1 rounded-2xl">
+                <?php 
+                $isToday = (!empty($start_date) && $start_date === date('Y-m-d') && $end_date === date('Y-m-d'));
+                $isWeek  = (!empty($start_date) && $start_date === date('Y-m-d', strtotime('-6 days')) && $end_date === date('Y-m-d'));
+                $isMonth = (!empty($start_date) && $start_date === date('Y-m-01') && $end_date === date('Y-m-t'));
+                $isAll   = empty($start_date) && empty($end_date);
+                ?>
+                <a href="dashboard.php?page=analytics&start_date=<?= date('Y-m-d') ?>&end_date=<?= date('Y-m-d') ?>" class="px-2.5 py-1 text-[11px] font-bold rounded-xl transition <?= $isToday ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-400 hover:text-white hover:bg-white/5' ?>">☀️ Hari Ini</a>
+                <a href="dashboard.php?page=analytics&start_date=<?= date('Y-m-d', strtotime('-6 days')) ?>&end_date=<?= date('Y-m-d') ?>" class="px-2.5 py-1 text-[11px] font-bold rounded-xl transition <?= $isWeek ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-400 hover:text-white hover:bg-white/5' ?>">🗓️ 7 Hari</a>
+                <a href="dashboard.php?page=analytics&start_date=<?= date('Y-m-01') ?>&end_date=<?= date('Y-m-t') ?>" class="px-2.5 py-1 text-[11px] font-bold rounded-xl transition <?= $isMonth ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-400 hover:text-white hover:bg-white/5' ?>">📆 Bulan Ini</a>
+                <a href="dashboard.php?page=analytics" class="px-2.5 py-1 text-[11px] font-bold rounded-xl transition <?= $isAll ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-400 hover:text-white hover:bg-white/5' ?>">Semua</a>
+            </div>
+
+            <form method="GET" action="dashboard.php" class="glass-card-dark border border-white/10 p-1.5 rounded-2xl flex flex-wrap items-center gap-2">
                 <input type="hidden" name="page" value="analytics">
                 <div class="flex items-center gap-1.5">
                     <label class="text-[10px] font-bold text-slate-400 uppercase">Dari:</label>
@@ -226,14 +240,33 @@ foreach ($produk_sales_map as $p) {
                 <p class="text-xs text-slate-400 mt-1">Perbandingan akumulasi volume terjual (Pcs) dan nilai omzet per produk di seluruh titik operasional Borobudur</p>
             </div>
             
-            <!-- Tombol Aksi: Lihat Detail Transaksi & Cetak Laporan -->
+            <!-- Tombol Aksi: Lihat Detail Transaksi & Menu Cetak Cepat Periode -->
             <div class="flex flex-wrap items-center gap-2.5">
                 <button type="button" onclick="bukaModal('modal-detail-transaksi')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-lg shadow-blue-600/30 flex items-center gap-2 transition hover:scale-105 cursor-pointer">
                     <span>👁️</span> <span>Lihat Detail Transaksi</span>
                 </button>
-                <a href="export.php?module=penjualan&format=pdf&start_date=<?= urlencode($start_date) ?>&end_date=<?= urlencode($end_date) ?>&autoprint=1" target="_blank" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-white/10 font-bold text-xs px-4 py-2.5 rounded-xl flex items-center gap-2 transition hover:border-white/20">
-                    <span>🖨️</span> <span>Cetak Laporan Penjualan</span>
-                </a>
+                
+                <!-- Dropdown Cetak Laporan Periode -->
+                <div class="relative inline-block text-left" id="dropdown-cetak-wrapper">
+                    <button type="button" onclick="toggleDropdownCetak(event)" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-white/10 font-bold text-xs px-4 py-2.5 rounded-xl flex items-center gap-2 transition hover:border-white/20 cursor-pointer">
+                        <span>🖨️</span> <span>Cetak Laporan Penjualan</span> <span class="text-[10px] text-slate-400">▼</span>
+                    </button>
+                    <div id="menu-dropdown-cetak" class="hidden absolute right-0 mt-2 w-64 rounded-2xl bg-slate-900 border border-white/15 shadow-2xl z-30 py-2 divide-y divide-white/5">
+                        <div class="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pilih Periode Cetak PDF</div>
+                        <a href="export.php?module=penjualan&format=pdf&period_type=harian&autoprint=1" target="_blank" class="flex items-center gap-2.5 px-4 py-2.5 text-xs text-slate-300 hover:text-white hover:bg-blue-600/20 font-semibold transition">
+                            <span>☀️</span> <span>Cetak Harian (Hari Ini)</span>
+                        </a>
+                        <a href="export.php?module=penjualan&format=pdf&period_type=mingguan&autoprint=1" target="_blank" class="flex items-center gap-2.5 px-4 py-2.5 text-xs text-slate-300 hover:text-white hover:bg-blue-600/20 font-semibold transition">
+                            <span>🗓️</span> <span>Cetak Mingguan (7 Hari)</span>
+                        </a>
+                        <a href="export.php?module=penjualan&format=pdf&period_type=bulanan&autoprint=1" target="_blank" class="flex items-center gap-2.5 px-4 py-2.5 text-xs text-slate-300 hover:text-white hover:bg-blue-600/20 font-semibold transition">
+                            <span>📆</span> <span>Cetak Bulanan (Bulan Ini)</span>
+                        </a>
+                        <a href="export.php?module=penjualan&format=pdf<?= (!empty($start_date) && !empty($end_date)) ? '&start_date='.urlencode($start_date).'&end_date='.urlencode($end_date) : '' ?>&autoprint=1" target="_blank" class="flex items-center gap-2.5 px-4 py-2.5 text-xs text-slate-300 hover:text-white hover:bg-white/5 font-semibold transition">
+                            <span>🌐</span> <span>Cetak Sesuai Filter / Semua</span>
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -275,9 +308,9 @@ foreach ($produk_sales_map as $p) {
     </div>
 </div>
 
-<!-- Modal Rincian Penjualan Produk Seluruh Outlet (Lengkap dengan Jam/Waktu Transaksi) -->
+<!-- Modal Rincian Penjualan Produk Seluruh Outlet (Lengkap dengan Jam/Waktu Transaksi & Filter Periode) -->
 <div id="modal-detail-transaksi" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden items-center justify-center p-4">
-    <div class="glass-card-dark rounded-3xl p-6 w-full max-w-5xl max-h-[88vh] flex flex-col border border-white/10 text-white shadow-2xl">
+    <div class="glass-card-dark rounded-3xl p-6 w-full max-w-5xl max-h-[90vh] flex flex-col border border-white/10 text-white shadow-2xl">
         
         <!-- Modal Header -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-white/10 mb-4 gap-3">
@@ -291,6 +324,30 @@ foreach ($produk_sales_map as $p) {
             <button onclick="tutupModal('modal-detail-transaksi')" class="self-end sm:self-auto p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition text-lg leading-none">✕</button>
         </div>
 
+        <!-- Filter Periode Cepat: Harian, Mingguan, Bulanan, Semua -->
+        <div class="p-3 rounded-2xl bg-slate-900/80 border border-white/10 mb-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div class="flex flex-wrap items-center gap-1.5" id="btn-group-periode-modal">
+                <button type="button" onclick="pilihPeriodeModal('all')" id="btn-period-all" class="btn-period-tab px-3 py-1.5 rounded-xl text-xs font-bold transition bg-blue-600 text-white shadow-sm flex items-center gap-1.5">
+                    <span>🌐</span> <span>Semua Transaksi</span>
+                </button>
+                <button type="button" onclick="pilihPeriodeModal('harian')" id="btn-period-harian" class="btn-period-tab px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 flex items-center gap-1.5">
+                    <span>☀️</span> <span>Harian (Hari Ini)</span>
+                </button>
+                <button type="button" onclick="pilihPeriodeModal('mingguan')" id="btn-period-mingguan" class="btn-period-tab px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 flex items-center gap-1.5">
+                    <span>🗓️</span> <span>Mingguan (7 Hari)</span>
+                </button>
+                <button type="button" onclick="pilihPeriodeModal('bulanan')" id="btn-period-bulanan" class="btn-period-tab px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 flex items-center gap-1.5">
+                    <span>📆</span> <span>Bulanan (Bulan Ini)</span>
+                </button>
+            </div>
+            <div class="flex items-center gap-2 text-xs">
+                <span class="text-slate-400">Periode Aktif:</span>
+                <span id="badge-periode-aktif" class="font-mono font-bold text-blue-400 bg-blue-500/10 border border-blue-500/20 px-2.5 py-1 rounded-lg">
+                    Seluruh Riwayat Transaksi
+                </span>
+            </div>
+        </div>
+
         <!-- Filter Pencarian Cepat & Quick Summary -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
             <div class="relative flex-1 max-w-md">
@@ -301,9 +358,9 @@ foreach ($produk_sales_map as $p) {
             </div>
             <div class="flex items-center gap-3 text-xs">
                 <span class="text-slate-400">
-                    Menampilkan: <strong id="count-transaksi-filtered" class="text-white"><?= count($list_transaksi) ?></strong> dari <?= count($list_transaksi) ?> Transaksi
+                    Menampilkan: <strong id="count-transaksi-filtered" class="text-white"><?= count($list_transaksi) ?></strong> dari <span id="count-total-transaksi"><?= count($list_transaksi) ?></span> Transaksi
                 </span>
-                <span class="px-2.5 py-1 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-bold">
+                <span id="badge-total-omzet" class="px-2.5 py-1 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-bold">
                     Total Omzet: Rp <?= number_format($total_omset, 0, ',', '.') ?>
                 </span>
             </div>
@@ -325,16 +382,17 @@ foreach ($produk_sales_map as $p) {
                 </thead>
                 <tbody id="tbody-detail-transaksi" class="divide-y divide-white/5 text-slate-300">
                     <?php if (empty($list_transaksi)): ?>
-                        <tr>
+                        <tr id="row-empty-msg">
                             <td colspan="7" class="p-8 text-center text-slate-400 text-xs">Belum ada data transaksi yang tercatat.</td>
                         </tr>
                     <?php else: ?>
                         <?php $no = 1; foreach($list_transaksi as $tx): 
-                            $tglFmt = !empty($tx['tanggal']) ? date('d M Y', strtotime($tx['tanggal'])) : '-';
+                            $tglRaw = $tx['tanggal'] ?? '';
+                            $tglFmt = !empty($tglRaw) ? date('d M Y', strtotime($tglRaw)) : '-';
                             $jamFmt = !empty($tx['waktu_final']) ? (date('H:i:s', strtotime($tx['waktu_final'])) . ' WIB') : '-';
                         ?>
-                        <tr class="hover:bg-white/[0.02] transition row-trx-detail">
-                            <td class="p-3 text-center text-slate-500 font-mono"><?= $no++ ?></td>
+                        <tr class="hover:bg-white/[0.02] transition row-trx-detail" data-tanggal="<?= htmlspecialchars($tglRaw) ?>" data-total="<?= intval($tx['total_final']) ?>">
+                            <td class="p-3 text-center text-slate-500 font-mono cell-number"><?= $no++ ?></td>
                             <td class="p-3 whitespace-nowrap">
                                 <span class="font-bold text-white block"><?= $tglFmt ?></span>
                                 <span class="text-[10px] text-blue-400 font-mono font-semibold"><?= $jamFmt ?></span>
@@ -366,18 +424,18 @@ foreach ($produk_sales_map as $p) {
             </table>
         </div>
 
-        <!-- Modal Footer: Cetak Laporan, Export Excel, CSV -->
+        <!-- Modal Footer: Cetak Laporan, Export Excel, CSV Sesuai Periode -->
         <div class="pt-4 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs mt-4">
-            <span class="text-slate-400">Total <?= count($list_transaksi) ?> transaksi tercatat dalam sistem POS.</span>
+            <span class="text-slate-400">Pilih periode di atas untuk mencetak atau mengunduh data spesifik.</span>
             <div class="flex flex-wrap items-center gap-2">
-                <a href="export.php?module=penjualan&format=excel&start_date=<?= urlencode($start_date) ?>&end_date=<?= urlencode($end_date) ?>" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3.5 py-2 rounded-xl transition text-xs flex items-center gap-1.5 shadow-sm shadow-emerald-600/30">
+                <a id="btn-export-excel-modal" href="export.php?module=penjualan&format=excel&start_date=<?= urlencode($start_date) ?>&end_date=<?= urlencode($end_date) ?>" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3.5 py-2 rounded-xl transition text-xs flex items-center gap-1.5 shadow-sm shadow-emerald-600/30">
                     <span>📊</span> <span>Export Excel</span>
                 </a>
-                <a href="export.php?module=penjualan&format=csv&start_date=<?= urlencode($start_date) ?>&end_date=<?= urlencode($end_date) ?>" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-white/10 font-bold px-3 py-2 rounded-xl transition text-xs">
+                <a id="btn-export-csv-modal" href="export.php?module=penjualan&format=csv&start_date=<?= urlencode($start_date) ?>&end_date=<?= urlencode($end_date) ?>" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-white/10 font-bold px-3 py-2 rounded-xl transition text-xs">
                     CSV
                 </a>
-                <a href="export.php?module=penjualan&format=pdf&start_date=<?= urlencode($start_date) ?>&end_date=<?= urlencode($end_date) ?>&autoprint=1" target="_blank" class="bg-blue-600 hover:bg-blue-500 text-white font-black px-4 py-2 rounded-xl transition text-xs flex items-center gap-1.5 shadow-lg shadow-blue-600/30">
-                    <span>🖨️</span> <span>Cetak / PDF Dokumen Resmi</span>
+                <a id="btn-cetak-pdf-modal" href="export.php?module=penjualan&format=pdf&start_date=<?= urlencode($start_date) ?>&end_date=<?= urlencode($end_date) ?>&autoprint=1" target="_blank" class="bg-blue-600 hover:bg-blue-500 text-white font-black px-4 py-2 rounded-xl transition text-xs flex items-center gap-1.5 shadow-lg shadow-blue-600/30">
+                    <span>🖨️</span> <span id="label-cetak-modal">Cetak / PDF Dokumen Resmi</span>
                 </a>
                 <button type="button" onclick="tutupModal('modal-detail-transaksi')" class="px-3 py-2 rounded-xl text-slate-400 hover:text-white transition font-bold">
                     Tutup
@@ -624,29 +682,164 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 
+let currentModalPeriod = 'all';
+
 /**
- * Filter pencarian instan pada tabel modal detail transaksi penjualan
+ * Toggle menu dropdown cetak periode di kartu grafik
  */
-function filterTabelDetailTransaksi() {
+function toggleDropdownCetak(e) {
+    if (e) e.stopPropagation();
+    const menu = document.getElementById('menu-dropdown-cetak');
+    if (menu) menu.classList.toggle('hidden');
+}
+
+window.addEventListener('click', function(e) {
+    const wrap = document.getElementById('dropdown-cetak-wrapper');
+    const menu = document.getElementById('menu-dropdown-cetak');
+    if (wrap && menu && !wrap.contains(e.target)) {
+        menu.classList.add('hidden');
+    }
+});
+
+/**
+ * Filter Periode Harian / Mingguan / Bulanan / Semua pada Modal
+ */
+function pilihPeriodeModal(tipe) {
+    currentModalPeriod = tipe;
+
+    // Update style tombol tab aktif
+    document.querySelectorAll('.btn-period-tab').forEach(b => {
+        b.classList.remove('bg-blue-600', 'text-white', 'shadow-sm');
+        b.classList.add('bg-slate-800', 'text-slate-300');
+    });
+    const activeBtn = document.getElementById('btn-period-' + tipe);
+    if (activeBtn) {
+        activeBtn.classList.remove('bg-slate-800', 'text-slate-300');
+        activeBtn.classList.add('bg-blue-600', 'text-white', 'shadow-sm');
+    }
+
+    // Tentukan tanggal batas
+    const todayObj = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    const todayStr = todayObj.getFullYear() + '-' + pad(todayObj.getMonth() + 1) + '-' + pad(todayObj.getDate());
+
+    const weekAgoObj = new Date();
+    weekAgoObj.setDate(weekAgoObj.getDate() - 6);
+    const weekAgoStr = weekAgoObj.getFullYear() + '-' + pad(weekAgoObj.getMonth() + 1) + '-' + pad(weekAgoObj.getDate());
+
+    const firstDayMonthStr = todayObj.getFullYear() + '-' + pad(todayObj.getMonth() + 1) + '-01';
+    const lastDayObj = new Date(todayObj.getFullYear(), todayObj.getMonth() + 1, 0);
+    const lastDayMonthStr = lastDayObj.getFullYear() + '-' + pad(lastDayObj.getMonth() + 1) + '-' + pad(lastDayObj.getDate());
+
+    let startDate = '';
+    let endDate = '';
+    let labelBadge = 'Seluruh Riwayat Transaksi';
+    let labelCetak = 'Cetak / PDF Dokumen Resmi';
+
+    const monthNames = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+
+    if (tipe === 'harian') {
+        startDate = todayStr;
+        endDate = todayStr;
+        labelBadge = 'Harian (' + pad(todayObj.getDate()) + ' ' + monthNames[todayObj.getMonth()] + ' ' + todayObj.getFullYear() + ')';
+        labelCetak = 'Cetak / PDF Laporan Harian';
+    } else if (tipe === 'mingguan') {
+        startDate = weekAgoStr;
+        endDate = todayStr;
+        labelBadge = 'Mingguan (' + weekAgoStr + ' s/d ' + todayStr + ')';
+        labelCetak = 'Cetak / PDF Laporan Mingguan';
+    } else if (tipe === 'bulanan') {
+        startDate = firstDayMonthStr;
+        endDate = lastDayMonthStr;
+        labelBadge = 'Bulanan (' + monthNames[todayObj.getMonth()] + ' ' + todayObj.getFullYear() + ')';
+        labelCetak = 'Cetak / PDF Laporan Bulanan';
+    }
+
+    const badgeEl = document.getElementById('badge-periode-aktif');
+    if (badgeEl) badgeEl.textContent = labelBadge;
+
+    const labelCetakEl = document.getElementById('label-cetak-modal');
+    if (labelCetakEl) labelCetakEl.textContent = labelCetak;
+
+    // Update URL tombol cetak & ekspor di footer modal
+    const pParam = '&period_type=' + tipe + (startDate ? '&start_date=' + startDate + '&end_date=' + endDate : '');
+    const btnPdf = document.getElementById('btn-cetak-pdf-modal');
+    if (btnPdf) btnPdf.href = 'export.php?module=penjualan&format=pdf' + pParam + '&autoprint=1';
+    
+    const btnExcel = document.getElementById('btn-export-excel-modal');
+    if (btnExcel) btnExcel.href = 'export.php?module=penjualan&format=excel' + pParam;
+
+    const btnCsv = document.getElementById('btn-export-csv-modal');
+    if (btnCsv) btnCsv.href = 'export.php?module=penjualan&format=csv' + pParam;
+
+    // Terapkan filter baris tabel
+    applyModalFilters();
+}
+
+/**
+ * Filter gabungan: Berdasarkan rentang periode tanggal + teks pencarian
+ */
+function applyModalFilters() {
     const input = document.getElementById('cari-transaksi-input');
-    if (!input) return;
-    const query = input.value.toLowerCase().trim();
+    const query = input ? input.value.toLowerCase().trim() : '';
     const rows = document.querySelectorAll('.row-trx-detail');
+
+    const todayObj = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    const todayStr = todayObj.getFullYear() + '-' + pad(todayObj.getMonth() + 1) + '-' + pad(todayObj.getDate());
+
+    const weekAgoObj = new Date();
+    weekAgoObj.setDate(weekAgoObj.getDate() - 6);
+    const weekAgoStr = weekAgoObj.getFullYear() + '-' + pad(weekAgoObj.getMonth() + 1) + '-' + pad(weekAgoObj.getDate());
+
+    const firstDayMonthStr = todayObj.getFullYear() + '-' + pad(todayObj.getMonth() + 1) + '-01';
+    const lastDayObj = new Date(todayObj.getFullYear(), todayObj.getMonth() + 1, 0);
+    const lastDayMonthStr = lastDayObj.getFullYear() + '-' + pad(lastDayObj.getMonth() + 1) + '-' + pad(lastDayObj.getDate());
+
     let visibleCount = 0;
+    let omzetVisible = 0;
 
     rows.forEach(function(row) {
-        const text = row.textContent.toLowerCase();
-        if (query === '' || text.indexOf(query) !== -1) {
+        const rowTgl = (row.getAttribute('data-tanggal') || '').trim();
+        const rowTotal = parseInt(row.getAttribute('data-total') || '0', 10);
+        const rowText = row.textContent.toLowerCase();
+
+        // 1. Cek Periode
+        let matchPeriod = false;
+        if (currentModalPeriod === 'all') {
+            matchPeriod = true;
+        } else if (currentModalPeriod === 'harian') {
+            matchPeriod = (rowTgl === todayStr);
+        } else if (currentModalPeriod === 'mingguan') {
+            matchPeriod = (rowTgl >= weekAgoStr && rowTgl <= todayStr);
+        } else if (currentModalPeriod === 'bulanan') {
+            matchPeriod = (rowTgl >= firstDayMonthStr && rowTgl <= lastDayMonthStr);
+        }
+
+        // 2. Cek Pencarian
+        let matchQuery = (query === '' || rowText.indexOf(query) !== -1);
+
+        if (matchPeriod && matchQuery) {
             row.style.display = '';
             visibleCount++;
+            omzetVisible += rowTotal;
+            const cellNum = row.querySelector('.cell-number');
+            if (cellNum) cellNum.textContent = visibleCount;
         } else {
             row.style.display = 'none';
         }
     });
 
-    const countSpan = document.getElementById('count-transaksi-filtered');
-    if (countSpan) {
-        countSpan.textContent = visibleCount;
+    const countFiltered = document.getElementById('count-transaksi-filtered');
+    if (countFiltered) countFiltered.textContent = visibleCount;
+
+    const badgeOmzet = document.getElementById('badge-total-omzet');
+    if (badgeOmzet) {
+        badgeOmzet.textContent = 'Total Omzet: Rp ' + omzetVisible.toLocaleString('id-ID');
     }
+}
+
+function filterTabelDetailTransaksi() {
+    applyModalFilters();
 }
 </script>
