@@ -62,6 +62,116 @@ $kasirs = $conn->query("SELECT * FROM `kasir` ORDER BY `id` DESC");
             </tbody>
         </table>
     </div>
+
+    <!-- ========================================================================= -->
+    <!-- TABEL REKAPITULASI & RIWAYAT TUTUP SHIFT KASIR (Z-REPORT AUDIT)           -->
+    <!-- ========================================================================= -->
+    <?php
+    $shift_history_res = $conn->query("
+        SELECT cs.*, l.name as outlet_name 
+        FROM `cashier_shifts` cs
+        LEFT JOIN `locations` l ON cs.outlet_id = l.id
+        ORDER BY cs.id DESC
+        LIMIT 30
+    ");
+    $shifts_count = $shift_history_res ? $shift_history_res->num_rows : 0;
+    ?>
+    <div class="space-y-3 pt-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+                <h3 class="text-lg font-black text-white flex items-center gap-2">
+                    <span>💵</span> <span>Rekapitulasi Tutup Shift Kasir (Z-Report)</span>
+                    <span class="text-[10px] px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono font-bold">
+                        <?= $shifts_count ?> Laporan Tersimpan
+                    </span>
+                </h3>
+                <p class="text-xs text-slate-400">Bukti serah terima setoran kas, rekonsiliasi tunai vs QRIS, dan transparansi selisih fisik.</p>
+            </div>
+            <div class="text-xs text-slate-400">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-900 border border-white/10 font-medium">
+                    <span>🏛️</span> Standar Akuntansi Resmi PT TWB
+                </span>
+            </div>
+        </div>
+
+        <div class="glass-card-dark rounded-3xl border border-white/5 overflow-hidden shadow-xl">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs min-w-[850px]">
+                    <thead>
+                        <tr class="bg-white/[0.03] text-slate-400 font-bold uppercase tracking-wider border-b border-white/5">
+                            <th class="p-3.5">No. Referensi Shift</th>
+                            <th class="p-3.5">Waktu Closing</th>
+                            <th class="p-3.5">Petugas & Terminal</th>
+                            <th class="p-3.5 text-center">Nota</th>
+                            <th class="p-3.5 text-right">Penjualan Tunai</th>
+                            <th class="p-3.5 text-right">Penjualan QRIS</th>
+                            <th class="p-3.5 text-right font-black text-white">Grand Total</th>
+                            <th class="p-3.5 text-right">Fisik di Laci</th>
+                            <th class="p-3.5 text-center">Selisih Kas</th>
+                            <th class="p-3.5">Keterangan</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5 font-medium text-slate-300">
+                        <?php if ($shifts_count === 0): ?>
+                            <tr>
+                                <td colspan="10" class="p-8 text-center text-slate-400">
+                                    <span class="text-3xl block mb-2">📋</span>
+                                    <span class="text-sm font-bold text-slate-300">Belum Ada Rekapitulasi Shift Tersimpan</span>
+                                    <p class="text-xs text-slate-500 mt-1 max-w-md mx-auto">
+                                        Saat petugas kasir menekan tombol <strong class="text-amber-400">"Tutup Shift"</strong> pada terminal kasir POS, bukti setoran resmi (Z-Report) akan tersimpan dan tampil di tabel ini secara otomatis.
+                                    </p>
+                                </td>
+                            </tr>
+                        <?php else: ?>
+                            <?php while ($s = $shift_history_res->fetch_assoc()): 
+                                $diff = intval($s['difference']);
+                                $diffBadge = match(true) {
+                                    $diff === 0 => '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">✓ Rp 0 (Pas)</span>',
+                                    $diff > 0   => '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">+ Rp ' . number_format($diff, 0, ',', '.') . ' (Lebih)</span>',
+                                    default     => '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">- Rp ' . number_format(abs($diff), 0, ',', '.') . ' (Kurang)</span>'
+                                };
+                            ?>
+                            <tr class="hover:bg-white/[0.02] transition">
+                                <td class="p-3.5 font-mono font-bold text-blue-400">
+                                    <?= htmlspecialchars($s['shift_number']) ?>
+                                </td>
+                                <td class="p-3.5 whitespace-nowrap">
+                                    <span class="text-white font-bold block"><?= date('d M Y', strtotime($s['closing_time'])) ?></span>
+                                    <span class="text-[10px] text-slate-400 font-mono"><?= date('H:i', strtotime($s['closing_time'])) ?> WIB</span>
+                                </td>
+                                <td class="p-3.5">
+                                    <span class="text-white font-bold block"><?= htmlspecialchars($s['kasir_nama']) ?></span>
+                                    <span class="text-[10px] text-slate-400"><?= htmlspecialchars($s['pos_aktif']) ?></span>
+                                </td>
+                                <td class="p-3.5 text-center font-bold text-white">
+                                    <?= $s['transaction_count'] ?>
+                                </td>
+                                <td class="p-3.5 text-right font-mono text-emerald-400">
+                                    Rp <?= number_format($s['cash_sales'], 0, ',', '.') ?>
+                                </td>
+                                <td class="p-3.5 text-right font-mono text-blue-400">
+                                    Rp <?= number_format($s['qris_sales'], 0, ',', '.') ?>
+                                </td>
+                                <td class="p-3.5 text-right font-mono font-black text-white">
+                                    Rp <?= number_format($s['total_sales'], 0, ',', '.') ?>
+                                </td>
+                                <td class="p-3.5 text-right font-mono font-bold text-amber-300">
+                                    Rp <?= number_format($s['actual_cash'], 0, ',', '.') ?>
+                                </td>
+                                <td class="p-3.5 text-center whitespace-nowrap">
+                                    <?= $diffBadge ?>
+                                </td>
+                                <td class="p-3.5 text-[11px] text-slate-400 max-w-[150px] truncate" title="<?= htmlspecialchars($s['notes'] ?? '') ?>">
+                                    <?= !empty($s['notes']) ? htmlspecialchars($s['notes']) : '-' ?>
+                                </td>
+                            </tr>
+                            <?php endwhile; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Modal Tambah Kasir -->

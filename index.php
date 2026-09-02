@@ -91,8 +91,9 @@ if ($terminals_q) {
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         @media print {
             body * { visibility: hidden; }
-            #area-cetak-nota, #area-cetak-nota * { visibility: visible; }
-            #area-cetak-nota {
+            #area-cetak-nota, #area-cetak-nota *,
+            #area-cetak-zreport, #area-cetak-zreport * { visibility: visible; }
+            #area-cetak-nota, #area-cetak-zreport {
                 position: absolute;
                 left: 0;
                 top: 0;
@@ -104,7 +105,7 @@ if ($terminals_q) {
                 color: #000000 !important;
                 font-family: 'Courier New', Courier, monospace;
             }
-            #area-cetak-nota img {
+            #area-cetak-nota img, #area-cetak-zreport img {
                 filter: grayscale(100%) contrast(200%);
                 max-height: 42px !important;
                 display: block;
@@ -499,7 +500,10 @@ if ($terminals_q) {
     <!-- 4. Modal Ganti Terminal POS -->
     <?php require_once __DIR__ . '/views/pos/modal_terminal.php'; ?>
 
-    <!-- 5. Modal Konfirmasi & Alert Kustom -->
+    <!-- 5. Modal Tutup Shift Kasir & Rekapitulasi Kas (Z-Report) -->
+    <?php require_once __DIR__ . '/views/pos/modal_closing_shift.php'; ?>
+
+    <!-- 6. Modal Konfirmasi & Alert Kustom -->
     <?php require_once __DIR__ . '/views/layouts/modal_custom.php'; ?>
 
     <!-- 6. Skrip Eksternal -->

@@ -17,39 +17,65 @@
         </button>
     </div>
 
+<?php
+// Query lencana indikator dinamis sidebar (Stok kritis & retur pending)
+$countKritisStok = 0;
+$countReturPending = 0;
+try {
+    if (isset($conn) && $conn instanceof mysqli) {
+        $stkRes = $conn->query("SELECT COUNT(*) FROM `stok_lokasi` WHERE `quantity` <= 3");
+        if ($stkRes) {
+            $countKritisStok = intval($stkRes->fetch_row()[0] ?? 0);
+        }
+
+        $retRes = $conn->query("SELECT COUNT(*) FROM `returns` WHERE `status` = 'pending' OR `created_at` >= DATE_SUB(NOW(), INTERVAL 48 HOUR)");
+        if ($retRes) {
+            $countReturPending = intval($retRes->fetch_row()[0] ?? 0);
+        }
+    }
+} catch (Exception $e) {
+    // Safe fallback jika tabel belum siap
+}
+?>
     <!-- Navigation Menu Items -->
-    <nav class="space-y-1 flex-1 overflow-y-auto custom-scroll pr-0.5">
-        <a href="dashboard.php?page=analytics" class="flex items-center gap-2.5 px-3.5 py-2 rounded-xl text-xs font-bold transition duration-200 <?= ($page === 'analytics') ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30' : 'text-slate-400 hover:bg-slate-900 hover:text-white' ?>">
+    <nav class="space-y-1.5 flex-1 overflow-y-auto custom-scroll pr-0.5">
+        <a href="dashboard.php?page=analytics" class="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition duration-200 <?= ($page === 'analytics') ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30' : 'text-slate-400 hover:bg-slate-900 hover:text-white' ?>">
             <span class="text-base">📊</span> <span>Grafik & Analisis</span>
         </a>
 
-        <a href="dashboard.php?page=menu" class="flex items-center gap-2.5 px-3.5 py-2 rounded-xl text-xs font-bold transition duration-200 <?= ($page === 'menu') ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30' : 'text-slate-400 hover:bg-slate-900 hover:text-white' ?>">
+        <a href="dashboard.php?page=menu" class="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition duration-200 <?= ($page === 'menu') ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30' : 'text-slate-400 hover:bg-slate-900 hover:text-white' ?>">
             <span class="text-base">📋</span> <span>Kelola Produk</span>
         </a>
 
-        <a href="dashboard.php?page=stok" class="flex items-center gap-2.5 px-3.5 py-2 rounded-xl text-xs font-bold transition duration-200 <?= ($page === 'stok') ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30' : 'text-slate-400 hover:bg-slate-900 hover:text-white' ?>">
-            <span class="text-base">📦</span> <span>Kelola Stok Barang</span>
+        <a href="dashboard.php?page=stok" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition duration-200 <?= ($page === 'stok') ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30' : 'text-slate-400 hover:bg-slate-900 hover:text-white' ?>">
+            <div class="flex items-center gap-2.5">
+                <span class="text-base">📦</span> <span>Kelola Stok Barang</span>
+            </div>
+            <?php if ($countKritisStok > 0): ?>
+                <span class="px-2 py-0.5 text-[10px] font-black rounded-full bg-rose-500 text-white shadow-sm shadow-rose-500/50 animate-pulse" title="<?= $countKritisStok ?> produk stok kritis/habis">
+                    <?= $countKritisStok ?>
+                </span>
+            <?php endif; ?>
         </a>
 
-        <a href="dashboard.php?page=kasir" class="flex items-center gap-2.5 px-3.5 py-2 rounded-xl text-xs font-bold transition duration-200 <?= ($page === 'kasir') ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30' : 'text-slate-400 hover:bg-slate-900 hover:text-white' ?>">
+        <a href="dashboard.php?page=kasir" class="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition duration-200 <?= ($page === 'kasir') ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30' : 'text-slate-400 hover:bg-slate-900 hover:text-white' ?>">
             <span class="text-base">👥</span> <span>Kelola Petugas Kasir</span>
         </a>
 
-        <a href="dashboard.php?page=outlet" class="flex items-center gap-2.5 px-3.5 py-2 rounded-xl text-xs font-bold transition duration-200 <?= ($page === 'outlet') ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30' : 'text-slate-400 hover:bg-slate-900 hover:text-white' ?>">
+        <a href="dashboard.php?page=outlet" class="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition duration-200 <?= ($page === 'outlet') ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30' : 'text-slate-400 hover:bg-slate-900 hover:text-white' ?>">
             <span class="text-base">🏪</span> <span>Kelola Outlet</span>
         </a>
 
-        <a href="dashboard.php?page=retur" class="flex items-center gap-2.5 px-3.5 py-2 rounded-xl text-xs font-bold transition duration-200 <?= ($page === 'retur') ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30' : 'text-slate-400 hover:bg-slate-900 hover:text-white' ?>">
-            <span class="text-base">⚠️</span> <span>Retur & Barang Rusak</span>
+        <a href="dashboard.php?page=retur" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition duration-200 <?= ($page === 'retur') ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30' : 'text-slate-400 hover:bg-slate-900 hover:text-white' ?>">
+            <div class="flex items-center gap-2.5">
+                <span class="text-base">⚠️</span> <span>Retur & Barang Rusak</span>
+            </div>
+            <?php if ($countReturPending > 0): ?>
+                <span class="px-2 py-0.5 text-[10px] font-black rounded-full bg-amber-500 text-slate-950 shadow-sm shadow-amber-500/50" title="<?= $countReturPending ?> retur barang menunggu tindakan">
+                    <?= $countReturPending ?>
+                </span>
+            <?php endif; ?>
         </a>
-
-        <!-- Menu Tombol Sembunyikan Sidebar -->
-        <button type="button" onclick="toggleSidebar()" class="w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-[11px] font-semibold text-slate-400 hover:bg-slate-900 hover:text-white transition group border border-dashed border-white/10 hover:border-blue-500/40 mt-2">
-            <span class="flex items-center gap-2">
-                <span>◀</span> <span>Sembunyikan Sidebar</span>
-            </span>
-            <span class="text-[9px] bg-slate-800 text-slate-400 group-hover:text-blue-400 px-1.5 py-0.5 rounded font-mono">Tutup</span>
-        </button>
     </nav>
 
     <!-- Bottom Actions: Tema & Logout (Always Visible & Prominent) -->
