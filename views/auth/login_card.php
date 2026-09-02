@@ -1,5 +1,6 @@
 <!-- ======================================================================== -->
 <!-- KARTU LOGIN INTERAKTIF DUAL-MODE (KASIR & ADMIN) — VELOCE POS TWB       -->
+<!-- DILENGKAPI SWAP DENGAN WARNA & BACKGROUND SANGAT KONTRAS & JELAS        -->
 <!-- ======================================================================== -->
 <div id="twb-login-card" class="w-full max-w-lg rounded-3xl p-6 sm:p-8 relative z-10 shadow-2xl transition-all duration-300">
     
@@ -17,22 +18,49 @@
 
     <!-- Peringatan Error (Jika Ada) -->
     <?php if (!empty($error)): ?>
-        <div class="p-3.5 rounded-2xl mb-4.5 flex items-center gap-2.5 text-xs font-semibold shadow-sm animate-shake" style="background-color: #fee2e2; border: 1.5px solid #fca5a5; color: #991b1b;">
+        <div class="p-3.5 rounded-2xl mb-4 flex items-center gap-2.5 text-xs font-semibold shadow-sm animate-shake" style="background-color: #fee2e2; border: 1.5px solid #fca5a5; color: #991b1b;">
             <span class="text-base">⚠️</span> 
             <span><?= htmlspecialchars($error) ?></span>
         </div>
     <?php endif; ?>
 
-    <!-- Segmented Tab Switcher (Swap Kasir vs Admin) -->
-    <div class="grid grid-cols-2 p-1.5 rounded-2xl mb-5 border transition-all" style="background-color: #f1f5f9; border-color: #cbd5e1;" id="twb-tab-wrapper">
-        <button type="button" onclick="switchLoginTab('kasir')" id="tab-btn-kasir" class="py-2.5 px-3 rounded-xl text-xs font-extrabold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm">
-            <span>🛒</span>
-            <span>Petugas Kasir</span>
-        </button>
-        <button type="button" onclick="switchLoginTab('admin')" id="tab-btn-admin" class="py-2.5 px-3 rounded-xl text-xs font-extrabold transition-all flex items-center justify-center gap-2 cursor-pointer">
-            <span>🛡️</span>
-            <span>Administrator</span>
-        </button>
+    <!-- ==================================================================== -->
+    <!-- SEGMENTED TAB SWITCHER — WARNA & BACKGROUND SANGAT KONTRAS & TEGAS   -->
+    <!-- ==================================================================== -->
+    <div class="mb-4">
+        <div class="p-1.5 rounded-2xl border transition-all" style="background-color: #e2e8f0; border-color: #cbd5e1;" id="twb-tab-wrapper">
+            <div class="grid grid-cols-2 gap-1.5">
+                <!-- Tombol Tab Kasir (Warna Khas Biru #2563eb saat aktif) -->
+                <button type="button" onclick="switchLoginTab('kasir')" id="tab-btn-kasir" 
+                        class="py-3 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer">
+                    <span class="text-base">🛒</span>
+                    <span>Petugas Kasir</span>
+                </button>
+
+                <!-- Tombol Tab Administrator (Warna Khas Ungu Indigo #4f46e5 saat aktif) -->
+                <button type="button" onclick="switchLoginTab('admin')" id="tab-btn-admin" 
+                        class="py-3 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer">
+                    <span class="text-base">🛡️</span>
+                    <span>Administrator</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Banner Penjelas Mode (Dinamis Sesuai Tab Aktif) -->
+        <div id="tab-banner-kasir" class="mt-2.5 p-2.5 rounded-xl flex items-center gap-2.5 text-xs font-bold transition-all" style="background-color: #eff6ff; border: 1.5px solid #93c5fd; color: #1e40af;">
+            <span class="text-base">🛒</span>
+            <div>
+                <span class="block">Mode Kasir Operasional (POS)</span>
+                <span class="text-[10px] font-medium text-blue-600 block">Pilih nama profil Anda di bawah dan masukkan kata sandi</span>
+            </div>
+        </div>
+        <div id="tab-banner-admin" class="hidden mt-2.5 p-2.5 rounded-xl flex items-center gap-2.5 text-xs font-bold transition-all" style="background-color: #eef2ff; border: 1.5px solid #c7d2fe; color: #3730a3;">
+            <span class="text-base">🛡️</span>
+            <div>
+                <span class="block">Mode Administrator & Manajemen</span>
+                <span class="text-[10px] font-medium text-indigo-600 block">Akses khusus manajer, keuangan, dan rekapitulasi seluruh outlet</span>
+            </div>
+        </div>
     </div>
 
     <!-- ==================================================================== -->
@@ -79,7 +107,7 @@
                 <?php endforeach; ?>
             </div>
 
-            <!-- Dropdown Sinkron (Fallback / Tambahan) -->
+            <!-- Dropdown Sinkron (Alternatif / Pilihan Tambahan) -->
             <div class="relative">
                 <select id="select-kasir-dropdown" onchange="selectKasirFromDropdown(this.value)" 
                         class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-white/15 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 dark:text-white focus:outline-none focus:border-blue-500">
@@ -124,7 +152,7 @@
         </div>
 
         <!-- Tombol Masuk Kasir -->
-        <button type="submit" class="w-full py-3 rounded-2xl text-xs font-black transition-all shadow-md cursor-pointer flex items-center justify-center gap-2" style="background-color: #2563eb; color: #ffffff;">
+        <button type="submit" class="w-full py-3.5 rounded-2xl text-xs font-black transition-all shadow-lg cursor-pointer flex items-center justify-center gap-2" style="background-color: #2563eb; color: #ffffff;">
             <span>Buka Kasir POS</span>
             <span>➔</span>
         </button>
@@ -135,11 +163,6 @@
     <!-- ==================================================================== -->
     <form method="POST" id="form-login-admin" class="space-y-4 hidden">
         <input type="hidden" name="login_type" value="admin">
-
-        <div class="p-3 rounded-2xl flex items-center gap-2.5 text-xs font-semibold" style="background-color: #eff6ff; border: 1.5px solid #bfdbfe; color: #1e40af;">
-            <span class="text-base">🛡️</span>
-            <span>Panel Khusus Manajer, Keuangan & Supervisor Multi-Outlet</span>
-        </div>
 
         <div>
             <label class="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1.5">
@@ -160,10 +183,10 @@
                     👁️
                 </button>
             </div>
-            <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-1">*Akun default: <span class="font-mono font-bold text-blue-600 dark:text-blue-400">admin</span> / <span class="font-mono font-bold text-blue-600 dark:text-blue-400">admin123</span></p>
+            <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-1">*Akun default: <span class="font-mono font-bold text-indigo-600 dark:text-indigo-400">admin</span> / <span class="font-mono font-bold text-indigo-600 dark:text-indigo-400">admin123</span></p>
         </div>
 
-        <button type="submit" class="w-full py-3 rounded-2xl text-xs font-black transition-all shadow-md cursor-pointer flex items-center justify-center gap-2" style="background-color: #4338ca; color: #ffffff;">
+        <button type="submit" class="w-full py-3.5 rounded-2xl text-xs font-black transition-all shadow-lg cursor-pointer flex items-center justify-center gap-2" style="background-color: #4f46e5; color: #ffffff;">
             <span>Masuk Panel Admin & Laporan</span>
             <span>➔</span>
         </button>
@@ -185,12 +208,26 @@ html:not(.dark) #twb-login-card {
     color: #0f172a !important;
 }
 
+html[data-theme="light"] #twb-tab-wrapper,
+html.light #twb-tab-wrapper,
+body.light-theme #twb-tab-wrapper,
+html:not(.dark) #twb-tab-wrapper {
+    background-color: #e2e8f0 !important;
+    border: 2px solid #cbd5e1 !important;
+}
+
 /* TEMA GELAP: SOLID DARK SLATE */
 html.dark #twb-login-card,
 html[data-theme="dark"] #twb-login-card {
     background-color: #0f172a !important;
     border: 1px solid #334155 !important;
     color: #ffffff !important;
+}
+
+html.dark #twb-tab-wrapper,
+html[data-theme="dark"] #twb-tab-wrapper {
+    background-color: #1e293b !important;
+    border: 2px solid #334155 !important;
 }
 
 /* KARTU PROFIL KASIR (NORMAL) */
@@ -265,42 +302,59 @@ html[data-theme="dark"] .kasir-profile-card.active-kasir-card .kasir-name-label 
 <!-- ======================================================================== -->
 <script>
 /**
- * Switch antara Tab Petugas Kasir dan Administrator
+ * Switch antara Tab Petugas Kasir dan Administrator dengan warna khas kontras tinggi
  */
 function switchLoginTab(type) {
     const btnKasir = document.getElementById('tab-btn-kasir');
     const btnAdmin = document.getElementById('tab-btn-admin');
     const formKasir = document.getElementById('form-login-kasir');
     const formAdmin = document.getElementById('form-login-admin');
+    const bannerKasir = document.getElementById('tab-banner-kasir');
+    const bannerAdmin = document.getElementById('tab-banner-admin');
+
+    const isDark = document.documentElement.classList.contains('dark') || document.body.classList.contains('dark');
+    const inactiveColor = isDark ? '#94a3b8' : '#475569';
 
     if (type === 'admin') {
         formKasir.classList.add('hidden');
         formAdmin.classList.remove('hidden');
+        bannerKasir.classList.add('hidden');
+        bannerAdmin.classList.remove('hidden');
 
-        // Style Tab Admin Aktif
-        btnAdmin.style.backgroundColor = '#ffffff';
-        btnAdmin.style.color = '#4338ca';
-        btnAdmin.classList.add('shadow-sm');
+        // TAB ADMIN AKTIF: Warna Royal Indigo Solid (#4f46e5), Teks Putih Bersih
+        btnAdmin.style.backgroundColor = '#4f46e5';
+        btnAdmin.style.color = '#ffffff';
+        btnAdmin.style.boxShadow = '0 4px 14px rgba(79, 70, 229, 0.45)';
+        btnAdmin.style.border = '1px solid #4338ca';
 
+        // TAB KASIR NONAKTIF: Transparan, Teks Slate Jelas
         btnKasir.style.backgroundColor = 'transparent';
-        btnKasir.style.color = '#64748b';
-        btnKasir.classList.remove('shadow-sm');
+        btnKasir.style.color = inactiveColor;
+        btnKasir.style.boxShadow = 'none';
+        btnKasir.style.border = 'none';
 
-        document.getElementById('input-admin-username').focus();
+        const adminInput = document.getElementById('input-admin-username');
+        if (adminInput) adminInput.focus();
     } else {
         formAdmin.classList.add('hidden');
         formKasir.classList.remove('hidden');
+        bannerAdmin.classList.add('hidden');
+        bannerKasir.classList.remove('hidden');
 
-        // Style Tab Kasir Aktif
-        btnKasir.style.backgroundColor = '#ffffff';
-        btnKasir.style.color = '#2563eb';
-        btnKasir.classList.add('shadow-sm');
+        // TAB KASIR AKTIF: Warna Royal Blue Solid (#2563eb), Teks Putih Bersih
+        btnKasir.style.backgroundColor = '#2563eb';
+        btnKasir.style.color = '#ffffff';
+        btnKasir.style.boxShadow = '0 4px 14px rgba(37, 99, 235, 0.45)';
+        btnKasir.style.border = '1px solid #1d4ed8';
 
+        // TAB ADMIN NONAKTIF: Transparan, Teks Slate Jelas
         btnAdmin.style.backgroundColor = 'transparent';
-        btnAdmin.style.color = '#64748b';
-        btnAdmin.classList.remove('shadow-sm');
+        btnAdmin.style.color = inactiveColor;
+        btnAdmin.style.boxShadow = 'none';
+        btnAdmin.style.border = 'none';
 
-        document.getElementById('input-kasir-pass').focus();
+        const passKasir = document.getElementById('input-kasir-pass');
+        if (passKasir) passKasir.focus();
     }
 }
 
