@@ -198,49 +198,103 @@
         }
 
         /* ========================================================================= */
-        /* TOPBAR & PUSAT NOTIFIKASI DI TEMA TERANG                                 */
+        /* SOLID NOTIFICATION DROPDOWN (DARK & LIGHT MODE ZERO BLEED THROUGH)       */
         /* ========================================================================= */
+        #notif-dropdown-menu {
+            background-color: #0b1120 !important; /* Solid 100% Opaque Dark Navy/Slate */
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(255, 255, 255, 0.1) !important;
+        }
+        #notif-dropdown-menu .notif-header {
+            background-color: #0f172a !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+        }
+        #notif-dropdown-menu .notif-tabs-bar {
+            background-color: #070b14 !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+        }
+        #notif-dropdown-menu #notif-items-list {
+            background-color: #0b1120 !important;
+        }
+        #notif-dropdown-menu .notif-item {
+            background-color: #0f172a !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+        }
+        #notif-dropdown-menu .notif-item:hover {
+            background-color: #1e293b !important;
+        }
+        #notif-dropdown-menu .notif-item.border-rose-500 {
+            background-color: #1f121d !important;
+        }
+        #notif-dropdown-menu .notif-item.border-amber-500 {
+            background-color: #211c12 !important;
+        }
+        #notif-dropdown-menu .notif-item.border-emerald-500 {
+            background-color: #0d1e17 !important;
+        }
+        #notif-dropdown-menu .notif-item.border-blue-500 {
+            background-color: #111e33 !important;
+        }
+        #notif-dropdown-menu .notif-footer {
+            background-color: #0f172a !important;
+            border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+        }
+
+        /* Light Mode Overrides */
         html[data-theme="light"] #admin-topbar,
         html.light #admin-topbar {
-            background-color: rgba(255, 255, 255, 0.95) !important;
+            background-color: rgba(255, 255, 255, 0.98) !important;
             border-bottom-color: #e2e8f0 !important;
         }
         html[data-theme="light"] #notif-dropdown-menu,
         html.light #notif-dropdown-menu {
-            background: #ffffff !important;
-            border-color: #e2e8f0 !important;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+            background-color: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.15), 0 0 0 1px #e2e8f0 !important;
         }
-        html[data-theme="light"] #notif-dropdown-menu > div:first-child,
-        html.light #notif-dropdown-menu > div:first-child {
+        html[data-theme="light"] #notif-dropdown-menu .notif-header,
+        html.light #notif-dropdown-menu .notif-header {
             background-color: #f8fafc !important;
             border-bottom-color: #e2e8f0 !important;
         }
-        html[data-theme="light"] #notif-dropdown-menu > div:nth-child(2),
-        html.light #notif-dropdown-menu > div:nth-child(2) {
+        html[data-theme="light"] #notif-dropdown-menu .notif-tabs-bar,
+        html.light #notif-dropdown-menu .notif-tabs-bar {
             background-color: #f1f5f9 !important;
             border-bottom-color: #e2e8f0 !important;
         }
-        html[data-theme="light"] #notif-dropdown-menu > div:last-child,
-        html.light #notif-dropdown-menu > div:last-child {
+        html[data-theme="light"] #notif-dropdown-menu #notif-items-list,
+        html.light #notif-dropdown-menu #notif-items-list {
+            background-color: #ffffff !important;
+        }
+        html[data-theme="light"] #notif-dropdown-menu .notif-item,
+        html.light #notif-dropdown-menu .notif-item {
+            background-color: #ffffff !important;
+            border-bottom: 1px solid #f1f5f9 !important;
+        }
+        html[data-theme="light"] #notif-dropdown-menu .notif-item:hover,
+        html.light #notif-dropdown-menu .notif-item:hover {
             background-color: #f8fafc !important;
-            border-top-color: #e2e8f0 !important;
         }
-        html[data-theme="light"] .notif-item,
-        html.light .notif-item {
-            border-bottom-color: #f1f5f9 !important;
-        }
-        html[data-theme="light"] .notif-item:hover,
-        html.light .notif-item:hover {
-            background-color: #f8fafc !important;
-        }
-        html[data-theme="light"] .notif-item.border-rose-500,
-        html.light .notif-item.border-rose-500 {
+        html[data-theme="light"] #notif-dropdown-menu .notif-item.border-rose-500,
+        html.light #notif-dropdown-menu .notif-item.border-rose-500 {
             background-color: #fff1f2 !important;
         }
-        html[data-theme="light"] .notif-item.border-amber-500,
-        html.light .notif-item.border-amber-500 {
+        html[data-theme="light"] #notif-dropdown-menu .notif-item.border-amber-500,
+        html.light #notif-dropdown-menu .notif-item.border-amber-500 {
             background-color: #fffbeb !important;
+        }
+        html[data-theme="light"] #notif-dropdown-menu .notif-item.border-emerald-500,
+        html.light #notif-dropdown-menu .notif-item.border-emerald-500 {
+            background-color: #f0fdf4 !important;
+        }
+        html[data-theme="light"] #notif-dropdown-menu .notif-item.border-blue-500,
+        html.light #notif-dropdown-menu .notif-item.border-blue-500 {
+            background-color: #eff6ff !important;
+        }
+        html[data-theme="light"] #notif-dropdown-menu .notif-footer,
+        html.light #notif-dropdown-menu .notif-footer {
+            background-color: #f8fafc !important;
+            border-top-color: #e2e8f0 !important;
         }
     </style>
 </head>

@@ -66,11 +66,11 @@ $currentPageTitle = $pageTitles[$page ?? 'analytics'] ?? 'Dashboard Admin';
                     </span>
                 </button>
 
-                <!-- DROPDOWN PANEL NOTIFIKASI (GLASSMORPHISM) -->
-                <div id="notif-dropdown-menu" class="hidden absolute right-0 mt-3 w-80 sm:w-96 glass-card-dark rounded-3xl border border-white/10 shadow-2xl overflow-hidden z-50 transition-all duration-200">
+                <!-- DROPDOWN PANEL NOTIFIKASI (SOLID ZERO-BLEED THROUGH) -->
+                <div id="notif-dropdown-menu" class="hidden absolute right-0 mt-3 w-80 sm:w-96 rounded-3xl border shadow-2xl overflow-hidden z-50 transition-all duration-200">
                     
                     <!-- Header Dropdown -->
-                    <div class="p-4 border-b border-white/10 bg-slate-900/80 flex items-center justify-between gap-2">
+                    <div class="notif-header p-4 flex items-center justify-between gap-2">
                         <div class="flex items-center gap-2">
                             <span class="text-base">🔔</span>
                             <div>
@@ -84,7 +84,7 @@ $currentPageTitle = $pageTitles[$page ?? 'analytics'] ?? 'Dashboard Admin';
                     </div>
 
                     <!-- Filter Kategori Tabs -->
-                    <div class="flex items-center border-b border-white/5 bg-slate-950/40 text-[10px] font-bold text-slate-400 px-2 py-1.5 gap-1 overflow-x-auto">
+                    <div class="notif-tabs-bar flex items-center px-2 py-1.5 gap-1 overflow-x-auto text-[10px] font-bold text-slate-400">
                         <button type="button" onclick="filterNotifCategory('all')" class="notif-tab-btn px-2.5 py-1 rounded-lg bg-blue-600 text-white transition active-tab" data-cat="all">Semua</button>
                         <button type="button" onclick="filterNotifCategory('stok_kritis')" class="notif-tab-btn px-2.5 py-1 rounded-lg hover:bg-white/5 transition" data-cat="stok_kritis">⚠️ Stok Kritis</button>
                         <button type="button" onclick="filterNotifCategory('retur_barang')" class="notif-tab-btn px-2.5 py-1 rounded-lg hover:bg-white/5 transition" data-cat="retur_barang">📦 Retur</button>
@@ -103,10 +103,10 @@ $currentPageTitle = $pageTitles[$page ?? 'analytics'] ?? 'Dashboard Admin';
                             <?php foreach ($initialNotifs as $nt): 
                                 $isUnread = (intval($nt['is_read']) === 0);
                                 $typeStyle = match($nt['type']) {
-                                    'danger'  => 'border-l-4 border-rose-500 bg-rose-500/5',
-                                    'warning' => 'border-l-4 border-amber-500 bg-amber-500/5',
-                                    'success' => 'border-l-4 border-emerald-500 bg-emerald-500/5',
-                                    default   => 'border-l-4 border-blue-500 bg-blue-500/5'
+                                    'danger'  => 'border-rose-500',
+                                    'warning' => 'border-amber-500',
+                                    'success' => 'border-emerald-500',
+                                    default   => 'border-blue-500'
                                 };
                                 $icon = match($nt['category']) {
                                     'stok_kritis'   => ($nt['type'] === 'danger' ? '🔴' : '⚡'),
@@ -116,7 +116,7 @@ $currentPageTitle = $pageTitles[$page ?? 'analytics'] ?? 'Dashboard Admin';
                                     default         => '🔔'
                                 };
                             ?>
-                                <div class="notif-item p-3.5 hover:bg-white/[0.03] transition flex items-start gap-3 relative cursor-pointer <?= $typeStyle ?> <?= $isUnread ? 'font-semibold' : 'opacity-75' ?>" 
+                                <div class="notif-item p-3.5 transition flex items-start gap-3 relative cursor-pointer border-l-4 <?= $typeStyle ?> <?= $isUnread ? 'font-semibold' : 'opacity-75' ?>" 
                                      data-id="<?= $nt['id'] ?>" 
                                      data-cat="<?= $nt['category'] ?>"
                                      onclick="handleNotifClick(<?= $nt['id'] ?>, '<?= htmlspecialchars($nt['link_url'] ?? '') ?>')">
@@ -140,7 +140,7 @@ $currentPageTitle = $pageTitles[$page ?? 'analytics'] ?? 'Dashboard Admin';
                     </div>
 
                     <!-- Footer Dropdown -->
-                    <div class="p-2.5 border-t border-white/10 bg-slate-900/60 text-center">
+                    <div class="notif-footer p-2.5 text-center">
                         <a href="dashboard.php?page=stok" class="text-[11px] font-bold text-slate-400 hover:text-white transition">
                             Lihat Manajemen Stok Seluruh Outlet ➔
                         </a>
@@ -309,10 +309,10 @@ function renderNotificationItems(notifs) {
     let html = '';
     notifs.forEach(nt => {
         const isUnread = (parseInt(nt.is_read) === 0);
-        let typeStyle = 'border-l-4 border-blue-500 bg-blue-500/5';
-        if (nt.type === 'danger') typeStyle = 'border-l-4 border-rose-500 bg-rose-500/5';
-        else if (nt.type === 'warning') typeStyle = 'border-l-4 border-amber-500 bg-amber-500/5';
-        else if (nt.type === 'success') typeStyle = 'border-l-4 border-emerald-500 bg-emerald-500/5';
+        let typeStyle = 'border-blue-500';
+        if (nt.type === 'danger') typeStyle = 'border-rose-500';
+        else if (nt.type === 'warning') typeStyle = 'border-amber-500';
+        else if (nt.type === 'success') typeStyle = 'border-emerald-500';
 
         let icon = '🔔';
         if (nt.category === 'stok_kritis') icon = (nt.type === 'danger' ? '🔴' : '⚡');
@@ -321,7 +321,7 @@ function renderNotificationItems(notifs) {
         else if (nt.category === 'mutasi_stok') icon = '🚚';
 
         html += `
-            <div class="notif-item p-3.5 hover:bg-white/[0.03] transition flex items-start gap-3 relative cursor-pointer ${typeStyle} ${isUnread ? 'font-semibold' : 'opacity-75'}" 
+            <div class="notif-item p-3.5 transition flex items-start gap-3 relative cursor-pointer border-l-4 ${typeStyle} ${isUnread ? 'font-semibold' : 'opacity-75'}" 
                  data-id="${nt.id}" 
                  data-cat="${nt.category}"
                  onclick="handleNotifClick(${nt.id}, '${nt.link_url || ''}')">
