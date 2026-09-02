@@ -328,6 +328,31 @@ function tampilkanStruk(noId, tgl, wkt, total, metode, bayar, kembalian, items) 
 }
 
 /**
+ * Cetak Nota Belanja Pembeli (Thermal 58mm/80mm)
+ */
+function cetakNotaBelanja() {
+    document.body.classList.add('printing-nota');
+    document.body.classList.remove('printing-zreport');
+
+    const areaNota = document.getElementById('area-cetak-nota');
+    const areaZreport = document.getElementById('area-cetak-zreport');
+    if (areaZreport) {
+        areaZreport.classList.add('hidden');
+        areaZreport.style.display = 'none';
+    }
+    if (areaNota) {
+        areaNota.classList.remove('hidden');
+        areaNota.style.display = 'block';
+    }
+
+    window.print();
+
+    setTimeout(() => {
+        document.body.classList.remove('printing-nota');
+    }, 1500);
+}
+
+/**
  * Tutup Modal Struk Instan Tanpa Page Reload
  */
 function tutupModalStruk() {

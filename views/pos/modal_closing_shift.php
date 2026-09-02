@@ -759,13 +759,17 @@ async function simpanClosingShift() {
             if (json.status === 'success' && json.data) {
                 currentShiftData.shift_number = json.data.shift_number;
                 currentShiftData.shift_id = json.data.shift_id;
+                currentShiftData.shift_state = 'ALREADY_CLOSED';
                 
                 // Konfirmasi cetak struk thermal
                 if (confirm("Shift berhasil ditutup dan tersimpan resmi ke sistem!\n\nNomor Shift: " + json.data.shift_number + "\n\nApakah Anda ingin mencetak struk Z-Report sekarang?")) {
                     cetakZReportThermal();
                 }
                 tutupModal('modal-closing-shift');
-                window.location.reload();
+                // Segarkan status modal dan tombol navbar secara asinkron tanpa me-reload seluruh halaman
+                setTimeout(() => {
+                    bukaModalTutupShift();
+                }, 800);
             } else {
                 alert("Gagal menutup shift: " + (json.message || 'Terjadi kesalahan sistem.'));
             }
@@ -797,35 +801,55 @@ function mulaiShiftBaru() {
 }
 
 /**
- * Cetak struk thermal Z-Report (58mm/80mm) dengan unhide otomatis
+ * Cetak struk thermal Z-Report (58mm/80mm) dengan unhide otomatis & isolasi print
  */
 function cetakZReportThermal() {
     const area = document.getElementById('area-cetak-zreport');
     if (!area) return;
+
+    // Aktifkan mode isolasi print Z-Report (sembunyikan nota belanja)
+    document.body.classList.add('printing-zreport');
+    document.body.classList.remove('printing-nota');
+
+    const areaNota = document.getElementById('area-cetak-nota');
+    if (areaNota) {
+        areaNota.classList.add('hidden');
+        areaNota.style.display = 'none';
+    }
 
     // Pastikan data thermal terisi dengan format WIB
     const nowWib = new Date();
     const timeStrWib = nowWib.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
     const dateStrWib = nowWib.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
-    document.getElementById('zr-print-number').textContent = currentShiftData.shift_number || ('SFT-' + nowWib.toISOString().slice(0,10).replace(/-/g,'') + '-PRE');
+    // Fallback data lengkap agar tidak muncul tanda minus atau 0 jika belum ter-fetch
+    const kasirNamaVal = currentShiftData.kasir_nama || (document.getElementById('cs-kasir-nama') ? document.getElementById('cs-kasir-nama').textContent.trim() : '') || 'Kasir';
+    const posAktifVal = currentShiftData.pos_aktif || (document.getElementById('cs-pos-aktif') ? document.getElementById('cs-pos-aktif').textContent.trim() : '') || 'Kasir Utama';
+    const floatVal = currentShiftData.opening_cash || parseInt(document.getElementById('cs-input-float')?.value) || 100000;
+    const actualVal = currentShiftData.actual_cash || parseInt(document.getElementById('cs-input-actual')?.value) || floatVal;
+    const cashSales = (currentShiftData.cash_sales !== undefined && currentShiftData.cash_sales !== null) ? currentShiftData.cash_sales : 0;
+    const qrisSales = (currentShiftData.qris_sales !== undefined && currentShiftData.qris_sales !== null) ? currentShiftData.qris_sales : 0;
+    const totalSales = (currentShiftData.total_sales !== undefined && currentShiftData.total_sales !== null) ? currentShiftData.total_sales : (cashSales + qrisSales);
+    const txCount = currentShiftData.nota_count || (document.getElementById('cs-tx-count') ? parseInt(document.getElementById('cs-tx-count').textContent) : 0) || 0;
+    const notesVal = document.getElementById('cs-input-notes')?.value.trim() || currentShiftData.notes || 'Tidak ada catatan.';
+    const diff = actualVal - (floatVal + cashSales);
+
+    document.getElementById('zr-print-number').textContent = currentShiftData.shift_number || ('SFT-' + nowWib.toISOString().slice(0,10).replace(/-/g,'') + '-RESMI');
     document.getElementById('zr-print-date').textContent = dateStrWib + ' ' + timeStrWib + ' WIB';
-    document.getElementById('zr-print-kasir').textContent = currentShiftData.kasir_nama;
-    document.getElementById('zr-sign-kasir').textContent = `( ${currentShiftData.kasir_nama} )`;
-    document.getElementById('zr-print-pos').textContent = currentShiftData.pos_aktif;
+    document.getElementById('zr-print-kasir').textContent = kasirNamaVal;
+    document.getElementById('zr-sign-kasir').textContent = `( ${kasirNamaVal} )`;
+    document.getElementById('zr-print-pos').textContent = posAktifVal;
     document.getElementById('zr-print-open').textContent = (currentShiftData.opening_time ? currentShiftData.opening_time.split(' ')[1] : '08:00:00') + ' WIB';
     document.getElementById('zr-print-close').textContent = timeStrWib + ' WIB';
-    document.getElementById('zr-print-tx').textContent = currentShiftData.nota_count + ' Nota';
-    document.getElementById('zr-print-cash').textContent = formatRupiahJs(currentShiftData.cash_sales);
-    document.getElementById('zr-print-qris').textContent = formatRupiahJs(currentShiftData.qris_sales);
-    document.getElementById('zr-print-total').textContent = formatRupiahJs(currentShiftData.total_sales);
-    document.getElementById('zr-print-float').textContent = formatRupiahJs(currentShiftData.opening_cash);
-    document.getElementById('zr-print-cashin').textContent = formatRupiahJs(currentShiftData.cash_sales);
-    document.getElementById('zr-print-actual').textContent = formatRupiahJs(currentShiftData.actual_cash);
-    
-    const diff = currentShiftData.difference;
+    document.getElementById('zr-print-tx').textContent = txCount + ' Nota';
+    document.getElementById('zr-print-cash').textContent = formatRupiahJs(cashSales);
+    document.getElementById('zr-print-qris').textContent = formatRupiahJs(qrisSales);
+    document.getElementById('zr-print-total').textContent = formatRupiahJs(totalSales);
+    document.getElementById('zr-print-float').textContent = formatRupiahJs(floatVal);
+    document.getElementById('zr-print-cashin').textContent = formatRupiahJs(cashSales);
+    document.getElementById('zr-print-actual').textContent = formatRupiahJs(actualVal);
     document.getElementById('zr-print-diff').textContent = (diff === 0) ? 'Rp 0 (PAS)' : ((diff > 0 ? '+ ' : '- ') + formatRupiahJs(Math.abs(diff)));
-    document.getElementById('zr-print-notes').textContent = document.getElementById('cs-input-notes').value.trim() || 'Tidak ada catatan.';
+    document.getElementById('zr-print-notes').textContent = notesVal;
 
     // Buka tampilan cetak secara fisik agar terbaca printer thermal
     area.classList.remove('hidden');
@@ -836,8 +860,9 @@ function cetakZReportThermal() {
 
     // Sembunyikan kembali setelah proses cetak
     setTimeout(function() {
+        document.body.classList.remove('printing-zreport');
         area.classList.add('hidden');
         area.style.display = 'none';
-    }, 1200);
+    }, 1500);
 }
 </script>

@@ -96,11 +96,13 @@ if ($terminals_q) {
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         @media print {
             body * { visibility: hidden !important; }
-            #area-cetak-nota, #area-cetak-nota *,
-            #area-cetak-zreport, #area-cetak-zreport * { 
-                visibility: visible !important; 
+
+            /* 1. JIKA MENCETAK NOTA BELANJA PEMBELI */
+            body.printing-nota #area-cetak-nota,
+            body.printing-nota #area-cetak-nota * {
+                visibility: visible !important;
             }
-            #area-cetak-nota, #area-cetak-zreport {
+            body.printing-nota #area-cetak-nota {
                 display: block !important;
                 visibility: visible !important;
                 position: absolute !important;
@@ -115,6 +117,61 @@ if ($terminals_q) {
                 font-family: 'Courier New', Courier, monospace !important;
                 z-index: 9999999 !important;
             }
+            body.printing-nota #area-cetak-zreport {
+                display: none !important;
+                visibility: hidden !important;
+            }
+
+            /* 2. JIKA MENCETAK REKAPITULASI SHIFT (Z-REPORT) */
+            body.printing-zreport #area-cetak-zreport,
+            body.printing-zreport #area-cetak-zreport * {
+                visibility: visible !important;
+            }
+            body.printing-zreport #area-cetak-zreport {
+                display: block !important;
+                visibility: visible !important;
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 76mm !important;
+                max-width: 76mm !important;
+                margin: 0 auto !important;
+                padding: 4mm 6mm !important;
+                background: #ffffff !important;
+                color: #000000 !important;
+                font-family: 'Courier New', Courier, monospace !important;
+                z-index: 9999999 !important;
+            }
+            body.printing-zreport #area-cetak-nota {
+                display: none !important;
+                visibility: hidden !important;
+            }
+
+            /* 3. DEFAULT: TAMPILKAN NOTA BELANJA HANYA JIKA TIDAK ADA CLASS LAIN */
+            body:not(.printing-nota):not(.printing-zreport) #area-cetak-nota,
+            body:not(.printing-nota):not(.printing-zreport) #area-cetak-nota * {
+                visibility: visible !important;
+            }
+            body:not(.printing-nota):not(.printing-zreport) #area-cetak-nota {
+                display: block !important;
+                visibility: visible !important;
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 76mm !important;
+                max-width: 76mm !important;
+                margin: 0 auto !important;
+                padding: 4mm 6mm !important;
+                background: #ffffff !important;
+                color: #000000 !important;
+                font-family: 'Courier New', Courier, monospace !important;
+                z-index: 9999999 !important;
+            }
+            body:not(.printing-nota):not(.printing-zreport) #area-cetak-zreport {
+                display: none !important;
+                visibility: hidden !important;
+            }
+
             #area-cetak-nota img, #area-cetak-zreport img {
                 filter: grayscale(100%) contrast(200%);
                 max-height: 42px !important;

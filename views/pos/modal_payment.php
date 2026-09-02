@@ -111,7 +111,7 @@
         </div>
 
         <div class="flex gap-2 pt-2">
-            <button onclick="window.print()" class="flex-1 bg-slate-900 text-white font-bold py-3 rounded-xl text-xs hover:bg-slate-800 transition">
+            <button onclick="cetakNotaBelanja()" class="flex-1 bg-slate-900 text-white font-bold py-3 rounded-xl text-xs hover:bg-slate-800 transition cursor-pointer">
                 🖨️ Cetak
             </button>
             <button onclick="tutupModalStruk()" class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl text-xs hover:bg-blue-500 transition">
