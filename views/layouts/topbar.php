@@ -24,7 +24,19 @@ $currentPageTitle = $pageTitles[$page ?? 'analytics'] ?? 'Dashboard Admin';
 
 <!-- TOPBAR UTILITY HEADER -->
 <header id="admin-topbar" class="w-full bg-slate-950/80 backdrop-blur-xl border-b border-white/10 sticky top-0 z-20 px-4 md:px-8 py-2.5 transition-colors duration-300">
-    <div class="w-full flex items-center justify-end gap-3.5">
+    <div class="w-full flex items-center justify-between gap-3.5">
+        
+        <!-- Mobile Native App Header Brand (Khusus HP md:hidden) -->
+        <div class="flex md:hidden items-center gap-2.5 min-w-0">
+            <div class="h-8 px-1.5 bg-white rounded-xl flex items-center justify-center shadow-md border border-white/20 shrink-0">
+                <img src="assets/images/logo_twb.png" alt="Logo TWB" class="h-5 w-auto object-contain">
+            </div>
+            <div class="overflow-hidden">
+                <span class="text-xs font-black text-white truncate block"><?= $currentPageTitle ?></span>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2.5 md:gap-3.5 ml-auto">
         
         <!-- Badge Status Real-time Online -->
         <div class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px] font-bold">
@@ -128,7 +140,7 @@ $currentPageTitle = $pageTitles[$page ?? 'analytics'] ?? 'Dashboard Admin';
             </div>
         </div>
 
-        <!-- Avatar Profil Admin Khusus -->
+        <!-- Avatar Profil Admin Khusus & Tombol Cepat -->
         <div class="flex items-center gap-2 pl-2 border-l border-white/10">
             <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white font-black text-xs shadow-md border border-white/20 shrink-0">
                 AK
@@ -136,6 +148,16 @@ $currentPageTitle = $pageTitles[$page ?? 'analytics'] ?? 'Dashboard Admin';
             <div class="hidden sm:block text-left">
                 <span class="text-xs font-bold text-white block leading-tight">Admin Khusus</span>
                 <span class="text-[9px] text-blue-400 font-mono block">Superadmin TWB</span>
+            </div>
+
+            <!-- Tombol Cepat Kasir & Logout -->
+            <div class="flex items-center gap-1.5 ml-1">
+                <a href="index.php" class="p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl bg-blue-600/20 text-blue-400 hover:bg-blue-600 hover:text-white border border-blue-500/30 transition text-xs font-bold flex items-center gap-1" title="Buka Terminal Kasir POS">
+                    <span>🛒</span> <span class="hidden sm:inline text-[11px]">Kasir</span>
+                </a>
+                <a href="dashboard.php?action=logout" class="p-1.5 sm:p-2 rounded-xl bg-rose-500/10 text-rose-400 hover:bg-rose-500 hover:text-white border border-rose-500/20 transition text-xs font-bold flex items-center justify-center" title="Keluar / Logout">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                </a>
             </div>
         </div>
 

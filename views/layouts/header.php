@@ -2,9 +2,18 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>TWB Admin Khusus — Master Multi-Outlet & Vending Machine Borobudur</title>
     <link rel="icon" type="image/png" href="assets/images/logo_twb.png">
+
+    <!-- PWA Primary Tags & Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1e40af">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="TWB Admin">
+    <link rel="apple-touch-icon" href="assets/images/logo_twb.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -31,6 +40,8 @@
         html[data-theme="light"], html.light { color-scheme: light; }
         html[data-theme="light"] body, html.light body, body.light-theme { background-color: #f1f5f9 !important; color: #0f172a !important; }
         html[data-theme="light"] aside, html.light aside, html[data-theme="light"] header, html.light header { background-color: #ffffff !important; border-color: #e2e8f0 !important; color: #0f172a !important; }
+        html[data-theme="light"] #mobile-admin-bottom-nav, html.light #mobile-admin-bottom-nav { background-color: #ffffff !important; border-color: #e2e8f0 !important; }
+        html[data-theme="light"] #mobile-admin-bottom-nav a:not(.text-blue-400), html.light #mobile-admin-bottom-nav a:not(.text-blue-400) { color: #64748b !important; }
         html[data-theme="light"] .bg-slate-900, html.light .bg-slate-900, html[data-theme="light"] .bg-slate-950, html.light .bg-slate-950 { background-color: #ffffff !important; }
         html[data-theme="light"] .glass-card-dark, html.light .glass-card-dark { background: #ffffff !important; border: 1px solid #e2e8f0 !important; box-shadow: 0 4px 15px rgba(0,0,0,0.05) !important; color: #0f172a !important; }
         html[data-theme="light"] .text-white, html.light .text-white, html[data-theme="light"] .text-slate-100, html.light .text-slate-100 { color: #0f172a !important; }

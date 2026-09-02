@@ -494,12 +494,18 @@ function updateFloatingCartBar() {
 
 // 3. Gesture Sentuh / Touch Swipe untuk beralih layar layaknya App Native
 let touchStartX = 0;
+let touchStartY = 0;
 let touchEndX = 0;
+let touchEndY = 0;
+let isTouchingCartScroll = false;
 
 document.addEventListener('touchstart', e => {
     if (window.innerWidth >= 1024) return;
     if (e.changedTouches && e.changedTouches.length > 0) {
         touchStartX = e.changedTouches[0].screenX;
+        touchStartY = e.changedTouches[0].screenY;
+        // Cek apakah sentuhan dimulai dari area scroll keranjang atau grid produk
+        isTouchingCartScroll = !!e.target.closest('#cart-items-wrapper');
     }
 }, { passive: true });
 
@@ -507,19 +513,28 @@ document.addEventListener('touchend', e => {
     if (window.innerWidth >= 1024) return;
     if (e.changedTouches && e.changedTouches.length > 0) {
         touchEndX = e.changedTouches[0].screenX;
+        touchEndY = e.changedTouches[0].screenY;
         handleMobileSwipe();
     }
 }, { passive: true });
 
 function handleMobileSwipe() {
-    const swipeDistance = touchEndX - touchStartX;
-    // Ambang batas geser minimal 75px
-    if (Math.abs(swipeDistance) < 75) return;
+    const deltaX = touchEndX - touchStartX;
+    const deltaY = touchEndY - touchStartY;
 
-    if (swipeDistance < -75 && currentMobileTab === 'catalog') {
+    // Jika gerakan vertikal lebih dominan (scrolling atas/bawah), batalkan deteksi swap!
+    if (Math.abs(deltaY) > Math.abs(deltaX) * 0.75) return;
+
+    // Jika jari sedang berada di dalam daftar keranjang dan bergerak vertikal, jangan ganggu
+    if (isTouchingCartScroll && Math.abs(deltaY) > 20) return;
+
+    // Ambang batas geser horizontal minimal 80px
+    if (Math.abs(deltaX) < 80) return;
+
+    if (deltaX < -80 && currentMobileTab === 'catalog') {
         // Geser Kiri (Swipe Left) -> Beralih ke Keranjang
         switchMobileTab('cart');
-    } else if (swipeDistance > 75 && currentMobileTab === 'cart') {
+    } else if (deltaX > 80 && currentMobileTab === 'cart') {
         // Geser Kanan (Swipe Right) -> Beralih ke Katalog Menu
         switchMobileTab('catalog');
     }

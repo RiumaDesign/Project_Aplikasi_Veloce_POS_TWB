@@ -1,6 +1,6 @@
 <!-- Sidebar Keranjang Belanja (Mobile Cart View) -->
-<aside id="mobile-cart-view" class="w-full lg:w-96 bg-slate-900 border-l border-white/10 hidden lg:flex flex-col h-full shadow-2xl relative z-10 cart-sidebar-panel">
-    <div class="p-4 sm:p-5 border-b border-white/10 flex items-center justify-between cart-header-panel">
+<aside id="mobile-cart-view" class="w-full lg:w-96 bg-slate-900 border-l border-white/10 hidden lg:flex flex-col h-full shadow-2xl relative z-10 cart-sidebar-panel overflow-hidden">
+    <div class="p-4 sm:p-5 border-b border-white/10 flex items-center justify-between cart-header-panel shrink-0">
         <div class="flex items-center gap-2.5">
             <!-- Tombol Cepat Kembali ke Menu (Khusus Layar HP/Tablet lg:hidden) -->
             <button type="button" onclick="switchMobileTab('catalog')" class="lg:hidden px-2.5 py-1.5 -ml-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition text-xs font-bold flex items-center gap-1 cursor-pointer border border-white/10" title="Kembali ke Katalog Menu">
@@ -16,8 +16,8 @@
         </button>
     </div>
 
-    <!-- List Items in Cart -->
-    <div id="cart-items-wrapper" class="flex-1 p-5 overflow-y-auto min-h-0 custom-scroll divide-y divide-white/5">
+    <!-- List Items in Cart (Native Smooth Scrollable) -->
+    <div id="cart-items-wrapper" class="flex-1 p-5 overflow-y-auto min-h-0 custom-scroll divide-y divide-white/5 select-text" style="-webkit-overflow-scrolling: touch; touch-action: pan-y; overscroll-behavior: contain;">
         <div id="empty-cart-state" class="py-20 text-center text-slate-500">
             <span class="text-4xl block mb-2 opacity-50">🛒</span>
             <p class="text-xs font-semibold text-slate-400">Keranjang masih kosong</p>
@@ -26,7 +26,7 @@
     </div>
 
     <!-- Summary & Checkout Action -->
-    <div id="cart-checkout-box" class="p-5 border-t border-white/10 bg-slate-950/60 space-y-4 cart-checkout-panel pb-8 lg:pb-5">
+    <div id="cart-checkout-box" class="p-5 border-t border-white/10 bg-slate-950/60 space-y-4 cart-checkout-panel pb-8 lg:pb-5 shrink-0">
         <div class="space-y-2">
             <div class="flex justify-between text-xs text-slate-400">
                 <span class="font-medium text-slate-400 label-subtotal">Subtotal</span>
