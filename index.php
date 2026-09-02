@@ -575,7 +575,7 @@ if ($terminals_q) {
         }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 antialiased h-screen h-[100dvh] flex flex-col overflow-hidden select-none">
+<body class="bg-slate-950 text-slate-100 antialiased h-screen h-[100dvh] flex flex-col overflow-hidden">
     
     <!-- 1. Header / Navbar Kasir -->
     <?php require_once __DIR__ . '/views/pos/navbar.php'; ?>

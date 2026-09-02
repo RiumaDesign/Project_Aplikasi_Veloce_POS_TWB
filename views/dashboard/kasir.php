@@ -20,7 +20,8 @@ $kasirs = $conn->query("SELECT * FROM `kasir` ORDER BY `id` DESC");
 
     <!-- Tabel Petugas Kasir -->
     <div class="glass-card-dark rounded-3xl border border-white/5 overflow-hidden shadow-xl">
-        <table class="w-full text-left text-xs">
+        <div class="overflow-x-auto custom-scroll">
+            <table class="w-full text-left text-xs min-w-[500px]">
             <thead>
                 <tr class="bg-white/[0.03] text-slate-400 font-bold uppercase tracking-wider border-b border-white/5">
                     <th class="p-4">ID</th>
@@ -61,6 +62,7 @@ $kasirs = $conn->query("SELECT * FROM `kasir` ORDER BY `id` DESC");
                 <?php endwhile; ?>
             </tbody>
         </table>
+        </div>
     </div>
 
     <!-- ========================================================================= -->

@@ -53,8 +53,8 @@ $outlets = $conn->query("SELECT * FROM `locations` WHERE `type` IN ('outlet', 'v
         <div class="p-5 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
             <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">Daftar Titik Penjualan & Terminal</h3>
         </div>
-        <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs">
+        <div class="overflow-x-auto custom-scroll">
+            <table class="w-full text-left text-xs min-w-[550px]">
                 <thead>
                     <tr class="bg-white/[0.03] text-slate-400 font-bold uppercase tracking-wider border-b border-white/5">
                         <th class="p-4">Kode</th>

@@ -513,8 +513,8 @@ $export_params = http_build_query([
         </div>
 
         <!-- TABEL DATA MUTASI STOK -->
-        <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs">
+        <div class="overflow-x-auto custom-scroll">
+            <table class="w-full text-left text-xs min-w-[750px]">
                 <thead>
                     <tr class="bg-white/[0.03] text-slate-400 font-bold uppercase tracking-wider border-b border-white/5">
                         <th class="p-4 w-12 text-center">No</th>

@@ -1,6 +1,6 @@
 <!-- Modal Pembayaran & Cetak Struk -->
 <div id="modal-bayar" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden items-center justify-center p-4">
-    <div class="glass-card-dark rounded-3xl p-6 w-full max-w-md border border-white/10 text-white shadow-2xl space-y-4">
+    <div class="glass-card-dark rounded-3xl p-5 sm:p-6 w-full max-w-md max-h-[92dvh] overflow-y-auto custom-scroll border border-white/10 text-white shadow-2xl space-y-4">
         <div class="flex justify-between items-center pb-3 border-b border-white/10">
             <h3 class="text-base font-bold text-white">💳 Pembayaran Pesanan</h3>
             <button onclick="tutupModal('modal-bayar')" class="text-slate-400 hover:text-white">✕</button>
@@ -50,22 +50,27 @@
                     100k
                 </button>
             </div>
-
-            <div class="flex justify-between items-center text-xs pt-1 text-slate-400 font-medium">
-                <span class="font-bold">Kembalian:</span>
-                <span id="kembalian-display" class="font-mono font-black text-sm text-emerald-400">Rp 0</span>
-            </div>
         </div>
 
-        <button id="btn-proses-transaksi" onclick="prosesSimpanTransaksi()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 rounded-2xl text-sm transition shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2">
-            <span>Selesaikan & Cetak Nota</span> <span>✓</span>
-        </button>
+        <div id="display-kembalian-wrapper" class="bg-slate-950/60 border border-white/5 p-4 rounded-2xl flex items-center justify-between">
+            <span class="text-xs font-bold text-slate-400">Uang Kembalian</span>
+            <span id="modal-kembalian-display" class="text-xl font-black text-emerald-400">Rp 0</span>
+        </div>
+
+        <div class="pt-2 flex gap-3">
+            <button type="button" onclick="tutupModal('modal-bayar')" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3.5 rounded-xl text-xs transition cursor-pointer">
+                Batal
+            </button>
+            <button type="button" id="btn-proses-transaksi" onclick="selesaikanTransaksi()" class="flex-[2] bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 rounded-xl text-xs transition shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 cursor-pointer">
+                <span>✓ Selesaikan & Cetak</span>
+            </button>
+        </div>
     </div>
 </div>
 
 <!-- Modal Struk / Cetak Nota -->
 <div id="modal-struk" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden items-center justify-center p-4">
-    <div class="bg-white text-slate-900 rounded-3xl p-6 w-full max-w-sm shadow-2xl space-y-4">
+    <div class="bg-white text-slate-900 rounded-3xl p-5 sm:p-6 w-full max-w-sm max-h-[92dvh] overflow-y-auto custom-scroll shadow-2xl space-y-4">
         <div id="area-cetak-nota" class="font-mono text-xs text-slate-800 space-y-3 p-1">
             <div class="text-center pb-3 border-b border-dashed border-slate-400">
                 <img src="assets/images/logo_twb.png" alt="Logo TWB" class="h-11 mx-auto mb-1.5 object-contain filter contrast-125">

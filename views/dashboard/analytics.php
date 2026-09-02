@@ -376,9 +376,9 @@ foreach ($produk_sales_map as $p) {
             </div>
         </div>
 
-        <!-- Tabel Transaksi Lengkap -->
-        <div class="overflow-y-auto flex-1 rounded-2xl border border-white/5 bg-slate-950/40 custom-scroll">
-            <table class="w-full text-left text-xs">
+        <!-- Tabel Transaksi Lengkap (Scrollable Horisontal di Mobile) -->
+        <div class="overflow-x-auto overflow-y-auto flex-1 rounded-2xl border border-white/5 bg-slate-950/40 custom-scroll">
+            <table class="w-full text-left text-xs min-w-[700px]">
                 <thead class="sticky top-0 bg-slate-900/90 backdrop-blur border-b border-white/10 text-slate-400 uppercase text-[10px] font-bold">
                     <tr>
                         <th class="p-3 text-center w-12">No</th>
@@ -467,11 +467,11 @@ foreach ($produk_sales_map as $p) {
             </div>
             <button onclick="tutupModal('modal-audit-export')" class="text-slate-400 hover:text-white text-lg">✕</button>
         </div>
-        <div class="overflow-y-auto flex-1 divide-y divide-white/5 pr-1">
+        <div class="overflow-x-auto overflow-y-auto flex-1 divide-y divide-white/5 pr-1 custom-scroll">
             <?php if (!$export_logs_res || $export_logs_res->num_rows === 0): ?>
                 <div class="p-8 text-center text-slate-400 text-xs">Belum ada aktivitas ekspor yang tercatat di sistem.</div>
             <?php else: ?>
-                <table class="w-full text-left text-xs">
+                <table class="w-full text-left text-xs min-w-[650px]">
                     <thead>
                         <tr class="text-[10px] uppercase tracking-wider text-slate-400 border-b border-white/10">
                             <th class="py-2.5 px-3">Waktu</th>

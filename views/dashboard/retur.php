@@ -73,8 +73,8 @@ $returns_res = $conn->query("
         <div class="p-5 border-b border-white/5 bg-white/[0.02] flex justify-between items-center">
             <h3 class="font-bold text-xs uppercase tracking-wider text-slate-300">📋 Log Riwayat Retur & Barang Rusak</h3>
         </div>
-        <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs">
+        <div class="overflow-x-auto custom-scroll">
+            <table class="w-full text-left text-xs min-w-[650px]">
                 <thead>
                     <tr class="bg-white/[0.03] text-slate-400 font-bold uppercase tracking-wider border-b border-white/5">
                         <th class="p-4">No. Retur</th>

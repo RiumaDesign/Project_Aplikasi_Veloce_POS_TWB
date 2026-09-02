@@ -1,6 +1,6 @@
 <!-- Modal Ganti Terminal POS -->
 <div id="modal-ganti-terminal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden items-center justify-center p-4">
-    <div class="glass-card-dark rounded-3xl p-6 w-full max-w-md border border-white/10 text-white shadow-2xl animate-fade-in">
+    <div class="glass-card-dark rounded-3xl p-5 sm:p-6 w-full max-w-md max-h-[92dvh] overflow-y-auto custom-scroll border border-white/10 text-white shadow-2xl animate-fade-in">
         <div class="flex justify-between items-center pb-4 border-b border-white/10 mb-5">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 border border-blue-500/30 flex items-center justify-center text-lg font-bold">🔄</div>
