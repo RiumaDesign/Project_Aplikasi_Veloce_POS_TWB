@@ -50,15 +50,15 @@
         <div id="tab-banner-kasir" class="mt-2.5 p-2.5 rounded-xl flex items-center gap-2.5 text-xs font-bold transition-all" style="background-color: #eff6ff; border: 1.5px solid #93c5fd; color: #1e40af;">
             <span class="text-base">🛒</span>
             <div>
-                <span class="block">Mode Kasir Operasional (POS)</span>
-                <span class="text-[10px] font-medium text-blue-600 block">Pilih nama profil Anda di bawah dan masukkan kata sandi</span>
+                <span class="block">Panel Khusus Kasir POS</span>
+                <span class="text-[10px] font-medium text-blue-600 block">Pilih nama Anda di bawah dan masukkan kata sandi</span>
             </div>
         </div>
         <div id="tab-banner-admin" class="hidden mt-2.5 p-2.5 rounded-xl flex items-center gap-2.5 text-xs font-bold transition-all" style="background-color: #eef2ff; border: 1.5px solid #c7d2fe; color: #3730a3;">
             <span class="text-base">🛡️</span>
             <div>
-                <span class="block">Mode Administrator & Manajemen</span>
-                <span class="text-[10px] font-medium text-indigo-600 block">Akses khusus manajer, keuangan, dan rekapitulasi seluruh outlet</span>
+                <span class="block">Panel Khusus Administrator</span>
+                <span class="text-[10px] font-medium text-indigo-600 block">Akses panel kendali, kelola data master & laporan multi-outlet</span>
             </div>
         </div>
     </div>
