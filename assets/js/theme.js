@@ -43,6 +43,7 @@
         }
 
         updateThemeUI(theme);
+        window.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme: theme } }));
     };
 
     // 3. Fungsi Toggle Global

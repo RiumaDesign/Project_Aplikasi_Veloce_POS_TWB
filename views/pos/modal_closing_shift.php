@@ -98,7 +98,7 @@
                     <div>
                         <label class="block text-xs font-semibold text-amber-400 mb-1.5 flex items-center justify-between">
                             <span>Uang Fisik Dihitung di Laci:</span>
-                            <span class="text-[10px] text-slate-400 cursor-pointer hover:underline" onclick="samakanUangFisik()">[Isi Sesuai Target]</span>
+                            <span class="text-[10px] text-slate-400 cursor-pointer hover:underline" onclick="samakanUangFisik()">[Hitung Pas]</span>
                         </label>
                         <div class="relative">
                             <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-500">Rp</span>
@@ -109,15 +109,14 @@
                     </div>
                 </div>
 
-                <!-- Kartu Hasil Rekonsiliasi (Expected vs Actual vs Difference) -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-white/5">
-                    <div class="flex items-center justify-between p-3 rounded-xl bg-slate-900 border border-white/5">
-                        <span class="text-xs text-slate-400">Target Kas Diharapkan:</span>
-                        <span id="cs-expected-cash" class="text-sm font-bold text-white">Rp 100.000</span>
-                    </div>
-                    <div id="cs-diff-card" class="flex items-center justify-between p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
-                        <span class="text-xs font-bold">Status Selisih:</span>
-                        <span id="cs-difference-badge" class="text-sm font-black">Rp 0 (Pas)</span>
+                <!-- Kartu Hasil Rekonsiliasi Selisih Fisik Kas Laci -->
+                <div class="pt-2 border-t border-white/5">
+                    <div id="cs-diff-card" class="flex items-center justify-between p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 transition-all duration-300">
+                        <div class="flex items-center gap-2">
+                            <span class="text-base">⚖️</span>
+                            <span class="text-xs font-bold uppercase tracking-wider">Status Selisih Kas:</span>
+                        </div>
+                        <span id="cs-difference-badge" class="text-sm font-black">Rp 0 (Pas / Seimbang)</span>
                     </div>
                 </div>
 
@@ -181,7 +180,6 @@
     <table style="width: 100%; font-size: 10px; line-height: 1.4;">
         <tr><td>Modal Awal (Float):</td><td style="text-align: right;" id="zr-print-float">Rp 0</td></tr>
         <tr><td>Kas Masuk (Tunai):</td><td style="text-align: right;" id="zr-print-cashin">Rp 0</td></tr>
-        <tr style="border-top: 1px solid #000;"><td>Target Uang Tunai:</td><td style="text-align: right; font-weight: bold;" id="zr-print-expected">Rp 0</td></tr>
         <tr><td style="font-weight: bold;">Uang Fisik di Laci:</td><td style="text-align: right; font-weight: bold;" id="zr-print-actual">Rp 0</td></tr>
         <tr style="border-top: 1px dashed #000; font-weight: bold;">
             <td>SELISIH KAS:</td>
@@ -277,7 +275,8 @@ function hitungSelisihKas() {
     const diff = actualVal - expected;
     currentShiftData.difference = diff;
 
-    document.getElementById('cs-expected-cash').textContent = formatRupiahJs(expected);
+    const expEl = document.getElementById('cs-expected-cash');
+    if (expEl) expEl.textContent = formatRupiahJs(expected);
 
     const badge = document.getElementById('cs-difference-badge');
     const card = document.getElementById('cs-diff-card');

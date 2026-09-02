@@ -296,6 +296,136 @@
             background-color: #f8fafc !important;
             border-top-color: #e2e8f0 !important;
         }
+
+        /* ========================================================================= */
+        /* STYLING TEMA TERANG PREMIUM, EYE-CATCHING & HIGH CONTRAST                 */
+        /* ========================================================================= */
+        html[data-theme="light"], html.light {
+            color-scheme: light;
+        }
+
+        /* 1. Latar Belakang & Kartu Utama */
+        html[data-theme="light"] body, html.light body {
+            background-color: #f8fafc !important;
+            color: #1e293b !important;
+        }
+
+        html[data-theme="light"] .glass-card-dark, html.light .glass-card-dark {
+            background-color: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.02) !important;
+            color: #0f172a !important;
+        }
+
+        /* 2. Legend Strip Grafik & Bilah Penjualan Produk */
+        html[data-theme="light"] .chart-legend-strip, html.light .chart-legend-strip,
+        html[data-theme="light"] .bg-slate-950\/40, html.light .bg-slate-950\/40 {
+            background-color: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            color: #334155 !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03) !important;
+        }
+
+        /* 3. Dropdown Menu & Popover */
+        html[data-theme="light"] .bg-slate-950, html.light .bg-slate-950 {
+            background-color: #ffffff !important;
+            border-color: #e2e8f0 !important;
+            color: #0f172a !important;
+        }
+
+        html[data-theme="light"] .bg-slate-900, html.light .bg-slate-900 {
+            background-color: #f8fafc !important;
+            border-color: #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+
+        /* 4. Modal Universal (Modal Closing Shift, Detail Transaksi, Audit Export) */
+        html[data-theme="light"] #modal-closing-shift > div,
+        html.light #modal-closing-shift > div,
+        html[data-theme="light"] #modal-detail-transaksi > div,
+        html.light #modal-detail-transaksi > div,
+        html[data-theme="light"] #modal-audit-export > div,
+        html.light #modal-audit-export > div {
+            background-color: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.25) !important;
+            color: #0f172a !important;
+        }
+
+        html[data-theme="light"] #modal-closing-shift .bg-slate-950\/60,
+        html.light #modal-closing-shift .bg-slate-950\/60,
+        html[data-theme="light"] #modal-detail-transaksi .bg-slate-950\/60,
+        html.light #modal-detail-transaksi .bg-slate-950\/60 {
+            background-color: #f8fafc !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+            color: #0f172a !important;
+        }
+
+        html[data-theme="light"] #modal-closing-shift .bg-slate-950\/50,
+        html.light #modal-closing-shift .bg-slate-950\/50,
+        html[data-theme="light"] #modal-closing-shift .bg-slate-950\/70,
+        html.light #modal-closing-shift .bg-slate-950\/70 {
+            background-color: #f1f5f9 !important;
+            border: 1px solid #e2e8f0 !important;
+            color: #1e293b !important;
+        }
+
+        html[data-theme="light"] #modal-closing-shift .bg-slate-800\/40,
+        html.light #modal-closing-shift .bg-slate-800\/40 {
+            background-color: #f8fafc !important;
+            border: 1px solid #e2e8f0 !important;
+            color: #0f172a !important;
+        }
+
+        html[data-theme="light"] #modal-closing-shift .bg-slate-950\/80,
+        html.light #modal-closing-shift .bg-slate-950\/80,
+        html[data-theme="light"] #modal-detail-transaksi .bg-slate-950\/80,
+        html.light #modal-detail-transaksi .bg-slate-950\/80 {
+            background-color: #f8fafc !important;
+            border-top: 1px solid #e2e8f0 !important;
+        }
+
+        /* 5. Input Field & Textarea di Modal dan Form */
+        html[data-theme="light"] #modal-closing-shift input,
+        html.light #modal-closing-shift input,
+        html[data-theme="light"] #modal-closing-shift textarea,
+        html.light #modal-closing-shift textarea {
+            background-color: #ffffff !important;
+            border: 1.5px solid #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+
+        html[data-theme="light"] #modal-closing-shift input:focus,
+        html.light #modal-closing-shift input:focus,
+        html[data-theme="light"] #modal-closing-shift textarea:focus,
+        html.light #modal-closing-shift textarea:focus {
+            border-color: #2563eb !important;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
+        }
+
+        /* 6. Teks & Label Kontras Tinggi di Tema Terang */
+        html[data-theme="light"] .text-white, html.light .text-white {
+            color: #0f172a !important;
+        }
+        html[data-theme="light"] .bg-blue-600, html.light .bg-blue-600,
+        html[data-theme="light"] .bg-blue-600 .text-white, html.light .bg-blue-600 .text-white,
+        html[data-theme="light"] .bg-emerald-600, html.light .bg-emerald-600,
+        html[data-theme="light"] .bg-emerald-600 .text-white, html.light .bg-emerald-600 .text-white,
+        html[data-theme="light"] .bg-rose-600, html.light .bg-rose-600,
+        html[data-theme="light"] .bg-rose-600 .text-white, html.light .bg-rose-600 .text-white,
+        html[data-theme="light"] button.bg-blue-600, html.light button.bg-blue-600,
+        html[data-theme="light"] a.bg-blue-600, html.light a.bg-blue-600 {
+            color: #ffffff !important;
+        }
+        html[data-theme="light"] .text-slate-400, html.light .text-slate-400 {
+            color: #475569 !important;
+        }
+        html[data-theme="light"] .text-slate-300, html.light .text-slate-300 {
+            color: #334155 !important;
+        }
+        html[data-theme="light"] .text-slate-500, html.light .text-slate-500 {
+            color: #64748b !important;
+        }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-100 antialiased min-h-screen flex">

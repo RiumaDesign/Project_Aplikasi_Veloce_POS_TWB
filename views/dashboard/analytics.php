@@ -9,7 +9,17 @@ $end_date = $_GET['end_date'] ?? '';
 $where_clause = "";
 if (!empty($start_date) && !empty($end_date)) {
     $where_clause = " WHERE tanggal BETWEEN '$start_date' AND '$end_date' ";
+} elseif (!empty($start_date)) {
+    $where_clause = " WHERE tanggal >= '$start_date' ";
+} elseif (!empty($end_date)) {
+    $where_clause = " WHERE tanggal <= '$end_date' ";
 }
+
+// 0. Query Log Riwayat Aktivitas Ekspor Dokumen
+$export_logs_res = null;
+try {
+    $export_logs_res = $conn->query("SELECT * FROM `export_logs` ORDER BY id DESC LIMIT 25");
+} catch (Exception $e) {}
 
 // 1. Data Referensi Seluruh Lokasi Outlet & Vending Machine
 $locations_ref = [];
@@ -270,18 +280,18 @@ foreach ($produk_sales_map as $p) {
             </div>
         </div>
 
-        <!-- Indikator Legend & Stat Ringkas -->
-        <div class="flex flex-wrap items-center justify-between gap-3 p-3 rounded-2xl bg-slate-950/40 border border-white/5 mb-4 text-xs">
+        <!-- Indikator Legend & Stat Ringkas (Adaptif Tema Terang & Gelap) -->
+        <div class="chart-legend-strip flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl mb-4 text-xs transition-colors duration-200">
             <div class="flex items-center gap-5">
-                <span class="flex items-center gap-1.5 font-bold text-blue-400">
+                <span class="flex items-center gap-2 font-bold text-blue-500">
                     <span class="w-3.5 h-3.5 rounded-md bg-blue-500 inline-block shadow-sm"></span> Volume Terjual (Pcs)
                 </span>
-                <span class="flex items-center gap-1.5 font-bold text-emerald-400">
+                <span class="flex items-center gap-2 font-bold text-emerald-500">
                     <span class="w-3.5 h-3.5 rounded-md bg-emerald-500 inline-block shadow-sm"></span> Nilai Omzet (Rp)
                 </span>
             </div>
-            <div class="text-[11px] text-slate-400">
-                Total Produk Terdaftar: <strong class="text-white"><?= count($produk_sales_map) ?> Item</strong> • Total Volume: <strong class="text-blue-400 font-bold"><?= number_format(array_sum($chart_penjualan_qty)) ?> pcs</strong> • Total Omzet: <strong class="text-emerald-400 font-bold">Rp <?= number_format($total_omset, 0, ',', '.') ?></strong>
+            <div class="text-[11px] text-slate-400 font-medium">
+                Total Produk Terdaftar: <strong class="text-slate-800 dark:text-white font-bold"><?= count($produk_sales_map) ?> Item</strong> • Total Volume: <strong class="text-blue-500 font-bold"><?= number_format(array_sum($chart_penjualan_qty)) ?> pcs</strong> • Total Omzet: <strong class="text-emerald-500 font-bold">Rp <?= number_format($total_omset, 0, ',', '.') ?></strong>
             </div>
         </div>
 
@@ -500,13 +510,30 @@ foreach ($produk_sales_map as $p) {
     </div>
 </div>
 
-<!-- Inisialisasi Chart.js -->
+<!-- Inisialisasi Chart.js Dinamis dengan Deteksi & Live Switch Tema Terang/Gelap -->
 <script>
+function getTwbThemeConfig() {
+    const isLight = document.documentElement.getAttribute('data-theme') === 'light' || document.documentElement.classList.contains('light');
+    return {
+        isLight: isLight,
+        textX: isLight ? '#0f172a' : '#e2e8f0',
+        textY: isLight ? '#334155' : '#94a3b8',
+        legendText: isLight ? '#0f172a' : '#cbd5e1',
+        gridColor: isLight ? 'rgba(0, 0, 0, 0.07)' : 'rgba(255, 255, 255, 0.06)',
+        tooltipBg: isLight ? '#ffffff' : '#0f172a',
+        tooltipTitle: isLight ? '#0f172a' : '#ffffff',
+        tooltipBody: isLight ? '#334155' : '#cbd5e1',
+        tooltipBorder: isLight ? '#cbd5e1' : 'rgba(255, 255, 255, 0.15)'
+    };
+}
+
 document.addEventListener("DOMContentLoaded", function() {
+    const tc = getTwbThemeConfig();
+
     // 1. Chart Penjualan Produk Seluruh Outlet & Vending Machine
     const ctxPenjualan = document.getElementById('chartPenjualanProduk');
     if (ctxPenjualan) {
-        new Chart(ctxPenjualan, {
+        window.twbChartPenjualan = new Chart(ctxPenjualan, {
             type: 'bar',
             data: {
                 labels: <?= json_encode($chart_penjualan_labels) ?>,
@@ -515,17 +542,17 @@ document.addEventListener("DOMContentLoaded", function() {
                         label: 'Volume Terjual (Pcs)',
                         data: <?= json_encode($chart_penjualan_qty) ?>,
                         backgroundColor: 'rgba(59, 130, 246, 0.85)',
-                        borderColor: '#3b82f6',
-                        borderWidth: 1,
+                        borderColor: '#2563eb',
+                        borderWidth: 1.5,
                         borderRadius: 8,
                         yAxisID: 'y'
                     },
                     {
                         label: 'Nilai Omzet (Rp)',
                         data: <?= json_encode($chart_penjualan_omset) ?>,
-                        backgroundColor: 'rgba(16, 185, 129, 0.75)',
-                        borderColor: '#10b981',
-                        borderWidth: 1,
+                        backgroundColor: 'rgba(16, 185, 129, 0.85)',
+                        borderColor: '#059669',
+                        borderWidth: 1.5,
                         borderRadius: 8,
                         yAxisID: 'y1'
                     }
@@ -543,10 +570,10 @@ document.addEventListener("DOMContentLoaded", function() {
                         display: false
                     },
                     tooltip: {
-                        backgroundColor: '#0f172a',
-                        titleColor: '#fff',
-                        bodyColor: '#cbd5e1',
-                        borderColor: 'rgba(255, 255, 255, 0.15)',
+                        backgroundColor: tc.tooltipBg,
+                        titleColor: tc.tooltipTitle,
+                        bodyColor: tc.tooltipBody,
+                        borderColor: tc.tooltipBorder,
                         borderWidth: 1,
                         padding: 12,
                         callbacks: {
@@ -564,7 +591,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     x: {
                         grid: { display: false },
                         ticks: {
-                            color: '#e2e8f0',
+                            color: tc.textX,
                             font: { size: 11, weight: 'bold' }
                         }
                     },
@@ -575,13 +602,13 @@ document.addEventListener("DOMContentLoaded", function() {
                         title: {
                             display: true,
                             text: 'Volume Terjual (Pcs)',
-                            color: '#60a5fa',
+                            color: '#2563eb',
                             font: { size: 10, weight: 'bold' }
                         },
-                        grid: { color: 'rgba(255, 255, 255, 0.06)' },
+                        grid: { color: tc.gridColor },
                         ticks: {
-                            color: '#94a3b8',
-                            font: { size: 10 },
+                            color: tc.textY,
+                            font: { size: 10, weight: 'bold' },
                             precision: 0
                         }
                     },
@@ -592,13 +619,13 @@ document.addEventListener("DOMContentLoaded", function() {
                         title: {
                             display: true,
                             text: 'Nilai Omzet (Rp)',
-                            color: '#34d399',
+                            color: '#059669',
                             font: { size: 10, weight: 'bold' }
                         },
                         grid: { drawOnChartArea: false },
                         ticks: {
-                            color: '#94a3b8',
-                            font: { size: 10 },
+                            color: tc.textY,
+                            font: { size: 10, weight: 'bold' },
                             callback: function(val) {
                                 return 'Rp ' + (val >= 1000 ? (val/1000) + 'k' : val);
                             }
@@ -612,7 +639,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // 2. Chart Omset Penjualan per Seluruh Outlet / Vending Machine
     const ctxOutlet = document.getElementById('chartOutlet');
     if (ctxOutlet) {
-        new Chart(ctxOutlet, {
+        window.twbChartOutlet = new Chart(ctxOutlet, {
             type: 'doughnut',
             data: {
                 labels: <?= json_encode($labels_outlet_js) ?>,
@@ -634,7 +661,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     legend: {
                         position: 'bottom',
                         labels: {
-                            color: '#cbd5e1',
+                            color: tc.legendText,
                             font: { size: 11, weight: 'bold' },
                             padding: 12,
                             usePointStyle: true,
@@ -657,7 +684,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // 3. Chart Produk Terlaris
     const ctxProduk = document.getElementById('chartProduk');
     if (ctxProduk) {
-        new Chart(ctxProduk, {
+        window.twbChartProduk = new Chart(ctxProduk, {
             type: 'bar',
             data: {
                 labels: <?= json_encode(array_slice(array_keys($produk_terjual), 0, 5)) ?>,
@@ -674,12 +701,38 @@ document.addEventListener("DOMContentLoaded", function() {
                 maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
                 scales: {
-                    x: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8' } },
-                    y: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 11 } } }
+                    x: { grid: { color: tc.gridColor }, ticks: { color: tc.textY, font: { weight: 'bold' } } },
+                    y: { grid: { display: false }, ticks: { color: tc.textX, font: { size: 11, weight: 'bold' } } }
                 }
             }
         });
     }
+
+    // 4. Listener Live Theme Changed (Update warna chart seketika)
+    window.addEventListener('themeChanged', function() {
+        const c = getTwbThemeConfig();
+        if (window.twbChartPenjualan) {
+            window.twbChartPenjualan.options.scales.x.ticks.color = c.textX;
+            window.twbChartPenjualan.options.scales.y.ticks.color = c.textY;
+            window.twbChartPenjualan.options.scales.y.grid.color = c.gridColor;
+            window.twbChartPenjualan.options.scales.y1.ticks.color = c.textY;
+            window.twbChartPenjualan.options.plugins.tooltip.backgroundColor = c.tooltipBg;
+            window.twbChartPenjualan.options.plugins.tooltip.titleColor = c.tooltipTitle;
+            window.twbChartPenjualan.options.plugins.tooltip.bodyColor = c.tooltipBody;
+            window.twbChartPenjualan.options.plugins.tooltip.borderColor = c.tooltipBorder;
+            window.twbChartPenjualan.update();
+        }
+        if (window.twbChartOutlet) {
+            window.twbChartOutlet.options.plugins.legend.labels.color = c.legendText;
+            window.twbChartOutlet.update();
+        }
+        if (window.twbChartProduk) {
+            window.twbChartProduk.options.scales.x.ticks.color = c.textY;
+            window.twbChartProduk.options.scales.x.grid.color = c.gridColor;
+            window.twbChartProduk.options.scales.y.ticks.color = c.textX;
+            window.twbChartProduk.update();
+        }
+    });
 });
 
 let currentModalPeriod = 'all';

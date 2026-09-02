@@ -81,6 +81,12 @@ class ExportController {
             $s = $this->conn->real_escape_string($startDate);
             $e = $this->conn->real_escape_string($endDate);
             $conditions[] = "t.tanggal BETWEEN '$s' AND '$e'";
+        } elseif (!empty($startDate)) {
+            $s = $this->conn->real_escape_string($startDate);
+            $conditions[] = "t.tanggal >= '$s'";
+        } elseif (!empty($endDate)) {
+            $e = $this->conn->real_escape_string($endDate);
+            $conditions[] = "t.tanggal <= '$e'";
         }
         if ($outletId > 0) {
             $conditions[] = "t.outlet_id = $outletId";
