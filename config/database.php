@@ -4,12 +4,12 @@
  * Mendukung Lingkungan Lokal (XAMPP) & Cloud Deployment (Vercel, Railway, cPanel)
  */
 
-// Membaca kredensial dari Environment Variables jika tersedia (Cloud Deployment), atau fallback ke default lokal XAMPP
-$db_host = getenv('DB_HOST') ?: (isset($_SERVER['DB_HOST']) ? $_SERVER['DB_HOST'] : "localhost");
-$db_user = getenv('DB_USER') ?: (isset($_SERVER['DB_USER']) ? $_SERVER['DB_USER'] : "root");
-$db_pass = getenv('DB_PASS') !== false ? getenv('DB_PASS') : (getenv('DB_PASSWORD') !== false ? getenv('DB_PASSWORD') : (isset($_SERVER['DB_PASS']) ? $_SERVER['DB_PASS'] : ""));
-$db_name = getenv('DB_NAME') ?: (isset($_SERVER['DB_NAME']) ? $_SERVER['DB_NAME'] : "veloce_pos");
-$db_port = intval(getenv('DB_PORT') ?: (isset($_SERVER['DB_PORT']) ? $_SERVER['DB_PORT'] : 3306));
+// Membaca kredensial dari Environment Variables (Mendukung Vercel, Railway MYSQLHOST, dsb) atau fallback ke lokal XAMPP
+$db_host = getenv('DB_HOST') ?: (getenv('MYSQLHOST') ?: (isset($_SERVER['DB_HOST']) ? $_SERVER['DB_HOST'] : (isset($_SERVER['MYSQLHOST']) ? $_SERVER['MYSQLHOST'] : "localhost")));
+$db_user = getenv('DB_USER') ?: (getenv('MYSQLUSER') ?: (isset($_SERVER['DB_USER']) ? $_SERVER['DB_USER'] : (isset($_SERVER['MYSQLUSER']) ? $_SERVER['MYSQLUSER'] : "root")));
+$db_pass = getenv('DB_PASS') !== false ? getenv('DB_PASS') : (getenv('DB_PASSWORD') !== false ? getenv('DB_PASSWORD') : (getenv('MYSQLPASSWORD') !== false ? getenv('MYSQLPASSWORD') : (isset($_SERVER['DB_PASS']) ? $_SERVER['DB_PASS'] : (isset($_SERVER['MYSQLPASSWORD']) ? $_SERVER['MYSQLPASSWORD'] : ""))));
+$db_name = getenv('DB_NAME') ?: (getenv('MYSQLDATABASE') ?: (isset($_SERVER['DB_NAME']) ? $_SERVER['DB_NAME'] : (isset($_SERVER['MYSQLDATABASE']) ? $_SERVER['MYSQLDATABASE'] : "veloce_pos")));
+$db_port = intval(getenv('DB_PORT') ?: (getenv('MYSQLPORT') ?: (isset($_SERVER['DB_PORT']) ? $_SERVER['DB_PORT'] : (isset($_SERVER['MYSQLPORT']) ? $_SERVER['MYSQLPORT'] : 3306))));
 
 // Inisialisasi koneksi MySQLi dengan port pendukung
 mysqli_report(MYSQLI_REPORT_OFF);
@@ -98,5 +98,18 @@ date_default_timezone_set('Asia/Jakarta');
 // Set karakter encoding ke utf8mb4 dan zona waktu MySQL
 $conn->set_charset("utf8mb4");
 @$conn->query("SET time_zone = '+07:00'");
+
+// Otomatis inisialisasi skema jika database di cloud masih kosong (First Run Seeding)
+if ($conn && !$conn->connect_error) {
+    $check_tables = @$conn->query("SHOW TABLES LIKE 'produk'");
+    if ($check_tables && $check_tables->num_rows === 0) {
+        $sql_file = __DIR__ . '/../database/veloce_pos_latest.sql';
+        if (file_exists($sql_file)) {
+            $sql_content = file_get_contents($sql_file);
+            @$conn->multi_query($sql_content);
+            while (@$conn->next_result()) {;} // flush
+        }
+    }
+}
 
 
